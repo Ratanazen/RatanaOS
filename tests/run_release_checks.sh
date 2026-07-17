@@ -169,6 +169,14 @@ APPS_NOTE="No application smoke tests or application source files were found."
 if find "${ROOT_DIR}/apps" -type f 2>/dev/null | grep -q .; then
   APPS_NOTE="Application assets exist, but no smoke test automation is present."
 fi
+if [[ -x "${ROOT_DIR}/tests/smoke_desktop.sh" ]]; then
+  if "${ROOT_DIR}/tests/smoke_desktop.sh" "${ROOT_DIR}" >/tmp/ratanaos-apps.stdout 2>/tmp/ratanaos-apps.stderr; then
+    APPS_RC=0
+    APPS_NOTE="Desktop and application smoke automation passed via tests/smoke_desktop.sh."
+  else
+    APPS_NOTE="Desktop smoke automation exists but failed. See /tmp/ratanaos-apps.stderr."
+  fi
+fi
 
 SECURITY_RC=1
 SECURITY_NOTE="Security fixes were not validated; the repo contains package and installer configuration but no security-specific test coverage."
@@ -243,7 +251,7 @@ QA workflow branch target: \`qa/testing\`
 
 ## Summary
 
-RatanaOS is not release-ready as of ${REPORT_DATE}. The build/test scripts and installer/package inputs exist and pass shell syntax validation, but the local environment is missing required tools (\`lb\`, \`xorriso\`, \`qemu-system-x86_64\`), there is no generated ISO artifact, and there is no evidence of kernel, desktop, application, performance, or security-fix validation completing.
+RatanaOS is not release-ready as of ${REPORT_DATE}. Desktop and application scaffolding now exist, but the broader build and release pipeline remains blocked by missing tools, missing runtime artifacts, and incomplete kernel and security validation.
 
 ## Required Next Steps
 
@@ -251,7 +259,7 @@ RatanaOS is not release-ready as of ${REPORT_DATE}. The build/test scripts and i
 2. Install the build and test dependencies required by the existing pipeline.
 3. Run \`./build/build.sh\` to produce \`.artifacts/ratanaos.iso\`.
 4. Run \`./build/test.sh\` to exercise installer verification and QEMU smoke boot.
-5. Add dedicated performance, application smoke, kernel, and security regression tests under \`tests/\`.
+5. Expand the current desktop smoke coverage into broader performance, kernel, and security regression tests under \`tests/\`.
 EOF
 
 printf 'Release report written to %s\n' "${REPORT_FILE}"

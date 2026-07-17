@@ -1,0 +1,19 @@
+{
+  "name": "RatanaOS Sandstone",
+  "colors": {
+    "backgroundBase": "#f8f1e6",
+    "backgroundElevated": "#fffaf2",
+    "panelEdge": "#cab08a",
+    "textPrimary": "#1d1d1b",
+    "textMuted": "#6a5d49",
+    "accentPrimary": "#b96f31",
+    "accentSecondary": "#2b7a6e",
+    "accentTertiary": "#4f6fa3",
+    "accentQuaternary": "#87516e"
+  },
+  "typography": {
+    "headline": "Noto Sans",
+    "body": "Noto Sans",
+    "mono": "JetBrains Mono"
+  }
+}

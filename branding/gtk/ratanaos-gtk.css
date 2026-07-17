@@ -1,0 +1,24 @@
+:root {
+  --ratana-bg: #f8f1e6;
+  --ratana-panel: #fffaf2;
+  --ratana-ink: #1d1d1b;
+  --ratana-muted: #6a5d49;
+  --ratana-accent: #b96f31;
+}
+
+window, .background {
+  background: linear-gradient(135deg, #f8f1e6 0%, #e9dac0 100%);
+  color: var(--ratana-ink);
+}
+
+button.suggested-action {
+  background: var(--ratana-accent);
+  color: white;
+  border-radius: 16px;
+}
+
+card, .card {
+  background: rgba(255, 250, 242, 0.84);
+  border-radius: 18px;
+  border: 1px solid rgba(96, 78, 43, 0.15);
+}

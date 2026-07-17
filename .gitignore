@@ -3,9 +3,15 @@
 *.img
 *.qcow2
 *.log
+build/
 
 # Tool output
 dist/
 out/
 tmp/
 .cache/
+
+# Desktop development
+*.user
+*.swp
+*.autosave

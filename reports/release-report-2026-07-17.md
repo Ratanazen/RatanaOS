@@ -1,7 +1,7 @@
 # RatanaOS Release QA Report
 
 Date: 2026-07-17
-Branch: `security/audit`
+Branch: `feature/desktop`
 QA workflow branch target: `qa/testing`
 
 ## Scope
@@ -28,7 +28,7 @@ QA workflow branch target: `qa/testing`
 - Boot: FAIL - Boot test is blocked by a missing ISO artifact or missing QEMU/xorriso dependencies.
 - Installation: FAIL - Installer assets are incomplete.
 - Performance: FAIL - No performance benchmark suite or runnable image is available.
-- Applications: FAIL - Application assets exist, but no smoke test automation is present.
+- Applications: PASS - Desktop and application smoke automation passed via tests/smoke_desktop.sh.
 - Security fixes: FAIL - Security fixes were not validated; the repo contains package and installer configuration but no security-specific test coverage.
 
 ## Release Check
@@ -41,7 +41,7 @@ QA workflow branch target: `qa/testing`
 
 ## Summary
 
-RatanaOS is not release-ready as of 2026-07-17. The build/test scripts and installer/package inputs exist and pass shell syntax validation, but the local environment is missing required tools (`lb`, `xorriso`, `qemu-system-x86_64`), there is no generated ISO artifact, and there is no evidence of kernel, desktop, application, performance, or security-fix validation completing.
+RatanaOS is not release-ready as of 2026-07-17. Desktop and application scaffolding now exist, but the broader build and release pipeline remains blocked by missing tools, missing runtime artifacts, and incomplete kernel and security validation.
 
 ## Required Next Steps
 
@@ -49,4 +49,4 @@ RatanaOS is not release-ready as of 2026-07-17. The build/test scripts and insta
 2. Install the build and test dependencies required by the existing pipeline.
 3. Run `./build/build.sh` to produce `.artifacts/ratanaos.iso`.
 4. Run `./build/test.sh` to exercise installer verification and QEMU smoke boot.
-5. Add dedicated performance, application smoke, kernel, and security regression tests under `tests/`.
+5. Expand the current desktop smoke coverage into broader performance, kernel, and security regression tests under `tests/`.

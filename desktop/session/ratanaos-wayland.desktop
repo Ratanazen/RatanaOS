@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=RatanaOS Desktop
+Comment=RatanaOS Wayland session
+Exec=ratana-desktop-shell
+Type=Application
+DesktopNames=RatanaOS
+X-GDM-SessionRegisters=true
