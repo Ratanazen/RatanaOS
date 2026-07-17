@@ -1,0 +1,13 @@
+#!/bin/sh
+set -eu
+
+printf '%s\n' 'RatanaOS' > /etc/hostname
+printf '%s\n' '127.0.0.1 localhost' '127.0.1.1 ratanaos' > /etc/hosts
+
+# Preserve Debian compatibility metadata while presenting RatanaOS identity.
+if [ -e /etc/debian_version ]; then
+  cp /etc/debian_version /usr/share/ratanaos-debian-version
+fi
+mkdir -p /usr/share/ratanaos
+printf '%s\n' 'RatanaOS 0.1.0-dev' > /usr/share/ratanaos/version
+

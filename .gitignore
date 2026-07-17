@@ -1,0 +1,8 @@
+/build/work/
+/build/artifacts/
+/build/cache/
+*.iso
+*.contents
+*.packages
+*.zsync
+

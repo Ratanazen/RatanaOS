@@ -1,0 +1,35 @@
+name: Release RatanaOS ISO
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    container:
+      image: debian:stable
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify tag matches VERSION
+        shell: bash
+        run: test "${GITHUB_REF_NAME#v}" = "$(tr -d '[:space:]' < VERSION)"
+      - name: Install build dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends live-build debootstrap squashfs-tools xorriso isolinux syslinux-common grub-pc-bin grub-efi-amd64-bin mtools dosfstools make ca-certificates
+      - run: make test
+      - run: make build
+      - run: ./tests/smoke-iso.sh build/artifacts/*.iso
+      - uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            build/artifacts/*.iso
+            build/artifacts/*.sha256
+

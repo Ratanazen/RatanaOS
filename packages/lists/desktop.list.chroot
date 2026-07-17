@@ -1,0 +1,18 @@
+# Minimal Phase 1 KDE desktop and live-session integration.
+task-kde-desktop
+plasma-nm
+konsole
+dolphin
+ark
+firefox-esr
+live-boot
+live-config
+live-config-systemd
+sudo
+network-manager
+firmware-linux-free
+firmware-iwlwifi
+firmware-realtek
+discover
+packagekit
+

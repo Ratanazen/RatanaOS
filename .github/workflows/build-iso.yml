@@ -1,0 +1,44 @@
+name: Build RatanaOS ISO
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'build/**'
+      - 'branding/**'
+      - 'packages/**'
+      - 'scripts/**'
+      - 'VERSION'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    container:
+      image: debian:stable
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends live-build debootstrap squashfs-tools xorriso isolinux syslinux-common grub-pc-bin grub-efi-amd64-bin mtools dosfstools make ca-certificates
+      - name: Validate project
+        run: make test
+      - name: Build ISO
+        run: make build
+      - name: Smoke-test ISO
+        run: ./tests/smoke-iso.sh build/artifacts/*.iso
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ratanaos-iso
+          path: |
+            build/artifacts/*.iso
+            build/artifacts/*.sha256
+          if-no-files-found: error
+          retention-days: 14
+

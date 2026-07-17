@@ -1,0 +1,11 @@
+PRETTY_NAME="RatanaOS 0.1 (Debian Stable base)"
+NAME="RatanaOS"
+VERSION_ID="0.1"
+VERSION="0.1 Development"
+ID=ratanaos
+ID_LIKE=debian
+HOME_URL="https://ratanaos.example/"
+SUPPORT_URL="https://ratanaos.example/support"
+BUG_REPORT_URL="https://ratanaos.example/issues"
+LOGO=ratanaos
+
