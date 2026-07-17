@@ -1,0 +1,11 @@
+# Build artifacts
+*.iso
+*.img
+*.qcow2
+*.log
+
+# Tool output
+dist/
+out/
+tmp/
+.cache/
