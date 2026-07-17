@@ -18,6 +18,7 @@ ratana_add_qt_app(ratana-software-center software-center/main.cpp)
 ratana_add_qt_app(ratana-system-monitor system-monitor/main.cpp)
 ratana_add_qt_app(ratana-update-manager update-manager/main.cpp)
 ratana_add_qt_app(ratana-control-center control-center/main.cpp)
+ratana_add_qt_app(ratana-installer installer/main.cpp)
 ratana_add_qt_app(ratana-ai-assistant ai-assistant/main.cpp)
 
 if(TARGET PkgConfig::GTK4)
