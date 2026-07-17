@@ -21,6 +21,7 @@ endif()
 
 add_subdirectory(apps)
 add_subdirectory(desktop)
+add_subdirectory(system/manager)
 
 enable_testing()
 add_test(
