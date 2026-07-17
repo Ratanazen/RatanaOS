@@ -1,0 +1,12 @@
+apparmor
+apparmor-profiles
+apparmor-utils
+efibootmgr
+fwupd
+libpam-apparmor
+mokutil
+nftables
+shim-signed
+sbsigntool
+sudo
+

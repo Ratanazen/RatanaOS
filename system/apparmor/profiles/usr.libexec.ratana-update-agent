@@ -1,0 +1,34 @@
+#include <tunables/global>
+
+profile ratana-update-agent /usr/libexec/ratana-update-agent flags=(attach_disconnected,mediate_deleted) {
+  #include <abstractions/base>
+  #include <abstractions/nameservice>
+  #include <abstractions/ssl_certs>
+
+  capability net_bind_service,
+  capability setgid,
+  capability setuid,
+
+  network inet stream,
+  network inet6 stream,
+
+  /usr/libexec/ratana-update-agent mr,
+  /etc/apt/** r,
+  /etc/os-release r,
+  /run/** rw,
+  /tmp/** rw,
+  /usr/bin/apt-get ixr,
+  /usr/bin/apt-cache ixr,
+  /usr/bin/dpkg ixr,
+  /usr/bin/gpgv ixr,
+  /usr/share/keyrings/** r,
+  /var/cache/apt/** rw,
+  /var/lib/apt/** rw,
+  /var/lib/dpkg/** rw,
+  /var/log/apt/** rw,
+  /var/log/ratana-update-agent/** rwk,
+
+  deny /home/** wl,
+  deny /root/** wl,
+}
+
