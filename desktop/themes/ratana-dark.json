@@ -1,0 +1,24 @@
+{
+  "theme": "Ratana Dark",
+  "version": "1.0",
+  "colors": {
+    "background": "#1E1E2E",
+    "foreground": "#CDD6F4",
+    "primary": "#89B4FA",
+    "secondary": "#F38BA8",
+    "accent": "#94E2D5",
+    "panel": "#181825",
+    "border": "#313244"
+  },
+  "animations": {
+    "enabled": true,
+    "speed": "fast",
+    "window_open": "fade_scale",
+    "workspace_switch": "slide_horizontal"
+  },
+  "fonts": {
+    "ui": "Inter 10",
+    "monospace": "FiraCode Nerd Font 10"
+  },
+  "icons": "Ratana-Papirus"
+}
