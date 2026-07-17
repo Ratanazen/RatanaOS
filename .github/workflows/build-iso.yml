@@ -9,6 +9,10 @@ on:
       - 'branding/**'
       - 'packages/**'
       - 'scripts/**'
+      - 'tests/**'
+      - 'docs/**'
+      - '.github/workflows/**'
+      - 'Makefile'
       - 'VERSION'
 
 permissions:
@@ -41,4 +45,3 @@ jobs:
             build/artifacts/*.sha256
           if-no-files-found: error
           retention-days: 14
-

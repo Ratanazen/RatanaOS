@@ -18,6 +18,11 @@ checking in live-build's generated state. `stable` tracks the current Debian
 Stable release; production releases should pin a Debian codename and snapshot
 mirror after a release candidate is cut.
 
+Branding overlays are source templates. The configuration script renders their
+`@VERSION@` tokens from the single top-level `VERSION` file, preventing the ISO
+label, artifact filename, `/etc/os-release`, and installed identity from drifting
+apart.
+
 ## Build environment
 
 Use Debian Stable amd64, root privileges, 4 GiB RAM, and at least 20 GiB free
@@ -72,4 +77,3 @@ record package manifests, and compare two clean build outputs.
 4. Welcome, update, software, driver, backup, and settings applications.
 5. Secure Boot signing, hardware qualification, accessibility, localization,
    release signing, rollback, and recovery media.
-

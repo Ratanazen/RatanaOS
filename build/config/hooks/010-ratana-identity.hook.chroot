@@ -9,5 +9,4 @@ if [ -e /etc/debian_version ]; then
   cp /etc/debian_version /usr/share/ratanaos-debian-version
 fi
 mkdir -p /usr/share/ratanaos
-printf '%s\n' 'RatanaOS 0.1.0-dev' > /usr/share/ratanaos/version
-
+printf '%s\n' 'RatanaOS @VERSION@' > /usr/share/ratanaos/version

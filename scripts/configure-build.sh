@@ -32,9 +32,11 @@ lb config \
 rm -rf config/package-lists config/includes.chroot config/hooks
 mkdir -p config/package-lists config/includes.chroot/etc config/hooks/live
 cp "${PROJECT_ROOT}/packages/lists/desktop.list.chroot" config/package-lists/
-cp "${PROJECT_ROOT}/branding/etc/os-release" config/includes.chroot/etc/os-release
-cp "${PROJECT_ROOT}/branding/etc/issue" config/includes.chroot/etc/issue
-cp "${PROJECT_ROOT}/branding/etc/issue.net" config/includes.chroot/etc/issue.net
-cp "${PROJECT_ROOT}/build/config/hooks/010-ratana-identity.hook.chroot" config/hooks/live/
+render_template "${PROJECT_ROOT}/branding/etc/os-release" config/includes.chroot/etc/os-release
+render_template "${PROJECT_ROOT}/branding/etc/issue" config/includes.chroot/etc/issue
+render_template "${PROJECT_ROOT}/branding/etc/issue.net" config/includes.chroot/etc/issue.net
+render_template \
+  "${PROJECT_ROOT}/build/config/hooks/010-ratana-identity.hook.chroot" \
+  config/hooks/live/010-ratana-identity.hook.chroot
+chmod 0755 config/hooks/live/010-ratana-identity.hook.chroot
 log "configuration generated in ${WORK_DIR}"
-
