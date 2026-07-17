@@ -2,8 +2,18 @@ name: Build RatanaOS ISO
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - 'build/**'
+      - 'branding/**'
+      - 'packages/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - '.github/workflows/build-iso.yml'
+      - 'Makefile'
+      - 'VERSION'
   push:
-    branches: [main]
+    branches: [main, feature/build-system]
     paths:
       - 'build/**'
       - 'branding/**'
@@ -18,6 +28,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: build-iso-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-24.04
@@ -30,13 +44,29 @@ jobs:
       - name: Install build dependencies
         run: |
           apt-get update
-          apt-get install -y --no-install-recommends live-build debootstrap squashfs-tools xorriso isolinux syslinux-common grub-pc-bin grub-efi-amd64-bin mtools dosfstools make ca-certificates
+          apt-get install -y --no-install-recommends \
+            ca-certificates coreutils debootstrap dosfstools \
+            grub-efi-amd64-bin grub-pc-bin isolinux live-build make mtools \
+            qemu-system-x86 squashfs-tools syslinux-common xorriso
       - name: Validate project
         run: make test
       - name: Build ISO
         run: make build
       - name: Smoke-test ISO
         run: ./tests/smoke-iso.sh build/artifacts/*.iso
+      - name: Verify ISO checksum
+        working-directory: build/artifacts
+        run: sha256sum --check *.sha256
+      - name: Boot-test ISO in QEMU
+        run: |
+          set +e
+          timeout --signal=TERM 45 qemu-system-x86_64 \
+            -machine accel=tcg -m 2048 -smp 2 -boot once=d \
+            -cdrom build/artifacts/*.iso -display none -serial none \
+            -monitor none -no-reboot
+          status=$?
+          set -e
+          test "${status}" -eq 124
       - uses: actions/upload-artifact@v4
         with:
           name: ratanaos-iso
