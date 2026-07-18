@@ -11,7 +11,7 @@ Build on an amd64 Debian Stable machine or container with at least 20 GiB free:
 ```bash
 sudo apt update
 sudo apt install live-build debootstrap squashfs-tools xorriso isolinux \
-  syslinux-common grub-pc-bin grub-efi-amd64-bin mtools dosfstools
+syslinux-common grub-pc-bin grub-efi-amd64-bin mtools dosfstools
 make test
 sudo make build
 ```
