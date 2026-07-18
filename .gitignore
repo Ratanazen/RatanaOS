@@ -11,3 +11,5 @@ cache/
 /output/RatanaOS-*.img
 build/
 linux-7.1.3/
+build-tests/
+Release/
