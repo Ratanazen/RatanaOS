@@ -16,6 +16,24 @@ QString AIEngine::mockInference(Context context, const QString &query) {
     return "Please provide a query.";
   }
 
+  if (query.contains("theme", Qt::CaseInsensitive) || 
+      query.contains("wallpaper", Qt::CaseInsensitive)) {
+      return "Opening Appearance Center";
+  }
+  
+  if (query.contains("install apps", Qt::CaseInsensitive)) {
+      return "Opening Software Center";
+  }
+  
+  if (query.contains("fix settings", Qt::CaseInsensitive)) {
+      return "Opening Settings";
+  }
+
+  if (query.contains("avatar", Qt::CaseInsensitive) ||
+      query.contains("profile", Qt::CaseInsensitive)) {
+      return "Opening Profile Manager";
+  }
+
   switch (context) {
     case Context::EXPLAIN_COMMAND:
       if (query.contains("ls")) return "`ls` is a Linux command used to list directory contents. Using `-l` gives a long format, and `-a` shows hidden files.";
