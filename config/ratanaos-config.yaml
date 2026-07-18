@@ -1,0 +1,8 @@
+theme: dark
+icon_pack: Ratana
+wallpaper: default_mountains.jpg
+profile_image: default_avatar.png
+accent_color: blue
+boot_logo: ratana_boot_logo.svg
+grub_theme: ratana-dark
+plymouth_theme: ratanaos

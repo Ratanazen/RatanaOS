@@ -1,0 +1,36 @@
+#!/bin/bash
+set -e
+
+EDITION=${1:-standard}
+
+echo "Configuring for edition: $EDITION"
+
+lb config noauto \
+    --architectures amd64 \
+    --linux-flavours amd64 \
+    --distribution trixie \
+    --archive-areas "main contrib non-free non-free-firmware" \
+    --bootappend-live "boot=live components quiet splash findiso=\${iso_path}" \
+    --binary-images iso-hybrid \
+    --uefi-secure-boot enable \
+    --iso-application "RatanaOS Live" \
+    --iso-publisher "RatanaOS Project" \
+    --iso-volume "RATANAOS_$EDITION" \
+    --win32-loader false \
+    --memtest none \
+    --apt-indices none \
+    --apt-recommends false \
+    --debootstrap-options "--variant=minbase" \
+    --compression squashfs \
+    --system live \
+    "${@}"
+
+# Setup includes
+mkdir -p config/includes.chroot/usr/share/themes
+mkdir -p config/includes.chroot/usr/share/icons
+mkdir -p config/includes.chroot/usr/share/backgrounds/ratana
+cp -r themes/* config/includes.chroot/usr/share/themes/ 2>/dev/null || true
+cp -r branding/icons/* config/includes.chroot/usr/share/icons/ 2>/dev/null || true
+cp -r branding/wallpapers/* config/includes.chroot/usr/share/backgrounds/ratana/ 2>/dev/null || true
+
+echo "Configuration completed."

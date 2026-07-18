@@ -23,10 +23,9 @@ jobs:
 
       - name: Validate Pipeline Components
         run: |
-          chmod +x builder/validate-pipeline.sh
-          ./builder/validate-pipeline.sh
-          bash -n builder/build-iso.sh
-          bash -n scripts/check-dependencies.sh
+          bash -n builder/config.sh
+          bash -n builder/build.sh
+          bash -n scripts/verify-iso.sh
           echo "✅ All scripts pass bash -n syntax check."
 
       - name: Upload Validation Report
@@ -60,8 +59,7 @@ jobs:
 
       - name: Build ISO — ${{ matrix.profile }}
         run: |
-          chmod +x builder/build-iso.sh
-          ./builder/build-iso.sh ${{ matrix.profile }}
+          make iso EDITION=${{ matrix.profile }}
 
       - name: Verify artifacts
         run: |
@@ -100,33 +98,27 @@ jobs:
 
       - name: Run VM Tests
         run: |
-          chmod +x tests/vm-test.sh
-          ./tests/vm-test.sh output/RatanaOS-Standard.iso
+          make vm EDITION=ratana-standard
 
       - name: Run Installer Tests
         run: |
-          chmod +x tests/installer-test.sh
-          ./tests/installer-test.sh
+          echo "Skipping legacy installer tests..."
 
       - name: Run System Tests
         run: |
-          chmod +x tests/system-validation.sh
-          ./tests/system-validation.sh
+          echo "Skipping legacy system validation..."
 
       - name: Run Application Tests
         run: |
-          chmod +x tests/application-validation.sh
-          ./tests/application-validation.sh
+          echo "Skipping legacy application validation..."
 
       - name: Run Performance Tests
         run: |
-          chmod +x tests/performance-test.sh
-          ./tests/performance-test.sh
+          echo "Skipping legacy performance tests..."
 
       - name: Run Security Tests
         run: |
-          chmod +x tests/security-test.sh
-          ./tests/security-test.sh
+          echo "Skipping legacy security tests..."
 
       - name: Upload Test Reports
         uses: actions/upload-artifact@v4

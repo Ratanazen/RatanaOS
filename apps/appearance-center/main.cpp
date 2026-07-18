@@ -6,7 +6,19 @@
 #include <QPushButton>
 #include <QComboBox>
 #include <QMessageBox>
+#include <QDir>
+#include <QStringList>
 #include "customization_api.h"
+
+QStringList scanAssets(const QString &folder) {
+    QDir dir("/home/ratana/RatanaOS/assets/" + folder);
+    if (!dir.exists()) {
+        return QStringList{"(Default)"};
+    }
+    QStringList items = dir.entryList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
+    if (items.isEmpty()) return QStringList{"(Default)"};
+    return items;
+}
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
@@ -24,35 +36,28 @@ int main(int argc, char *argv[]) {
     layout->addWidget(comboTheme);
 
     // Icons
-    layout->addWidget(new QLabel("<b>Icons</b>"));
-    QHBoxLayout *iconLayout = new QHBoxLayout();
-    QPushButton *btnPreviewIcons = new QPushButton("Preview Icons");
-    QPushButton *btnApplyIcons = new QPushButton("Apply Icons");
-    QPushButton *btnInstallIcons = new QPushButton("Install Icon Packs");
-    iconLayout->addWidget(btnPreviewIcons);
-    iconLayout->addWidget(btnApplyIcons);
-    iconLayout->addWidget(btnInstallIcons);
-    layout->addLayout(iconLayout);
+    layout->addWidget(new QLabel("<b>Icons (Loaded from /assets/icons/)</b>"));
+    QComboBox *comboIcons = new QComboBox();
+    comboIcons->addItems(scanAssets("icons"));
+    layout->addWidget(comboIcons);
 
     // Wallpapers
-    layout->addWidget(new QLabel("<b>Wallpapers (/usr/share/ratana/themes/)</b>"));
-    QHBoxLayout *wpLayout = new QHBoxLayout();
-    QPushButton *btnLocalWP = new QPushButton("Local Images");
-    QPushButton *btnOnlineWP = new QPushButton("Online Source");
-    QPushButton *btnSlideshow = new QPushButton("Slideshow");
-    QPushButton *btnAutoWP = new QPushButton("Auto Change");
-    wpLayout->addWidget(btnLocalWP);
-    wpLayout->addWidget(btnOnlineWP);
-    wpLayout->addWidget(btnSlideshow);
-    wpLayout->addWidget(btnAutoWP);
-    layout->addLayout(wpLayout);
+    layout->addWidget(new QLabel("<b>Wallpapers (Loaded from /assets/wallpapers/)</b>"));
+    QComboBox *comboWP = new QComboBox();
+    comboWP->addItems(scanAssets("wallpapers"));
+    layout->addWidget(comboWP);
 
-    QObject::connect(comboTheme, &QComboBox::currentTextChanged, [&](const QString &theme) {
-        RatanaOS::Customization::setTheme(theme);
-    });
+    // Application
+    QHBoxLayout *actionLayout = new QHBoxLayout();
+    QPushButton *btnApply = new QPushButton("Apply Selected Settings");
+    actionLayout->addStretch();
+    actionLayout->addWidget(btnApply);
+    layout->addLayout(actionLayout);
 
-    QObject::connect(btnLocalWP, &QPushButton::clicked, [&]() {
-        QMessageBox::information(&window, "Wallpapers", "Opening /usr/share/ratana/themes/");
+    QObject::connect(btnApply, &QPushButton::clicked, [&]() {
+        RatanaOS::Customization::setTheme(comboTheme->currentText());
+        RatanaOS::Customization::setWallpaper(comboWP->currentText());
+        QMessageBox::information(&window, "Settings Applied", "Your personalization settings have been updated.\n(Configuration saved).");
     });
 
     layout->addStretch();

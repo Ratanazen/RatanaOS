@@ -1,22 +1,42 @@
-VERSION ?= 13.0
+# RatanaOS Live Build Makefile
 
-.PHONY: all test build clean
+EDITION ?= standard
+VERSION ?= 15.0
 
-all: test build
+.PHONY: all config build clean rebuild iso verify vm release
 
-test:
-	@echo "Running static and ISO smoke tests..."
-	@mkdir -p tests/results
-	@bash build/test.sh || true
-	@echo "Tests passed."
+all: iso verify
+
+config:
+	@echo "==> Configuring live-build for RatanaOS (${EDITION})..."
+	@chmod +x builder/config.sh
+	@./builder/config.sh ${EDITION}
 
 build:
-	@echo "Building RatanaOS ISO..."
-	@mkdir -p output
-	@chmod +x builder/build-iso.sh
-	@./builder/build-iso.sh ratana-standard amd64
-	@echo "ISO successfully written to output/RatanaOS-Standard.iso"
+	@echo "==> Building RatanaOS..."
+	@chmod +x builder/build.sh
+	@./builder/build.sh ${EDITION}
 
 clean:
-	@rm -rf build/artifacts/*
-	@rm -rf tests/results/*
+	@echo "==> Cleaning live-build workspace..."
+	lb clean || true
+	rm -rf output/*
+
+rebuild: clean config build
+
+iso: config build
+
+verify:
+	@echo "==> Verifying ISO..."
+	@chmod +x scripts/verify-iso.sh
+	@./scripts/verify-iso.sh ${EDITION}
+
+vm:
+	@echo "==> Running VM Test..."
+	@chmod +x scripts/test-qemu.sh
+	@./scripts/test-qemu.sh ${EDITION}
+
+release: iso verify
+	@echo "==> Generating Release Checksums..."
+	@cd output && sha256sum RatanaOS-*.iso > SHA256SUMS
+	@echo "==> Release complete!"

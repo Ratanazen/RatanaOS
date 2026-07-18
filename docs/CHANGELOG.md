@@ -1,8 +1,6 @@
 # Changelog
 
-## 2026-07-17
-
-- Initialized RatanaOS repository
-- Created baseline project directory structure
-- Added roadmap, architecture, status, and TODO tracking documents
-- Defined branch strategy and team ownership model
+## [v15.0]
+- Initial implementation of the complete live-build pipeline.
+- Added Makefile, QEMU, VirtualBox, VMware test scripts.
+- Added comprehensive ISO validation script.

@@ -1,0 +1,45 @@
+#!/bin/sh
+set -e
+
+echo "Running RatanaOS setup hook..."
+
+# Update caches
+update-icon-caches /usr/share/icons/* || true
+update-desktop-database -q || true
+update-mime-database /usr/share/mime || true
+
+# Enable services
+systemctl enable NetworkManager.service
+systemctl set-default graphical.target
+
+# Create live user 'ratana' with password 'ratana'
+if ! id "ratana" >/dev/null 2>&1; then
+    useradd -m -s /bin/bash ratana
+    echo "ratana:ratana" | chpasswd
+    usermod -aG sudo,netdev,audio,video,plugdev ratana
+fi
+
+# Enable SDDM auto login
+mkdir -p /etc/sddm.conf.d
+cat > /etc/sddm.conf.d/autologin.conf <<EOF
+[Autologin]
+User=ratana
+Session=plasma
+EOF
+
+# Compile custom apps if any
+if [ -d "/opt/ratanaos-apps" ]; then
+    echo "Building custom apps..."
+    for app_dir in /opt/ratanaos-apps/*; do
+        if [ -d "$app_dir" ] && [ -f "$app_dir/CMakeLists.txt" ]; then
+            cd "$app_dir"
+            mkdir -p build
+            cd build
+            cmake .. -DCMAKE_INSTALL_PREFIX=/usr
+            make -j$(nproc)
+            make install
+        fi
+    done
+fi
+
+echo "RatanaOS setup hook completed."

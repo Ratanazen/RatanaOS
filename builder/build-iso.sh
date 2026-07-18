@@ -164,7 +164,33 @@ menuentry "Install RatanaOS" {
     initrd /live/initrd.img
 }
 EOF
-echo "✅ Bootloader configured."
+echo "  ✅ Chroot networking enabled."
+
+# ── Step 4.5: Modular Assets & Branding (v16) ─────────────────────────
+echo "[4.5/11] Staging Modular Assets & Branding..."
+ASSETS_DIR="${ROOT_DIR}/assets"
+BRANDING_DIR="${ROOT_DIR}/branding"
+CONFIG_FILE="${ROOT_DIR}/config/ratanaos-config.yaml"
+
+if [ -f "$CONFIG_FILE" ]; then
+    echo "  ✅ Configuration found: ratanaos-config.yaml"
+else
+    echo "  ⚠️  Configuration missing! Aborting build."
+    exit 1
+fi
+
+mkdir -p "${CHROOT_DIR}/usr/share/ratana/assets"
+mkdir -p "${CHROOT_DIR}/usr/share/ratana/branding"
+mkdir -p "${CHROOT_DIR}/etc/ratana"
+
+# Copy dynamic assets
+cp -r "${ASSETS_DIR}/"* "${CHROOT_DIR}/usr/share/ratana/assets/" 2>/dev/null || true
+# Copy branding
+cp -r "${BRANDING_DIR}/"* "${CHROOT_DIR}/usr/share/ratana/branding/" 2>/dev/null || true
+# Copy config
+cp "${CONFIG_FILE}" "${CHROOT_DIR}/etc/ratana/ratanaos-config.yaml"
+
+echo "  ✅ Assets and branding staged into chroot."
 
 # ── Step 8: Build SquashFS ───────────────────────────────────────────
 echo "[8/11] Building SquashFS filesystem..."

@@ -1,11 +1,5 @@
-# RatanaOS Installation Guide
+# Installing RatanaOS
 
-1. Flash the `RatanaOS-amd64.iso` to a USB drive using a tool like Rufus or `dd`.
-2. Boot from the USB drive in either BIOS or UEFI mode.
-3. From the Live Desktop, launch the **RatanaOS Installer**.
-4. Follow the steps:
-   - Select Language, Keyboard, and Timezone.
-   - Select Disk (Auto or Manual partition). Btrfs and LUKS are supported!
-   - Create your User.
-   - Choose your Package Profile (Cybersecurity and Development tools).
-5. Let the installer run and reboot!
+1. Flash the ISO to a USB drive using `dd` or Rufus.
+2. Boot into the live environment.
+3. Use the provided installer to install RatanaOS to your hard drive.
