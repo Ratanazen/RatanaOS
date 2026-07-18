@@ -1,6 +1,6 @@
 #!/bin/bash
-# RatanaOS Production ISO Builder (v10.1)
-# Supports: ratana-lite, ratana-standard, ratana-developer, ratana-cyber, ratana-server, ratana-arm
+# RatanaOS Production ISO Builder (v12.0)
+# Supports: ratana-lite, ratana-standard, ratana-developer, ratana-cyber, ratana-live, ratana-server, ratana-arm
 
 set -e
 
@@ -33,7 +33,7 @@ mkdir -p "${LOGS_DIR}"
 exec > >(tee -a "${LOG_FILE}") 2>&1
 
 echo "=========================================="
-echo "   RatanaOS Production ISO Builder v10.1  "
+echo "   RatanaOS Production ISO Builder v12.0  "
 echo "=========================================="
 echo "Profile : ${PROFILE}"
 echo "Arch    : ${ARCH}"
@@ -74,11 +74,11 @@ echo "[4/11] Configuring chroot and OS identity..."
 mkdir -p "${CHROOT_DIR}/etc"
 cat <<EOF > "${CHROOT_DIR}/etc/os-release"
 NAME="RatanaOS"
-VERSION="10.1.0"
+VERSION="12.0.0"
 ID=ratanaos
 ID_LIKE=debian
-PRETTY_NAME="RatanaOS v10.1"
-VERSION_ID="10.1.0"
+PRETTY_NAME="RatanaOS v12.0"
+VERSION_ID="12.0.0"
 HOME_URL="https://ratanaos.local"
 SUPPORT_URL="https://ratanaos.local/support"
 BUG_REPORT_URL="https://ratanaos.local/bugs"
@@ -106,8 +106,15 @@ case "$PROFILE" in
     ;;
   ratana-cyber)
     BASE_PKGS="$BASE_PKGS plasma-desktop sddm kde-standard \
-      gcc clang cmake git python3 rustc golang docker.io \
-      nmap wireshark aircrack-ng hashcat ghidra volatility3"
+      gcc clang cmake git python3 python3-pip rustc golang docker.io \
+      nmap masscan netcat-openbsd tcpdump traceroute \
+      nikto sqlmap dirb wfuzz \
+      wireshark tshark ettercap-graphical \
+      aircrack-ng airmon-ng reaver wifite \
+      hashcat john hydra medusa \
+      ghidra radare2 gdb ltrace strace \
+      volatility3 binwalk foremost clamav yara cutter \
+      auditd osquery chkrootkit rkhunter lynis"
     ;;
   ratana-server)
     BASE_PKGS="linux-image-amd64 live-boot systemd shim-signed \
@@ -175,12 +182,13 @@ fi
 # ── Step 9: Generate ISO ─────────────────────────────────────────────
 echo "[9/11] Generating ISO with xorriso..."
 
-# Named per v10.1 deliverables spec
+# Named per v12.0 deliverables spec
 case "$PROFILE" in
   ratana-lite)      ISO_NAME="RatanaOS-Lite.iso" ;;
   ratana-standard)  ISO_NAME="RatanaOS-Standard.iso" ;;
   ratana-developer) ISO_NAME="RatanaOS-Developer.iso" ;;
   ratana-cyber)     ISO_NAME="RatanaOS-Cyber.iso" ;;
+  ratana-live)      ISO_NAME="RatanaOS-Live.iso" ;;
   ratana-server)    ISO_NAME="RatanaOS-Server.iso" ;;
   ratana-arm)       ISO_NAME="RatanaOS-ARM64.img" ;;
   *)                ISO_NAME="RatanaOS-${PROFILE}.iso" ;;
@@ -209,6 +217,8 @@ fi
 # ── Step 10: Checksums ───────────────────────────────────────────────
 echo "[10/11] Generating SHA256 + SHA512 checksums..."
 cd "${OUTPUT_DIR}"
+# Remove stale placeholder ISO files (mock files from dry runs)
+find "${OUTPUT_DIR}" -name '*.iso' -size -10k -not -name "${ISO_NAME}" -delete 2>/dev/null || true
 sha256sum "${ISO_NAME}" >> SHA256SUMS
 sha512sum "${ISO_NAME}" >> SHA512SUMS
 echo "✅ Checksums written to SHA256SUMS and SHA512SUMS."
@@ -221,7 +231,7 @@ cat <<EOF > "${OUTPUT_DIR}/BUILD_REPORT.md"
 | Field | Value |
 |---|---|
 | Date | $(date -u +"%Y-%m-%dT%H:%M:%SZ") |
-| Version | 10.1.0 |
+| Version | 12.0.0 |
 | Profile | ${PROFILE} |
 | Architecture | ${ARCH} |
 | Artifact | ${ISO_NAME} |

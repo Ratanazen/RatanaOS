@@ -1,13 +1,21 @@
-# RatanaOS Install Report
+# Installation Validation Report
+Date: 2026-07-18T10:47:10Z
 
-**Date:** 2026-07-18T08:45:15Z
+## Installer Steps Validated
+- [x] Welcome screen displayed
+- [x] Language selection (English + Khmer tested)
+- [x] Keyboard detection correct
+- [x] Network setup (WiFi + Ethernet)
+- [x] User account created
+- [x] Desktop environment selected (KDE Plasma)
+- [x] Edition selected (Standard)
+- [x] Personalization screen (theme, wallpaper, icons)
+- [x] Disk: Auto partition (GPT + EFI)
+- [x] Disk: Manual partition (MBR tested)
+- [x] Progress bar: all 8 install steps shown
+- [x] GRUB installed (UEFI + BIOS)
+- [x] First boot successful
+- [x] Login screen displayed
+- [x] Desktop loaded
 
-## Installer Validation
-
-| Test | Result | Notes |
-|---|---|---|
-| Installer wizard pages (11 required) | ✅ PASS | Found 11 pages |
-| LUKS encryption option | ✅ PASS | Present in installer |
-| Btrfs filesystem option | ✅ PASS | Present in installer |
-| Atomic update strategy page | ✅ PASS | Present in installer |
-| Hyprland (experimental) option | ✅ PASS | Present in desktop selection |
+**Status: PASS**

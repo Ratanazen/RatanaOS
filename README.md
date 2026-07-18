@@ -1,4 +1,4 @@
-# RatanaOS v11.1
+# RatanaOS v13 Ultimate
 
 [![Build Status](https://github.com/Ratanazen/RatanaOS/actions/workflows/main.yml/badge.svg)](https://github.com/Ratanazen/RatanaOS/actions)
 [![Latest Release](https://img.shields.io/github/v/release/Ratanazen/RatanaOS)](https://github.com/Ratanazen/RatanaOS/releases/latest)

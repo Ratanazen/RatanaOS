@@ -1,8 +1,8 @@
 {
   "id": "ratana-cyber",
   "name": "RatanaOS Cyber",
-  "version": "5.0.0",
-  "description": "Cybersecurity education platform with optional security toolkits",
+  "version": "12.0.0",
+  "description": "Cybersecurity education platform with built-in security toolkits",
   "architecture": "amd64",
   "target_size_gb": 4.0,
   "desktop": "kde",
@@ -12,25 +12,30 @@
     "shim-signed", "grub-efi-amd64-signed", "grub-pc-bin",
     "apparmor", "apparmor-utils", "ufw", "auditd",
     "flatpak", "curl", "wget", "rsync", "network-manager",
-    "pipewire", "wireplumber"
+    "pipewire", "wireplumber", "plymouth", "plymouth-themes"
   ],
   "desktop_packages": [
     "plasma-desktop", "sddm", "kde-standard", "dolphin", "konsole", "kate"
   ],
   "extra_packages": [
     "gcc", "g++", "clang", "cmake", "git", "python3", "python3-pip",
-    "rustc", "golang", "docker.io"
+    "rustc", "golang", "docker.io",
+    "nmap", "masscan", "netcat-openbsd", "tcpdump", "traceroute",
+    "nikto", "sqlmap", "dirb", "wfuzz",
+    "wireshark", "tshark", "ettercap-graphical",
+    "aircrack-ng", "airmon-ng", "reaver", "wifite",
+    "hashcat", "john", "hydra", "medusa",
+    "ghidra", "radare2", "gdb", "ltrace", "strace",
+    "volatility3", "binwalk", "foremost",
+    "clamav", "yara", "cutter",
+    "auditd", "osquery", "chkrootkit", "rkhunter", "lynis",
+    "autopsy", "sleuthkit"
   ],
   "optional_categories": {
-    "network_analysis":     ["nmap", "masscan", "netcat-openbsd", "tcpdump", "traceroute"],
-    "packet_capture":       ["wireshark", "tshark", "tcpdump", "ettercap-graphical"],
-    "web_testing":          ["burpsuite", "nikto", "sqlmap", "dirb", "wfuzz"],
-    "digital_forensics":    ["autopsy", "sleuthkit", "foremost", "binwalk", "volatility3"],
-    "reverse_engineering":  ["ghidra", "radare2", "gdb", "ltrace", "strace"],
-    "password_auditing":    ["hashcat", "john", "hydra", "medusa"],
-    "wireless_analysis":    ["aircrack-ng", "airmon-ng", "reaver", "wifite"],
-    "malware_analysis":     ["clamav", "yara", "volatility3", "cutter"],
-    "incident_response":    ["auditd", "osquery", "chkrootkit", "rkhunter", "lynis"]
+    "digital_forensics":    ["bulk_extractor", "plaso"],
+    "cloud_security":       ["awscli", "kubectl", "trivy"],
+    "mobile_security":      ["apktool", "adb"],
+    "exploit_frameworks":   ["metasploit-framework"]
   },
   "security_packages": ["ufw", "apparmor", "apparmor-utils", "fail2ban", "auditd"],
   "services_enable": ["NetworkManager", "sddm", "apparmor", "ufw", "auditd"],
