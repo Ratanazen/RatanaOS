@@ -10,7 +10,7 @@ set(CMAKE_AUTOUIC ON)
 
 option(RATANA_ENABLE_GTK_BRIDGE "Build GTK4 bridge demo" ON)
 
-find_package(Qt6 6.4 REQUIRED COMPONENTS Widgets)
+find_package(Qt6 6.4 REQUIRED COMPONENTS Widgets Sql)
 
 if(RATANA_ENABLE_GTK_BRIDGE)
   find_package(PkgConfig QUIET)
