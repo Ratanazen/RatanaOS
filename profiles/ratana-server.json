@@ -1,0 +1,43 @@
+{
+  "id": "ratana-server",
+  "name": "RatanaOS Server",
+  "version": "5.0.0",
+  "description": "Headless server edition with Docker, hardened kernel, auto-patching",
+  "architecture": "amd64",
+  "target_size_gb": 0.8,
+  "desktop": "none",
+  "display_manager": "none",
+  "base_packages": [
+    "linux-image-amd64", "systemd", "systemd-sysv",
+    "shim-signed", "grub-efi-amd64-signed", "grub-pc-bin",
+    "apparmor", "apparmor-utils", "ufw", "auditd", "fail2ban",
+    "openssh-server", "curl", "wget", "rsync", "network-manager",
+    "unattended-upgrades", "apt-listchanges"
+  ],
+  "desktop_packages": [],
+  "extra_packages": [
+    "docker.io", "docker-compose", "podman", "buildah",
+    "nginx", "certbot", "python3-certbot-nginx",
+    "postgresql", "redis-server",
+    "htop", "iotop", "nethogs", "nmap",
+    "logrotate", "cron"
+  ],
+  "security_packages": [
+    "ufw", "apparmor", "apparmor-utils", "fail2ban",
+    "auditd", "lynis", "rkhunter", "chkrootkit"
+  ],
+  "services_enable": [
+    "NetworkManager", "apparmor", "ufw", "auditd",
+    "fail2ban", "ssh", "unattended-upgrades", "docker"
+  ],
+  "services_disable": ["bluetooth", "cups", "avahi-daemon"],
+  "grub_theme": "none",
+  "plymouth_theme": "none",
+  "default_settings": {
+    "dark_mode": false,
+    "auto_updates": true,
+    "atomic_updates": false,
+    "encryption_default": true,
+    "headless": true
+  }
+}

@@ -1,3 +1,34 @@
+# RatanaOS v5.0 "Phoenix"
+
+[![Build Status](https://github.com/your-username/RatanaOS/actions/workflows/main.yml/badge.svg)](https://github.com/your-username/RatanaOS/actions)
+[![Latest Release](https://img.shields.io/github/v/release/your-username/RatanaOS)](https://github.com/your-username/RatanaOS/releases/latest)
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPL%203.0-blue.svg)](LICENSE)
+
+> **Replace `your-username` above with your actual GitHub username before publishing.**
+
+---
+
+## 📥 Download
+
+> **[⬇️ Download RatanaOS from the GitHub Releases page](https://github.com/your-username/RatanaOS/releases/latest)**
+
+| Edition | File | Size | Best For |
+|---|---|---|---|
+| 🪶 Lite | `RatanaOS-Lite.iso` | ≈2 GB | Older hardware, XFCE |
+| 🖥️ Standard | `RatanaOS-Standard.iso` | ≈3 GB | Everyday desktop, KDE |
+| 🧑‍💻 Developer | `RatanaOS-Developer.iso` | ≈3.5 GB | Programming, containers |
+| 🔐 Cyber | `RatanaOS-Cyber.iso` | ≈4 GB | Cybersecurity education |
+| 🗄️ Server | `RatanaOS-Server.iso` | ≈800 MB | Headless servers |
+| 🍓 ARM64 | `RatanaOS-ARM64.img` | ≈2 GB | Raspberry Pi 4/5, ARM SBCs |
+
+### Verify Your Download
+```bash
+# Download the checksum file alongside your ISO, then run:
+sha256sum -c SHA256SUMS
+```
+
+---
+
 # RatanaOS Cyber Edition v1.0
 
 Welcome to **RatanaOS Cyber Edition**, a specialized, Debian-based Linux distribution engineered from the ground up for cybersecurity professionals, software developers, and system administrators. 

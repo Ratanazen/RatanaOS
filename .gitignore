@@ -1,18 +1,13 @@
-# Build artifacts
+output/
 *.iso
 *.img
-*.qcow2
-*.log
+logs/
+build/live-build/
+cache/
+.artifacts/
+*.sha256
+*.sha512
+/output/RatanaOS-*.iso
+/output/RatanaOS-*.img
 build/
-
-# Tool output
-dist/
-out/
-tmp/
-.cache/
-
-# Desktop development
-*.user
-*.swp
-*.autosave
-output/
+linux-7.1.3/

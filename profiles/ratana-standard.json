@@ -1,0 +1,33 @@
+{
+  "id": "ratana-standard",
+  "name": "RatanaOS Standard",
+  "version": "5.0.0",
+  "description": "Everyday desktop for home and office use",
+  "architecture": "amd64",
+  "target_size_gb": 3.0,
+  "desktop": "kde",
+  "display_manager": "sddm",
+  "base_packages": [
+    "linux-image-amd64", "live-boot", "systemd", "systemd-sysv",
+    "shim-signed", "grub-efi-amd64-signed", "grub-pc-bin",
+    "apparmor", "apparmor-utils", "ufw", "auditd",
+    "flatpak", "snapd", "curl", "wget", "rsync", "network-manager",
+    "pipewire", "wireplumber", "bluetooth"
+  ],
+  "desktop_packages": [
+    "plasma-desktop", "sddm", "kde-standard", "dolphin",
+    "konsole", "kate", "gwenview", "okular", "spectacle"
+  ],
+  "extra_packages": [],
+  "security_packages": ["ufw", "apparmor", "apparmor-utils", "fail2ban"],
+  "services_enable": ["NetworkManager", "sddm", "apparmor", "ufw", "bluetooth"],
+  "services_disable": [],
+  "grub_theme": "ratana-standard",
+  "plymouth_theme": "ratanaos",
+  "default_settings": {
+    "dark_mode": true,
+    "auto_updates": true,
+    "atomic_updates": true,
+    "encryption_default": false
+  }
+}

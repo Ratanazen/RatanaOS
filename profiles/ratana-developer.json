@@ -1,0 +1,46 @@
+{
+  "id": "ratana-developer",
+  "name": "RatanaOS Developer",
+  "version": "5.0.0",
+  "description": "Full-stack development environment with container tools",
+  "architecture": "amd64",
+  "target_size_gb": 3.5,
+  "desktop": "kde",
+  "display_manager": "sddm",
+  "base_packages": [
+    "linux-image-amd64", "live-boot", "systemd", "systemd-sysv",
+    "shim-signed", "grub-efi-amd64-signed", "grub-pc-bin",
+    "apparmor", "apparmor-utils", "ufw", "auditd",
+    "flatpak", "snapd", "curl", "wget", "rsync", "network-manager",
+    "pipewire", "wireplumber", "bluetooth"
+  ],
+  "desktop_packages": [
+    "plasma-desktop", "sddm", "kde-standard", "dolphin",
+    "konsole", "kate", "gwenview", "okular", "spectacle"
+  ],
+  "extra_packages": [
+    "gcc", "g++", "clang", "llvm", "cmake", "make", "ninja-build",
+    "git", "git-lfs",
+    "python3", "python3-pip", "python3-venv",
+    "rustc", "cargo",
+    "golang",
+    "default-jdk", "default-jre",
+    "nodejs", "npm",
+    "docker.io", "docker-compose", "podman", "buildah",
+    "kubectl", "helm",
+    "code",
+    "postgresql-client", "sqlite3", "redis-tools",
+    "httpie", "jq", "yq"
+  ],
+  "security_packages": ["ufw", "apparmor", "apparmor-utils", "fail2ban"],
+  "services_enable": ["NetworkManager", "sddm", "apparmor", "ufw", "docker"],
+  "services_disable": [],
+  "grub_theme": "ratana-developer",
+  "plymouth_theme": "ratanaos",
+  "default_settings": {
+    "dark_mode": true,
+    "auto_updates": true,
+    "atomic_updates": true,
+    "encryption_default": true
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "id": "ratana-arm",
+  "name": "RatanaOS ARM Edition",
+  "version": "5.0.0",
+  "description": "ARM64 edition for Raspberry Pi 4/5 and generic ARM64 SBCs",
+  "architecture": "arm64",
+  "target_size_gb": 2.0,
+  "desktop": "xfce",
+  "display_manager": "lightdm",
+  "base_packages": [
+    "linux-image-arm64", "linux-headers-arm64",
+    "raspi-firmware", "rpi-eeprom",
+    "live-boot", "systemd", "systemd-sysv",
+    "apparmor", "ufw", "auditd",
+    "flatpak", "curl", "wget", "rsync", "network-manager",
+    "bluetooth", "bluez", "firmware-brcm80211"
+  ],
+  "desktop_packages": [
+    "xfce4", "xfce4-goodies", "lightdm", "lightdm-gtk-greeter",
+    "thunar", "mousepad", "xfce4-terminal"
+  ],
+  "extra_packages": [
+    "python3", "python3-pip", "git",
+    "raspi-gpio", "python3-gpiozero", "python3-rpi.gpio",
+    "i2c-tools", "spi-tools",
+    "cpufrequtils", "tlp"
+  ],
+  "security_packages": ["ufw", "apparmor"],
+  "services_enable": ["NetworkManager", "lightdm", "apparmor", "ufw", "bluetooth"],
+  "services_disable": [],
+  "grub_theme": "none",
+  "plymouth_theme": "ratanaos",
+  "arm_specific": {
+    "dtb_overlay": "vc4-kms-v3d",
+    "gpu_mem": 128,
+    "enable_uart": false,
+    "enable_i2c": true,
+    "enable_spi": true
+  },
+  "default_settings": {
+    "dark_mode": true,
+    "auto_updates": true,
+    "atomic_updates": false,
+    "power_management": "balanced"
+  }
+}

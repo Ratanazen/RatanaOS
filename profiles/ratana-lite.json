@@ -1,0 +1,31 @@
+{
+  "id": "ratana-lite",
+  "name": "RatanaOS Lite",
+  "version": "5.0.0",
+  "description": "Lightweight edition for older hardware",
+  "architecture": "amd64",
+  "target_size_gb": 2.0,
+  "desktop": "xfce",
+  "display_manager": "lightdm",
+  "base_packages": [
+    "linux-image-amd64", "live-boot", "systemd", "systemd-sysv",
+    "shim-signed", "grub-efi-amd64-signed", "grub-pc-bin",
+    "apparmor", "apparmor-utils", "ufw", "auditd",
+    "flatpak", "curl", "wget", "rsync", "network-manager"
+  ],
+  "desktop_packages": [
+    "xfce4", "xfce4-goodies", "lightdm", "lightdm-gtk-greeter",
+    "thunar", "mousepad", "ristretto", "xfce4-terminal"
+  ],
+  "extra_packages": [],
+  "security_packages": ["ufw", "apparmor", "apparmor-utils"],
+  "services_enable": ["NetworkManager", "lightdm", "apparmor", "ufw"],
+  "services_disable": ["bluetooth"],
+  "grub_theme": "ratana-lite",
+  "plymouth_theme": "ratanaos",
+  "default_settings": {
+    "dark_mode": true,
+    "auto_updates": true,
+    "atomic_updates": false
+  }
+}

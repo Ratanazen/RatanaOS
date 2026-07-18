@@ -11,167 +11,250 @@
 #include <QLineEdit>
 #include <QCheckBox>
 #include <QProgressBar>
+#include <QButtonGroup>
+#include <QRadioButton>
 
 class InstallerWizard : public QMainWindow {
+  QStackedWidget *stackedWidget;
+  QProgressBar   *progressBar;
+  QList<QPushButton*> sidebarBtns;
+
  public:
   InstallerWizard() {
-    setWindowTitle("RatanaOS Installer");
-    resize(1024, 768);
+    setWindowTitle("RatanaOS Installer — v5.0 Phoenix");
+    resize(1100, 750);
 
     auto *surface = new QWidget;
     setCentralWidget(surface);
     auto *mainLayout = new QHBoxLayout(surface);
     mainLayout->setContentsMargins(0, 0, 0, 0);
 
-    // Sidebar
+    // ── Sidebar ───────────────────────────────────────────────────
     auto *sidebar = new QFrame;
     sidebar->setObjectName("DesktopPanel");
-    sidebar->setFixedWidth(250);
+    sidebar->setFixedWidth(240);
     auto *sidebarLayout = new QVBoxLayout(sidebar);
-    sidebarLayout->addWidget(new QLabel("<b>Steps</b>"));
-    
-    QStringList steps = {"Welcome", "Language", "Keyboard", "Timezone", "Disk Selection", "User Creation", "Package Profile", "Installation", "Finish"};
+    sidebarLayout->setContentsMargins(12, 24, 12, 12);
+
+    auto *logo = new QLabel("🔥 RatanaOS");
+    logo->setObjectName("HeroTitle");
+    sidebarLayout->addWidget(logo);
+    sidebarLayout->addSpacing(16);
+
+    // Step list — 11 steps for v5.0
+    QStringList steps = {
+      "1. Welcome", "2. Language", "3. Keyboard", "4. Timezone",
+      "5. Disk", "6. Users", "7. Edition", "8. Desktop",
+      "9. Update Strategy", "10. Install", "11. Finish"
+    };
     for (const QString &step : steps) {
-      sidebarLayout->addWidget(RatanaUI::makePillButton(step, step == "Welcome"));
+      auto *btn = RatanaUI::makePillButton(step, step.startsWith("1."));
+      sidebarBtns.append(btn);
+      sidebarLayout->addWidget(btn);
     }
     sidebarLayout->addStretch();
     mainLayout->addWidget(sidebar);
 
-    // Content Area
+    // ── Content Area ──────────────────────────────────────────────
     auto *contentArea = new QWidget;
     auto *contentLayout = new QVBoxLayout(contentArea);
-    
-    auto *stackedWidget = new QStackedWidget;
-    
-    // Page 0: Welcome
-    auto *pageWelcome = new QWidget;
-    auto *welcomeLayout = new QVBoxLayout(pageWelcome);
-    welcomeLayout->addWidget(RatanaUI::makePanel("Welcome", "Start installing RatanaOS on your system."));
-    stackedWidget->addWidget(pageWelcome);
-    
-    // Page 1: Language
-    auto *pageLang = new QWidget;
-    auto *langLayout = new QVBoxLayout(pageLang);
-    langLayout->addWidget(new QLabel("Select Language:"));
-    auto *langCombo = new QComboBox;
-    langCombo->addItems({"English (US)", "English (UK)", "French", "German", "Spanish", "Khmer"});
-    langLayout->addWidget(langCombo);
-    langLayout->addStretch();
-    stackedWidget->addWidget(pageLang);
+    contentLayout->setContentsMargins(32, 24, 32, 16);
 
-    // Page 2: Keyboard
-    auto *pageKey = new QWidget;
-    auto *keyLayout = new QVBoxLayout(pageKey);
-    keyLayout->addWidget(new QLabel("Select Keyboard Layout:"));
-    auto *keyCombo = new QComboBox;
-    keyCombo->addItems({"US", "UK", "FR", "DE", "ES", "KH"});
-    keyLayout->addWidget(keyCombo);
-    keyLayout->addStretch();
-    stackedWidget->addWidget(pageKey);
+    stackedWidget = new QStackedWidget;
 
-    // Page 3: Timezone
-    auto *pageTime = new QWidget;
-    auto *timeLayout = new QVBoxLayout(pageTime);
-    timeLayout->addWidget(new QLabel("Select Timezone:"));
-    auto *timeCombo = new QComboBox;
-    timeCombo->addItems({"UTC", "America/New_York", "Europe/London", "Asia/Phnom_Penh"});
-    timeLayout->addWidget(timeCombo);
-    timeLayout->addStretch();
-    stackedWidget->addWidget(pageTime);
-
-    // Page 4: Disk Selection
-    auto *pageDisk = new QWidget;
-    auto *diskLayout = new QVBoxLayout(pageDisk);
-    diskLayout->addWidget(RatanaUI::makePanel("Disk Selection", "Choose where to install RatanaOS"));
-    auto *autoPartBtn = RatanaUI::makePillButton("Auto Partition (Erase Disk)", true);
-    auto *manualPartBtn = RatanaUI::makePillButton("Manual Partition");
-    diskLayout->addWidget(autoPartBtn);
-    diskLayout->addWidget(manualPartBtn);
-    
-    auto *btrfsCheck = new QCheckBox("Use Btrfs filesystem (Default is EXT4)");
-    auto *luksCheck = new QCheckBox("Encrypt disk with LUKS");
-    diskLayout->addWidget(btrfsCheck);
-    diskLayout->addWidget(luksCheck);
-    diskLayout->addStretch();
-    stackedWidget->addWidget(pageDisk);
-
-    // Page 5: User Creation
-    auto *pageUser = new QWidget;
-    auto *userLayout = new QVBoxLayout(pageUser);
-    userLayout->addWidget(new QLabel("Name:"));
-    userLayout->addWidget(new QLineEdit);
-    userLayout->addWidget(new QLabel("Username:"));
-    userLayout->addWidget(new QLineEdit);
-    userLayout->addWidget(new QLabel("Password:"));
-    userLayout->addWidget(new QLineEdit);
-    userLayout->addWidget(new QLabel("Hostname:"));
-    userLayout->addWidget(new QLineEdit("ratanaos"));
-    userLayout->addStretch();
-    stackedWidget->addWidget(pageUser);
-
-    // Page 6: Package Profile (New for Cyber Edition)
-    auto *pagePackages = new QWidget;
-    auto *pkgLayout = new QVBoxLayout(pagePackages);
-    pkgLayout->addWidget(RatanaUI::makePanel("Package Profile", "Select additional security and development toolkits to install."));
-    
-    QStringList categories = {
-        "Network analysis", "Packet capture", "Web application testing", 
-        "Digital forensics", "Reverse engineering", "Password auditing", 
-        "Wireless analysis", "Malware analysis", "Incident response"
-    };
-    
-    for (const QString &cat : categories) {
-        pkgLayout->addWidget(new QCheckBox(cat));
+    // ── Page 0: Welcome ───────────────────────────────────────────
+    {
+      auto *p = new QWidget; auto *l = new QVBoxLayout(p);
+      l->addWidget(RatanaUI::makePanel("Welcome to RatanaOS v5.0 Phoenix",
+        "This wizard will guide you through installing RatanaOS on your computer.\n"
+        "Click Next to begin."));
+      l->addStretch();
+      stackedWidget->addWidget(p);
     }
-    pkgLayout->addStretch();
-    stackedWidget->addWidget(pagePackages);
 
-    // Page 7: Installation
-    auto *pageInstall = new QWidget;
-    auto *installLayout = new QVBoxLayout(pageInstall);
-    installLayout->addWidget(RatanaUI::makePanel("Installing", "Please wait while RatanaOS is installed..."));
-    auto *progressBar = new QProgressBar;
-    progressBar->setValue(0);
-    installLayout->addWidget(progressBar);
-    installLayout->addStretch();
-    stackedWidget->addWidget(pageInstall);
+    // ── Page 1: Language ─────────────────────────────────────────
+    {
+      auto *p = new QWidget; auto *l = new QVBoxLayout(p);
+      l->addWidget(RatanaUI::makePanel("Language", "Choose your system language."));
+      auto *combo = new QComboBox;
+      combo->addItems({"English (US)", "English (UK)", "French", "German", "Spanish", "Khmer", "Japanese", "Chinese (Simplified)"});
+      l->addWidget(combo); l->addStretch();
+      stackedWidget->addWidget(p);
+    }
 
-    // Page 8: Finish
-    auto *pageFinish = new QWidget;
-    auto *finishLayout = new QVBoxLayout(pageFinish);
-    finishLayout->addWidget(RatanaUI::makePanel("Success!", "RatanaOS has been installed."));
-    auto *rebootBtn = RatanaUI::makePillButton("Reboot Now", true);
-    finishLayout->addWidget(rebootBtn);
-    finishLayout->addStretch();
-    stackedWidget->addWidget(pageFinish);
+    // ── Page 2: Keyboard ─────────────────────────────────────────
+    {
+      auto *p = new QWidget; auto *l = new QVBoxLayout(p);
+      l->addWidget(RatanaUI::makePanel("Keyboard Layout", "Select your keyboard layout."));
+      auto *combo = new QComboBox;
+      combo->addItems({"US", "UK", "FR", "DE", "ES", "KH", "JP"});
+      l->addWidget(combo); l->addStretch();
+      stackedWidget->addWidget(p);
+    }
+
+    // ── Page 3: Timezone ─────────────────────────────────────────
+    {
+      auto *p = new QWidget; auto *l = new QVBoxLayout(p);
+      l->addWidget(RatanaUI::makePanel("Timezone", "Select your region and timezone."));
+      auto *combo = new QComboBox;
+      combo->addItems({"UTC", "America/New_York", "America/Los_Angeles", "Europe/London", "Europe/Paris", "Asia/Tokyo", "Asia/Phnom_Penh", "Asia/Bangkok"});
+      l->addWidget(combo); l->addStretch();
+      stackedWidget->addWidget(p);
+    }
+
+    // ── Page 4: Disk ──────────────────────────────────────────────
+    {
+      auto *p = new QWidget; auto *l = new QVBoxLayout(p);
+      l->addWidget(RatanaUI::makePanel("Disk Configuration", "Choose how to partition your disk."));
+      auto *autoBtn  = RatanaUI::makePillButton("Automatic Partitioning (Erase Disk)", true);
+      auto *manBtn   = RatanaUI::makePillButton("Manual Partitioning");
+      l->addWidget(autoBtn); l->addWidget(manBtn);
+      l->addSpacing(12);
+      auto *btrfs = new QCheckBox("Use Btrfs filesystem (enables atomic snapshots)");
+      auto *luks  = new QCheckBox("Enable full-disk encryption (LUKS2)");
+      l->addWidget(btrfs); l->addWidget(luks); l->addStretch();
+      stackedWidget->addWidget(p);
+    }
+
+    // ── Page 5: Users ─────────────────────────────────────────────
+    {
+      auto *p = new QWidget; auto *l = new QVBoxLayout(p);
+      l->addWidget(RatanaUI::makePanel("Create Your Account", "Set up your user and machine name."));
+      for (const QString &lbl : {"Full Name:", "Username:", "Password:", "Confirm Password:", "Hostname:"}) {
+        l->addWidget(new QLabel(lbl));
+        auto *e = new QLineEdit;
+        if (lbl == "Hostname:") e->setText("ratanaos");
+        if (lbl.contains("Password")) e->setEchoMode(QLineEdit::Password);
+        l->addWidget(e);
+      }
+      l->addStretch();
+      stackedWidget->addWidget(p);
+    }
+
+    // ── Page 6: Edition ───────────────────────────────────────────
+    {
+      auto *p = new QWidget; auto *l = new QVBoxLayout(p);
+      l->addWidget(RatanaUI::makePanel("Select Edition", "Choose the edition that fits your use case."));
+      auto *grp = new QButtonGroup(p);
+      QStringList editions = {
+        "Lite — XFCE, ≈2 GB, for older hardware",
+        "Standard — KDE Plasma, ≈3 GB, everyday desktop",
+        "Developer — KDE + full dev toolchain, ≈3.5 GB",
+        "Cyber — KDE + optional security tools, ≈4 GB",
+        "Server — Headless, Docker, ≈800 MB"
+      };
+      for (const QString &ed : editions) {
+        auto *r = new QRadioButton(ed);
+        if (ed.startsWith("Standard")) r->setChecked(true);
+        grp->addButton(r);
+        l->addWidget(r);
+      }
+      l->addStretch();
+      stackedWidget->addWidget(p);
+    }
+
+    // ── Page 7: Desktop ───────────────────────────────────────────
+    {
+      auto *p = new QWidget; auto *l = new QVBoxLayout(p);
+      l->addWidget(RatanaUI::makePanel("Select Desktop Environment", "Choose your desktop."));
+      auto *grp = new QButtonGroup(p);
+      QStringList desktops = {
+        "KDE Plasma — Feature-rich, modern (Recommended)",
+        "XFCE — Lightweight, fast (Lite Edition default)",
+        "GNOME — Clean, minimal workflow",
+        "LXQt — Ultra-lightweight",
+        "Hyprland — Wayland tiling (Experimental, Developer/Cyber only)"
+      };
+      for (const QString &d : desktops) {
+        auto *r = new QRadioButton(d);
+        if (d.startsWith("KDE")) r->setChecked(true);
+        grp->addButton(r);
+        l->addWidget(r);
+      }
+      l->addStretch();
+      stackedWidget->addWidget(p);
+    }
+
+    // ── Page 8: Update Strategy ────────────────────────────────── (NEW v5.0)
+    {
+      auto *p = new QWidget; auto *l = new QVBoxLayout(p);
+      l->addWidget(RatanaUI::makePanel("Update Strategy",
+        "Choose how your system will receive updates."));
+      auto *grp = new QButtonGroup(p);
+      auto *rApt = new QRadioButton("Traditional APT — Standard Debian package updates");
+      auto *rAtomic = new QRadioButton("Atomic Updates — Btrfs snapshots with one-click rollback (Recommended)");
+      rAtomic->setChecked(true);
+      grp->addButton(rApt); grp->addButton(rAtomic);
+      l->addWidget(rApt); l->addWidget(rAtomic);
+      l->addSpacing(12);
+      auto *autoUpdate = new QCheckBox("Enable automatic security updates");
+      autoUpdate->setChecked(true);
+      auto *telemetry = new QCheckBox("Share anonymized usage data (opt-in, helps improve RatanaOS)");
+      l->addWidget(autoUpdate); l->addWidget(telemetry);
+      l->addStretch();
+      stackedWidget->addWidget(p);
+    }
+
+    // ── Page 9: Install ───────────────────────────────────────────
+    {
+      auto *p = new QWidget; auto *l = new QVBoxLayout(p);
+      l->addWidget(RatanaUI::makePanel("Installing RatanaOS",
+        "Please wait while RatanaOS is installed to your disk."));
+      progressBar = new QProgressBar;
+      progressBar->setValue(0);
+      progressBar->setTextVisible(true);
+      auto *statusLabel = new QLabel("Preparing installation...");
+      l->addWidget(progressBar);
+      l->addWidget(statusLabel);
+      l->addStretch();
+      stackedWidget->addWidget(p);
+    }
+
+    // ── Page 10: Finish ───────────────────────────────────────────
+    {
+      auto *p = new QWidget; auto *l = new QVBoxLayout(p);
+      l->addWidget(RatanaUI::makePanel("Installation Complete!",
+        "🎉 RatanaOS v5.0 Phoenix has been installed successfully.\n"
+        "Remove the installation media and click Reboot Now."));
+      l->addWidget(RatanaUI::makePillButton("Reboot Now", true));
+      l->addWidget(RatanaUI::makePillButton("Continue Testing Live Session"));
+      l->addStretch();
+      stackedWidget->addWidget(p);
+    }
 
     contentLayout->addWidget(stackedWidget);
 
-    // Navigation Controls
+    // ── Navigation ────────────────────────────────────────────────
     auto *navLayout = new QHBoxLayout;
-    auto *btnBack = new QPushButton("Back");
-    auto *btnNext = new QPushButton("Next");
+    auto *btnBack = new QPushButton("← Back");
+    auto *btnNext = new QPushButton("Next →");
+    btnNext->setDefault(true);
     navLayout->addStretch();
     navLayout->addWidget(btnBack);
     navLayout->addWidget(btnNext);
     contentLayout->addLayout(navLayout);
-    
-    // Quick wireup for Next button logic (mockup)
-    QObject::connect(btnNext, &QPushButton::clicked, [stackedWidget, progressBar]() {
+
+    // Navigation logic
+    QObject::connect(btnNext, &QPushButton::clicked, [this]() {
       int next = stackedWidget->currentIndex() + 1;
       if (next < stackedWidget->count()) {
         stackedWidget->setCurrentIndex(next);
-        if (next == 7) { // Installation page is now index 7
-           progressBar->setValue(50); // Mock progress
-        }
+        if (next == 9) progressBar->setValue(50); // mock progress on install page
+        updateSidebar(next);
       }
     });
-    QObject::connect(btnBack, &QPushButton::clicked, [stackedWidget]() {
+    QObject::connect(btnBack, &QPushButton::clicked, [this]() {
       int prev = stackedWidget->currentIndex() - 1;
-      if (prev >= 0) stackedWidget->setCurrentIndex(prev);
+      if (prev >= 0) { stackedWidget->setCurrentIndex(prev); updateSidebar(prev); }
     });
 
     mainLayout->addWidget(contentArea, 1);
+  }
+
+ private:
+  void updateSidebar(int index) {
+    for (int i = 0; i < sidebarBtns.size(); ++i)
+      sidebarBtns[i]->setProperty("active", i == index);
   }
 };
 

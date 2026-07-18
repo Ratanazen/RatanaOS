@@ -1,0 +1,46 @@
+{
+  "id": "ratana-cyber",
+  "name": "RatanaOS Cyber",
+  "version": "5.0.0",
+  "description": "Cybersecurity education platform with optional security toolkits",
+  "architecture": "amd64",
+  "target_size_gb": 4.0,
+  "desktop": "kde",
+  "display_manager": "sddm",
+  "base_packages": [
+    "linux-image-amd64", "live-boot", "systemd", "systemd-sysv",
+    "shim-signed", "grub-efi-amd64-signed", "grub-pc-bin",
+    "apparmor", "apparmor-utils", "ufw", "auditd",
+    "flatpak", "curl", "wget", "rsync", "network-manager",
+    "pipewire", "wireplumber"
+  ],
+  "desktop_packages": [
+    "plasma-desktop", "sddm", "kde-standard", "dolphin", "konsole", "kate"
+  ],
+  "extra_packages": [
+    "gcc", "g++", "clang", "cmake", "git", "python3", "python3-pip",
+    "rustc", "golang", "docker.io"
+  ],
+  "optional_categories": {
+    "network_analysis":     ["nmap", "masscan", "netcat-openbsd", "tcpdump", "traceroute"],
+    "packet_capture":       ["wireshark", "tshark", "tcpdump", "ettercap-graphical"],
+    "web_testing":          ["burpsuite", "nikto", "sqlmap", "dirb", "wfuzz"],
+    "digital_forensics":    ["autopsy", "sleuthkit", "foremost", "binwalk", "volatility3"],
+    "reverse_engineering":  ["ghidra", "radare2", "gdb", "ltrace", "strace"],
+    "password_auditing":    ["hashcat", "john", "hydra", "medusa"],
+    "wireless_analysis":    ["aircrack-ng", "airmon-ng", "reaver", "wifite"],
+    "malware_analysis":     ["clamav", "yara", "volatility3", "cutter"],
+    "incident_response":    ["auditd", "osquery", "chkrootkit", "rkhunter", "lynis"]
+  },
+  "security_packages": ["ufw", "apparmor", "apparmor-utils", "fail2ban", "auditd"],
+  "services_enable": ["NetworkManager", "sddm", "apparmor", "ufw", "auditd"],
+  "services_disable": [],
+  "grub_theme": "ratana-cyber",
+  "plymouth_theme": "ratanaos",
+  "default_settings": {
+    "dark_mode": true,
+    "auto_updates": true,
+    "atomic_updates": true,
+    "encryption_default": true
+  }
+}
