@@ -1,4 +1,4 @@
-# RatanaOS v5.0 "Phoenix"
+# RatanaOS v11.1
 
 [![Build Status](https://github.com/your-username/RatanaOS/actions/workflows/main.yml/badge.svg)](https://github.com/your-username/RatanaOS/actions)
 [![Latest Release](https://img.shields.io/github/v/release/your-username/RatanaOS)](https://github.com/your-username/RatanaOS/releases/latest)
@@ -29,7 +29,7 @@ sha256sum -c SHA256SUMS
 
 ---
 
-# RatanaOS Cyber Edition v1.0
+# RatanaOS v11.1
 
 Welcome to **RatanaOS Cyber Edition**, a specialized, Debian-based Linux distribution engineered from the ground up for cybersecurity professionals, software developers, and system administrators. 
 
@@ -48,6 +48,13 @@ RatanaOS provides an original, curated user experience, shipping with a bespoke 
   - **Ratana Software Center**: Unified APT and Flatpak graphical package management.
   - **Ratana Update Manager**: Background daemon for system upgrades and Btrfs snapshot rollbacks.
   - **RatanaAI Assistant**: Built-in AI copilot for shell command explanations and system troubleshooting.
+
+- **Advanced Personalization System**:
+  - **Ratana Profile Manager**: Upload avatars and manage local user profiles (`~/.config/ratana/profile/`).
+  - **Ratana Appearance Center**: Change themes (Dark, Light, AMOLED), apply icon packs, and manage wallpapers.
+  - **Ratana Login Manager**: Customize the login screen background, avatar display, and blur effects.
+  - **Ratana Branding Tool**: Administrator utilities to configure OS logos, Plymouth boot animations, and GRUB backgrounds.
+  - **Unified Databases**: Settings stored in lightweight SQLite databases (`themes.db`, `profiles.db`, `settings.db`).
 
 ---
 
