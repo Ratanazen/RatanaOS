@@ -24,7 +24,7 @@ QA workflow branch target: `qa/testing`
 ## Validation Results
 
 - Build: FAIL - Build prerequisites are incomplete in this environment.
-- ISO: PASS - ISO artifact exists at .artifacts/ratanaos.iso.
+- ISO: FAIL - No ISO artifact is available.
 - Boot: FAIL - Boot test is blocked by a missing ISO artifact or missing QEMU/xorriso dependencies.
 - Installation: FAIL - Installer assets are incomplete.
 - Performance: FAIL - No performance benchmark suite or runnable image is available.

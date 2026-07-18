@@ -32,7 +32,7 @@ cd ${ROOT_DIR}
 echo "✅ Release checks completed."
 
 echo "[4/4] Triggering Continuous Delivery (ISO Generation)..."
-./builder/build-iso.sh ratana-desktop
+./builder/build-iso.sh ratana-cyber
 echo "✅ ISO generated successfully."
 
 echo "========================================="
