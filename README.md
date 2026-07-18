@@ -1,16 +1,14 @@
 # RatanaOS v11.1
 
-[![Build Status](https://github.com/your-username/RatanaOS/actions/workflows/main.yml/badge.svg)](https://github.com/your-username/RatanaOS/actions)
-[![Latest Release](https://img.shields.io/github/v/release/your-username/RatanaOS)](https://github.com/your-username/RatanaOS/releases/latest)
+[![Build Status](https://github.com/Ratanazen/RatanaOS/actions/workflows/main.yml/badge.svg)](https://github.com/Ratanazen/RatanaOS/actions)
+[![Latest Release](https://img.shields.io/github/v/release/Ratanazen/RatanaOS)](https://github.com/Ratanazen/RatanaOS/releases/latest)
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL%203.0-blue.svg)](LICENSE)
-
-> **Replace `your-username` above with your actual GitHub username before publishing.**
 
 ---
 
 ## 📥 Download
 
-> **[⬇️ Download RatanaOS from the GitHub Releases page](https://github.com/your-username/RatanaOS/releases/latest)**
+> **[⬇️ Download RatanaOS from the GitHub Releases page](https://github.com/Ratanazen/RatanaOS/releases/latest)**
 
 | Edition | File | Size | Best For |
 |---|---|---|---|
