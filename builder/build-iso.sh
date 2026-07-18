@@ -1,5 +1,5 @@
 #!/bin/bash
-# RatanaOS Production ISO Builder (v5.0 Phoenix)
+# RatanaOS Production ISO Builder (v10.0)
 # Supports: ratana-lite, ratana-standard, ratana-developer, ratana-cyber, ratana-server, ratana-arm
 
 set -e
@@ -33,7 +33,7 @@ mkdir -p "${LOGS_DIR}"
 exec > >(tee -a "${LOG_FILE}") 2>&1
 
 echo "=========================================="
-echo "   RatanaOS Production ISO Builder v5.0  "
+echo "   RatanaOS Production ISO Builder v10.0  "
 echo "=========================================="
 echo "Profile : ${PROFILE}"
 echo "Arch    : ${ARCH}"
@@ -55,7 +55,7 @@ echo "Workspace: ${BUILD_DIR}"
 
 # ── Step 3: Bootstrap Debian Base ────────────────────────────────────
 echo "[3/11] Bootstrapping Debian Stable base (${ARCH})..."
-if command -v debootstrap >/dev/null 2>&1; then
+if command -v debootstrap >/dev/null 2>&1 && [ "$EUID" -eq 0 ]; then
   if [ "$ARCH" = "arm64" ]; then
     debootstrap --arch=arm64 --foreign bookworm "${CHROOT_DIR}" http://deb.debian.org/debian/
     # Second stage requires QEMU static binary for cross-compilation
@@ -65,7 +65,7 @@ if command -v debootstrap >/dev/null 2>&1; then
     debootstrap --arch=amd64 bookworm "${CHROOT_DIR}" http://deb.debian.org/debian/
   fi
 else
-  echo "⚠️  debootstrap not found — mocking base."
+  echo "⚠️  debootstrap not found or not running as root — mocking base."
   mkdir -p "${CHROOT_DIR}/bin" "${CHROOT_DIR}/etc" "${CHROOT_DIR}/var" "${CHROOT_DIR}/usr/share/ratanaos"
 fi
 
@@ -74,11 +74,11 @@ echo "[4/11] Configuring chroot and OS identity..."
 mkdir -p "${CHROOT_DIR}/etc"
 cat <<EOF > "${CHROOT_DIR}/etc/os-release"
 NAME="RatanaOS"
-VERSION="5.0.0 (Phoenix)"
+VERSION="10.0.0"
 ID=ratanaos
 ID_LIKE=debian
-PRETTY_NAME="RatanaOS v5.0 Phoenix"
-VERSION_ID="5.0.0"
+PRETTY_NAME="RatanaOS v10.0"
+VERSION_ID="10.0.0"
 HOME_URL="https://ratanaos.local"
 SUPPORT_URL="https://ratanaos.local/support"
 BUG_REPORT_URL="https://ratanaos.local/bugs"
@@ -175,7 +175,7 @@ fi
 # ── Step 9: Generate ISO ─────────────────────────────────────────────
 echo "[9/11] Generating ISO with xorriso..."
 
-# Named per v5.0 deliverables spec
+# Named per v10.0 deliverables spec
 case "$PROFILE" in
   ratana-lite)      ISO_NAME="RatanaOS-Lite.iso" ;;
   ratana-standard)  ISO_NAME="RatanaOS-Standard.iso" ;;
@@ -221,7 +221,7 @@ cat <<EOF > "${OUTPUT_DIR}/BUILD_REPORT.md"
 | Field | Value |
 |---|---|
 | Date | $(date -u +"%Y-%m-%dT%H:%M:%SZ") |
-| Version | 5.0.0 Phoenix |
+| Version | 10.0.0 |
 | Profile | ${PROFILE} |
 | Architecture | ${ARCH} |
 | Artifact | ${ISO_NAME} |
