@@ -199,10 +199,13 @@ ISO_PATH="${OUTPUT_DIR}/${ISO_NAME}"
 if command -v grub-mkrescue >/dev/null 2>&1; then
   mkdir -p "${IMAGE_DIR}/live"
   mkdir -p "${IMAGE_DIR}/EFI/BOOT"
-  # Touch mock kernel/initrd files so GRUB finds them
-  touch "${IMAGE_DIR}/live/vmlinuz" "${IMAGE_DIR}/live/initrd.img"
-  touch "${IMAGE_DIR}/vmlinuz" "${IMAGE_DIR}/initrd"
-  [ -f "${IMAGE_DIR}/live/filesystem.squashfs" ] || touch "${IMAGE_DIR}/live/filesystem.squashfs"
+  # Generate mock kernel/initrd files with non-zero size to prevent GRUB "premature end of file"
+  dd if=/dev/urandom of="${IMAGE_DIR}/live/vmlinuz" bs=1M count=10 2>/dev/null
+  dd if=/dev/urandom of="${IMAGE_DIR}/live/initrd.img" bs=1M count=10 2>/dev/null
+  # Copy them to root as well just in case
+  cp "${IMAGE_DIR}/live/vmlinuz" "${IMAGE_DIR}/vmlinuz"
+  cp "${IMAGE_DIR}/live/initrd.img" "${IMAGE_DIR}/initrd"
+  [ -f "${IMAGE_DIR}/live/filesystem.squashfs" ] || dd if=/dev/urandom of="${IMAGE_DIR}/live/filesystem.squashfs" bs=1M count=50 2>/dev/null
   
   grub-mkrescue -o "${ISO_PATH}" "${IMAGE_DIR}" 2>/dev/null && echo "✅ ISO created." || \
     { echo "⚠️  grub-mkrescue failed — mocking."; echo "Mock ISO" > "${ISO_PATH}"; }
