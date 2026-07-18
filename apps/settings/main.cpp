@@ -25,8 +25,8 @@ class SettingsWindow : public QMainWindow {
     auto *name = new QLabel("Settings");
     name->setObjectName("HeroTitle");
     sidebarLayout->addWidget(name);
-    for (const QString &entry : {"Personalization", "Display", "Network", "Privacy", "Updates", "Accounts"}) {
-      sidebarLayout->addWidget(RatanaUI::makePillButton(entry, entry == "Personalization"));
+    for (const QString &entry : {"Profile", "Appearance", "Themes", "Icons", "Wallpaper", "Login Screen", "Privacy", "Network", "Hardware", "Updates"}) {
+      sidebarLayout->addWidget(RatanaUI::makePillButton(entry, entry == "Profile"));
     }
     sidebarLayout->addStretch();
 

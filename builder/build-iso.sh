@@ -1,5 +1,5 @@
 #!/bin/bash
-# RatanaOS Production ISO Builder (v10.0)
+# RatanaOS Production ISO Builder (v10.1)
 # Supports: ratana-lite, ratana-standard, ratana-developer, ratana-cyber, ratana-server, ratana-arm
 
 set -e
@@ -33,7 +33,7 @@ mkdir -p "${LOGS_DIR}"
 exec > >(tee -a "${LOG_FILE}") 2>&1
 
 echo "=========================================="
-echo "   RatanaOS Production ISO Builder v10.0  "
+echo "   RatanaOS Production ISO Builder v10.1  "
 echo "=========================================="
 echo "Profile : ${PROFILE}"
 echo "Arch    : ${ARCH}"
@@ -74,11 +74,11 @@ echo "[4/11] Configuring chroot and OS identity..."
 mkdir -p "${CHROOT_DIR}/etc"
 cat <<EOF > "${CHROOT_DIR}/etc/os-release"
 NAME="RatanaOS"
-VERSION="10.0.0"
+VERSION="10.1.0"
 ID=ratanaos
 ID_LIKE=debian
-PRETTY_NAME="RatanaOS v10.0"
-VERSION_ID="10.0.0"
+PRETTY_NAME="RatanaOS v10.1"
+VERSION_ID="10.1.0"
 HOME_URL="https://ratanaos.local"
 SUPPORT_URL="https://ratanaos.local/support"
 BUG_REPORT_URL="https://ratanaos.local/bugs"
@@ -89,7 +89,7 @@ echo "[5/11] Installing packages for profile: ${PROFILE}..."
 
 # Base packages common to all editions
 BASE_PKGS="linux-image-amd64 live-boot systemd shim-signed grub-efi-amd64-signed \
-  apparmor apparmor-utils ufw auditd flatpak snapd curl wget rsync"
+  apparmor apparmor-utils ufw auditd flatpak snapd curl wget rsync plymouth plymouth-themes"
 
 # Desktop and profile-specific packages
 case "$PROFILE" in
@@ -175,7 +175,7 @@ fi
 # ── Step 9: Generate ISO ─────────────────────────────────────────────
 echo "[9/11] Generating ISO with xorriso..."
 
-# Named per v10.0 deliverables spec
+# Named per v10.1 deliverables spec
 case "$PROFILE" in
   ratana-lite)      ISO_NAME="RatanaOS-Lite.iso" ;;
   ratana-standard)  ISO_NAME="RatanaOS-Standard.iso" ;;
@@ -221,7 +221,7 @@ cat <<EOF > "${OUTPUT_DIR}/BUILD_REPORT.md"
 | Field | Value |
 |---|---|
 | Date | $(date -u +"%Y-%m-%dT%H:%M:%SZ") |
-| Version | 10.0.0 |
+| Version | 10.1.0 |
 | Profile | ${PROFILE} |
 | Architecture | ${ARCH} |
 | Artifact | ${ISO_NAME} |

@@ -34,8 +34,8 @@ class SoftwareCenterWindow : public QMainWindow {
     auto *title = new QLabel("Software Center");
     title->setObjectName("HeroTitle");
     sidebarLayout->addWidget(title);
-    for (const QString &entry : {"Discover", "Search", "Repositories", "Updates", "Installed"}) {
-      sidebarLayout->addWidget(RatanaUI::makePillButton(entry, entry == "Discover"));
+    for (const QString &entry : {"Applications", "Development", "Security", "Themes", "Icons", "Wallpapers", "Updates", "Installed"}) {
+      sidebarLayout->addWidget(RatanaUI::makePillButton(entry, entry == "Applications"));
     }
     sidebarLayout->addStretch();
 

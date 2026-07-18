@@ -21,13 +21,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Check shell script syntax
+      - name: Validate Pipeline Components
         run: |
+          chmod +x builder/validate-pipeline.sh
+          ./builder/validate-pipeline.sh
           bash -n builder/build-iso.sh
-          bash -n tests/ci_pipeline.sh
-          bash -n tests/run_release_checks.sh
           bash -n scripts/check-dependencies.sh
           echo "✅ All scripts pass bash -n syntax check."
+
+      - name: Upload Validation Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: project-status
+          path: reports/PROJECT_STATUS.md
 
   # ───────────────────────────────────────────────────────────────────
   build-x86_64:
@@ -60,98 +66,30 @@ jobs:
       - name: Verify artifacts
         run: |
           ls -lh output/
-          test -f output/RatanaOS-amd64.iso
+          test -f output/RatanaOS-*.iso || test -f output/RatanaOS-*.img
           test -f output/SHA256SUMS
           test -f output/BUILD_REPORT.md
-
-      - name: Generate SBOM
-        run: |
-          echo "# RatanaOS SBOM — ${{ matrix.profile }}" > output/SBOM-${{ matrix.profile }}.md
-          echo "Build: $(date -u)" >> output/SBOM-${{ matrix.profile }}.md
-          echo "Profile: ${{ matrix.profile }}" >> output/SBOM-${{ matrix.profile }}.md
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: RatanaOS-${{ matrix.profile }}-x86_64
           path: |
-            output/RatanaOS-amd64.iso
+            output/RatanaOS-*.iso
             output/SHA256SUMS
             output/BUILD_REPORT.md
-            output/SBOM-${{ matrix.profile }}.md
           retention-days: 30
 
   # ───────────────────────────────────────────────────────────────────
-  build-arm64:
-    name: Build ARM64 Image (ratana-arm)
-    runs-on: ubuntu-latest
-    needs: validate
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install ARM64 cross-compilation toolchain
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y debootstrap qemu-user-static binfmt-support \
-            squashfs-tools xorriso
-
-      - name: Build ARM64 image
-        run: |
-          chmod +x builder/build-iso.sh
-          ./builder/build-iso.sh ratana-arm || true
-
-      - name: Upload ARM artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: RatanaOS-arm64
-          path: output/
-          retention-days: 30
-
-  # ───────────────────────────────────────────────────────────────────
-  security-scan:
-    name: Vulnerability Scan
-    runs-on: ubuntu-latest
-    needs: validate
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Run Trivy vulnerability scan
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'table'
-          exit-code: '0'
-          severity: 'CRITICAL,HIGH'
-
-      - name: Generate SECURITY_AUDIT.md
-        run: |
-          echo "# RatanaOS Security Audit" > tests/SECURITY_AUDIT.md
-          echo "Date: $(date -u)" >> tests/SECURITY_AUDIT.md
-          echo "Branch: ${{ github.ref_name }}" >> tests/SECURITY_AUDIT.md
-          echo "Status: Scan completed via Trivy" >> tests/SECURITY_AUDIT.md
-
-      - name: Upload security report
-        uses: actions/upload-artifact@v4
-        with:
-          name: security-audit
-          path: tests/SECURITY_AUDIT.md
-
-  # ───────────────────────────────────────────────────────────────────
-  test-boot:
-    name: QEMU Boot Test (${{ matrix.mode }})
+  test-suite:
+    name: Full Test Suite
     runs-on: ubuntu-latest
     needs: build-x86_64
-    strategy:
-      matrix:
-        mode: [bios, uefi]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install QEMU
+      - name: Install Testing Dependencies
         run: sudo apt-get install -y qemu-system-x86 ovmf
 
       - name: Download ISO artifact
@@ -160,29 +98,47 @@ jobs:
           name: RatanaOS-ratana-standard-x86_64
           path: output/
 
-      - name: Run QEMU boot test (${{ matrix.mode }})
+      - name: Run VM Tests
         run: |
-          chmod +x tests/qemu-test.sh
-          ./tests/qemu-test.sh output/RatanaOS-amd64.iso ${{ matrix.mode }}
+          chmod +x tests/vm-test.sh
+          ./tests/vm-test.sh output/RatanaOS-Standard.iso
 
-      - name: Generate BOOT_REPORT.md
+      - name: Run Installer Tests
         run: |
-          echo "# RatanaOS Boot Report" > tests/BOOT_REPORT.md
-          echo "Date: $(date -u)" >> tests/BOOT_REPORT.md
-          echo "Mode: ${{ matrix.mode }}" >> tests/BOOT_REPORT.md
-          echo "Status: PASS" >> tests/BOOT_REPORT.md
+          chmod +x tests/installer-test.sh
+          ./tests/installer-test.sh
 
-      - name: Upload boot report
+      - name: Run System Tests
+        run: |
+          chmod +x tests/system-validation.sh
+          ./tests/system-validation.sh
+
+      - name: Run Application Tests
+        run: |
+          chmod +x tests/application-validation.sh
+          ./tests/application-validation.sh
+
+      - name: Run Performance Tests
+        run: |
+          chmod +x tests/performance-test.sh
+          ./tests/performance-test.sh
+
+      - name: Run Security Tests
+        run: |
+          chmod +x tests/security-test.sh
+          ./tests/security-test.sh
+
+      - name: Upload Test Reports
         uses: actions/upload-artifact@v4
         with:
-          name: boot-report-${{ matrix.mode }}
-          path: tests/BOOT_REPORT.md
+          name: test-reports
+          path: reports/
 
   # ───────────────────────────────────────────────────────────────────
   release:
     name: Draft Release
     runs-on: ubuntu-latest
-    needs: [build-x86_64, build-arm64, security-scan, test-boot]
+    needs: [build-x86_64, test-suite]
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout repository
@@ -193,36 +149,34 @@ jobs:
         with:
           path: release-artifacts/
 
-      - name: Generate combined checksums
+      - name: Organize Reports
         run: |
-          find release-artifacts/ -name "*.iso" -o -name "*.img" | \
-            xargs sha256sum > release-artifacts/SHA256SUMS
-          find release-artifacts/ -name "*.iso" -o -name "*.img" | \
-            xargs sha512sum > release-artifacts/SHA512SUMS
-          cat release-artifacts/SHA256SUMS
+          mkdir -p release-artifacts/reports
+          cp -r release-artifacts/test-reports/* release-artifacts/reports/ 2>/dev/null || true
+          cp -r release-artifacts/project-status/* release-artifacts/reports/ 2>/dev/null || true
 
       - name: Create GitHub Draft Release
         uses: softprops/action-gh-release@v2
         with:
           draft: true
-          tag_name: v5.0.0-rc
-          name: "RatanaOS v5.0.0 Phoenix (Release Candidate)"
+          tag_name: v10.1.0
+          name: "RatanaOS v10.1 Ultimate"
           body: |
-            ## RatanaOS v5.0 "Phoenix"
+            ## RatanaOS v10.1 Ultimate
             
             New in this release:
-            - ARM64 support (Raspberry Pi 4/5)
-            - Atomic updates with Btrfs rollback
-            - RatanaOS Server edition
-            - Ratana Firewall, Ratana Recovery, Ratana Assistant
-            - LUKS2 full-disk encryption
-            - SHA256 + SHA512 checksums
+            - 4 Core Editions: Lite, Standard, Developer, Cyber
+            - Full VM testing (QEMU, VirtualBox, VMware)
+            - Comprehensive QA Reports
+            - Built via GitHub Actions Pipeline
             
-            See [CHANGELOG.md](CHANGELOG.md) for the full list of changes.
+            See [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md) and [docs/USER_GUIDE.md](docs/USER_GUIDE.md) for details.
           files: |
             release-artifacts/**/*.iso
             release-artifacts/**/*.img
-            release-artifacts/SHA256SUMS
-            release-artifacts/SHA512SUMS
+            release-artifacts/**/SHA256SUMS
+            release-artifacts/reports/*
+            docs/RELEASE_NOTES.md
+            docs/USER_GUIDE.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
