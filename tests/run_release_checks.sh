@@ -123,7 +123,13 @@ ISO_RC=1
 ISO_NOTE="No ISO artifact is available."
 if [[ -f "${ARTIFACT_ISO}" ]]; then
   ISO_RC=0
-  ISO_NOTE="ISO artifact exists at .artifacts/ratanaos.iso."
+  ISO_SIZE_BYTES=$(stat -c%s "${ARTIFACT_ISO}")
+  ISO_SIZE_MB=$((ISO_SIZE_BYTES / 1024 / 1024))
+  if (( ISO_SIZE_MB > 4096 )); then
+      ISO_NOTE="ISO artifact exists at .artifacts/ratanaos.iso. WARNING: Size (${ISO_SIZE_MB}MB) exceeds 4GB limit for Cyber Edition."
+  else
+      ISO_NOTE="ISO artifact exists at .artifacts/ratanaos.iso. Size: ${ISO_SIZE_MB}MB (Within limits)."
+  fi
 fi
 
 INSTALLER_ASSETS_RC=0

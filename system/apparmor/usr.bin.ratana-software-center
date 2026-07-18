@@ -1,0 +1,23 @@
+#include <tunables/global>
+
+/usr/bin/ratana-software-center flags=(complain) {
+  #include <abstractions/base>
+  #include <abstractions/fonts>
+  #include <abstractions/wayland>
+  #include <abstractions/nameservice>
+
+  # Allow network access for downloading package indices
+  network inet stream,
+  network inet6 stream,
+
+  # Allow executing apt cache commands
+  /usr/bin/apt-cache rix,
+  /usr/bin/flatpak rix,
+  
+  # Allow triggering pkexec for installations
+  /usr/bin/pkexec Px,
+  
+  # Allow reading caches
+  /var/cache/apt/** r,
+  /var/lib/apt/lists/** r,
+}

@@ -2,87 +2,113 @@
 
 #include <QApplication>
 #include <QDate>
+#include <QTime>
+#include <QTimer>
 #include <QFrame>
 #include <QGridLayout>
+#include <QHBoxLayout>
 #include <QLabel>
 #include <QMainWindow>
+#include <QPushButton>
 #include <QVBoxLayout>
+#include <QStackedWidget>
 
-class DesktopShellWindow : public QMainWindow {
+class SessionManager : public QObject {
  public:
-  DesktopShellWindow() {
-    setWindowTitle("RatanaOS Desktop");
-    resize(1600, 960);
+  SessionManager(QObject *parent = nullptr) : QObject(parent) {}
+  void lockScreen() { qDebug("Locking screen..."); }
+  void logout() { qDebug("Logging out..."); }
+  void shutdown() { qDebug("Shutting down..."); }
+};
 
-    auto *surface = new QFrame;
-    surface->setObjectName("ShellSurface");
-    setCentralWidget(surface);
+class PanelWidget : public QFrame {
+ public:
+  PanelWidget(QWidget *parent = nullptr) : QFrame(parent) {
+    setObjectName("DesktopPanel");
+    setFixedHeight(40);
+    auto *layout = new QHBoxLayout(this);
+    layout->setContentsMargins(10, 0, 10, 0);
 
-    auto *sidebar = new QFrame;
-    auto *sidebarLayout = new QVBoxLayout(sidebar);
-    sidebarLayout->setContentsMargins(18, 18, 18, 18);
-    sidebarLayout->setSpacing(12);
-    auto *title = new QLabel("RatanaOS");
-    title->setObjectName("HeroTitle");
-    sidebarLayout->addWidget(title);
-    sidebarLayout->addWidget(new QLabel("Wayland-first workspace"));
-    for (const QString &entry : {"Launcher", "Files", "Settings", "Software", "Monitor", "Assistant"}) {
-      sidebarLayout->addWidget(RatanaUI::makePillButton(entry, entry == "Launcher"));
-    }
-    sidebarLayout->addStretch();
-    sidebarLayout->addWidget(new QLabel("Session: Focus"));
-
-    auto *content = new QWidget;
-    auto *contentLayout = new QVBoxLayout(content);
-    contentLayout->setSpacing(20);
-
-    auto *hero = RatanaUI::makePanel(
-        "Desktop Overview",
-        QString("Friday, %1").arg(QDate::currentDate().toString("MMMM d, yyyy")));
-    auto *heroLayout = qobject_cast<QVBoxLayout *>(hero->layout());
-    heroLayout->addWidget(RatanaUI::makeMetricRow("Notifications", "3", "all low priority"));
-    heroLayout->addWidget(RatanaUI::makeMetricRow("Windows", "8", "2 pinned workspaces"));
-    heroLayout->addWidget(RatanaUI::makeMetricRow("Updates", "12", "ready for tonight"));
-    contentLayout->addWidget(hero);
-
-    auto *grid = new QGridLayout;
-    grid->setSpacing(18);
-    grid->addWidget(RatanaUI::makeCard(
-        "Workspace",
-        "Project Studio",
-        "Pinned coding session with terminal, editor, docs, and assistant stacked for fast context switching.",
-        QColor("#b96f31")), 0, 0);
-    grid->addWidget(RatanaUI::makeCard(
-        "System health",
-        "Compositor stable",
-        "Frame pacing and memory pressure are in the expected range for a full workday load.",
-        QColor("#2b7a6e")), 0, 1);
-    grid->addWidget(RatanaUI::makeCard(
-        "Quick actions",
-        "Prepare for presentation",
-        "One action can mute alerts, raise brightness, and switch to external display layout.",
-        QColor("#4f6fa3")), 1, 0);
-    grid->addWidget(RatanaUI::makeCard(
-        "Activity",
-        "Software Center synced",
-        "Three productivity tools and one firmware patch were validated this morning.",
-        QColor("#87516e")), 1, 1);
-    contentLayout->addLayout(grid);
-
-    auto *aside = RatanaUI::makeSectionList("Today", {
-      "09:30 Design review in Focus Shield",
-      "13:00 Install preview desktop updates",
-      "16:45 Export session report"
+    auto *launcherBtn = RatanaUI::makePillButton("Launcher", true);
+    layout->addWidget(launcherBtn);
+    
+    layout->addStretch();
+    
+    auto *clockLabel = new QLabel(QTime::currentTime().toString("hh:mm"));
+    auto *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, [clockLabel]() {
+      clockLabel->setText(QTime::currentTime().toString("hh:mm"));
     });
+    timer->start(1000);
+    layout->addWidget(clockLabel);
+    
+    layout->addStretch();
 
-    RatanaUI::installWindowScaffold(surface, sidebar, content, aside);
+    auto *notifBtn = RatanaUI::makePillButton("Notifications");
+    auto *sessionBtn = RatanaUI::makePillButton("Session");
+    layout->addWidget(notifBtn);
+    layout->addWidget(sessionBtn);
+  }
+};
+
+class LauncherWidget : public QFrame {
+ public:
+  LauncherWidget(QWidget *parent = nullptr) : QFrame(parent) {
+    auto *layout = new QGridLayout(this);
+    layout->setSpacing(20);
+    layout->addWidget(RatanaUI::makeCard("App", "Terminal", "CLI Environment", QColor("#333333")), 0, 0);
+    layout->addWidget(RatanaUI::makeCard("App", "Settings", "System Config", QColor("#2b7a6e")), 0, 1);
+    layout->addWidget(RatanaUI::makeCard("App", "Software", "App Center", QColor("#4f6fa3")), 1, 0);
+    layout->addWidget(RatanaUI::makeCard("App", "Monitor", "Task Manager", QColor("#87516e")), 1, 1);
+  }
+};
+
+class NotificationCenterWidget : public QFrame {
+ public:
+  NotificationCenterWidget(QWidget *parent = nullptr) : QFrame(parent) {
+    auto *layout = new QVBoxLayout(this);
+    layout->addWidget(new QLabel("<b>Recent Notifications</b>"));
+    layout->addWidget(RatanaUI::makeMetricRow("System Update", "Available", "Core components ready"));
+    layout->addWidget(RatanaUI::makeMetricRow("Security", "Scan complete", "No issues found"));
+    layout->addStretch();
+  }
+};
+
+class DesktopEnvironment : public QMainWindow {
+ public:
+  DesktopEnvironment() {
+    setWindowTitle("RatanaOS Desktop Environment");
+    resize(1920, 1080);
+    
+    auto *central = new QWidget;
+    auto *mainLayout = new QVBoxLayout(central);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setSpacing(0);
+    
+    auto *panel = new PanelWidget(this);
+    mainLayout->addWidget(panel);
+    
+    auto *workspace = new QWidget;
+    auto *wsLayout = new QHBoxLayout(workspace);
+    
+    auto *launcher = new LauncherWidget(this);
+    auto *notifs = new NotificationCenterWidget(this);
+    
+    wsLayout->addWidget(launcher, 2);
+    wsLayout->addWidget(notifs, 1);
+    
+    mainLayout->addWidget(workspace);
+    setCentralWidget(central);
+    
+    // Session Manager integration
+    SessionManager session;
   }
 };
 
 int main(int argc, char *argv[]) {
   QApplication app(argc, argv);
   RatanaUI::applyAppTheme(app);
-  DesktopShellWindow window;
-  window.show();
+  DesktopEnvironment shell;
+  shell.show();
   return app.exec();
 }

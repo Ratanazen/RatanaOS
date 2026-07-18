@@ -1,0 +1,11 @@
+{
+  "name": "RatanaOS GNOME Profile",
+  "desktop": "GNOME",
+  "compositor": "mutter",
+  "panel_position": "top",
+  "theme_engine": "adwaita",
+  "packages": [
+    "gnome-shell",
+    "gdm3"
+  ]
+}

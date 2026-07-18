@@ -1,0 +1,20 @@
+#include <tunables/global>
+
+/usr/bin/ratana-terminal flags=(complain) {
+  #include <abstractions/base>
+  #include <abstractions/fonts>
+  #include <abstractions/X>
+  #include <abstractions/wayland>
+
+  # Allow executing standard shells and utilities
+  /bin/bash Cx -> ratana_bash,
+  /bin/zsh Cx -> ratana_zsh,
+  /usr/bin/** rix,
+  
+  # Allow access to user home directory for configs
+  owner @{HOME}/** rw,
+  
+  # System access required for UI
+  /etc/fonts/** r,
+  /sys/devices/** r,
+}

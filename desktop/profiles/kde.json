@@ -1,0 +1,12 @@
+{
+  "name": "RatanaOS KDE Plasma Profile",
+  "desktop": "KDE",
+  "compositor": "kwin_wayland",
+  "panel_position": "bottom",
+  "theme_engine": "kvantum",
+  "packages": [
+    "plasma-desktop",
+    "plasma-wayland-protocols",
+    "sddm"
+  ]
+}

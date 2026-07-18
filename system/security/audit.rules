@@ -1,0 +1,23 @@
+# RatanaOS Default Audit Rules
+# Automatically deployed for Milestone 8 Security compliance
+
+# Delete all existing rules
+-D
+
+# Set buffer size
+-b 8192
+
+# Monitor changes to user/group information
+-w /etc/group -p wa -k identity
+-w /etc/passwd -p wa -k identity
+-w /etc/gshadow -p wa -k identity
+-w /etc/shadow -p wa -k identity
+-w /etc/security/opasswd -p wa -k identity
+
+# Monitor changes to sudoers
+-w /etc/sudoers -p wa -k priv_deleg
+-w /etc/sudoers.d/ -p wa -k priv_deleg
+
+# Monitor failed logins (requires systemd-journald or similar parsing)
+-w /var/log/faillog -p wa -k logins
+-w /var/log/lastlog -p wa -k logins

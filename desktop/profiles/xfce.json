@@ -1,0 +1,11 @@
+{
+  "name": "RatanaOS XFCE Profile",
+  "desktop": "XFCE",
+  "compositor": "xfwm4",
+  "panel_position": "top",
+  "theme_engine": "gtk",
+  "packages": [
+    "xfce4",
+    "lightdm"
+  ]
+}

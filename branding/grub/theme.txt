@@ -1,0 +1,16 @@
+# GRUB theme for RatanaOS
+title-text: "RatanaOS"
+desktop-image: "background.png"
+terminal-box: "terminal_box_*.png"
+terminal-font: "Terminus Regular 14"
+
++ boot_menu {
+  left = 15%
+  width = 70%
+  top = 25%
+  height = 50%
+  item_font = "Unifont Regular 16"
+  item_color = "#e6e1da"
+  selected_item_color = "#1a1614"
+  selected_item_pixmap_style = "select_*.png"
+}

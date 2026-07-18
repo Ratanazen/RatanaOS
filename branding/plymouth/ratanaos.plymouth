@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=RatanaOS Splash
+Description=The default Plymouth theme for RatanaOS v2.0
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/ratanaos
+ScriptFile=/usr/share/plymouth/themes/ratanaos/ratanaos.script

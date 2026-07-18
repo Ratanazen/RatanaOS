@@ -1,0 +1,11 @@
+{
+  "name": "RatanaOS LXQt Profile",
+  "desktop": "LXQt",
+  "compositor": "openbox",
+  "panel_position": "bottom",
+  "theme_engine": "lxqt",
+  "packages": [
+    "lxqt",
+    "sddm"
+  ]
+}
