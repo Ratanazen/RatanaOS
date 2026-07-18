@@ -163,8 +163,13 @@ menuentry "Install RatanaOS" {
     linux /live/vmlinuz boot=live only-ubiquity quiet splash
     initrd /live/initrd.img
 }
+
+menuentry "Start RatanaOS (Recovery Mode)" {
+    linux /live/vmlinuz boot=live systemd.unit=recovery.target ratana_recovery=1
+    initrd /live/initrd.img
+}
 EOF
-echo "  ✅ Chroot networking enabled."
+echo "  ✅ Bootloader configured."
 
 # ── Step 4.5: Modular Assets & Branding (v16) ─────────────────────────
 echo "[4.5/11] Staging Modular Assets & Branding..."

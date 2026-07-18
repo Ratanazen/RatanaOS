@@ -1,7 +1,27 @@
 # RatanaOS Changelog
 
+## v18.0.0 "Recovery & Reliability"
+*A robust suite of rescue tools for mission-critical systems.*
+
+### Features
+- **Recovery Mode**: Dedicated GRUB boot entry booting directly into `ratana-recovery`.
+- **Ratana Recovery Overhaul**: Added new tools including System Log Viewer, Emergency Shell, Boot Repair, and Hardware/Boot Diagnostics.
+- **Crash Reporting**: Export segmentation faults and core dumps from `/var/crash` to external media.
+- **Documentation**: New `docs/RECOVERY.md` detailing disaster recovery workflows.
+
+---
+
+## v16.0.0 "Modular UI & Assets"
+*Zero-code UI personalization engine.*
+
+### Features
+- **Modular Assets**: Introduced unified `/assets/` directory structure for icons, wallpapers, avatars, and cursors.
+- **Configuration Engine**: Built `ratanaos-config.yaml` to orchestrate default configurations.
+- **Redesigned Installer**: 12-page Qt6 wizard scanning dynamic assets directly from the filesystem.
+
+---
+
 ## v5.0.0 "Phoenix" — In Development
-*ARM64, atomic updates, accessibility, two new editions.*
 
 ### New Editions
 - **RatanaOS Server** — headless, ~800 MB ISO, Docker/Podman, automated security patching, optional web-based control panel

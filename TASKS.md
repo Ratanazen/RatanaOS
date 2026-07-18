@@ -1,13 +1,15 @@
-# RatanaOS Task List (Agent v1.1 - UI Guidelines Updated)
+# RatanaOS Task List (v18.0)
 
-## Current Milestone: Pending User Definition
+## Current Milestone: v18 — Recovery & Reliability
 
-### Phase 1: Inspection & Planning (Current)
+### Phase 1: Inspection & Planning
 - [x] Inspect repository state (Git check).
-- [x] Adopt Agent v1.1 rules (Including expanded UI Engineer guidelines).
-- [ ] Receive next milestone assignment.
+- [x] Receive next milestone assignment (v18 -> v100 Roadmap).
 
-### Phase 2: Technical Debt & Preparation
-- [ ] Set up a mock-git tracking mechanism or wait for environment git installation.
-- [ ] Create base structure for unified `ratanaos-colors.json` and `index.theme` to comply with new UI Engineer rules.
-- [ ] Address pending tech debt from v12.0.
+### Phase 2: v18 Implementation
+- [x] Implement Recovery Mode UI and app (`ratana-recovery`).
+- [x] Integrate Boot Repair, Diagnostics, Snapshot Rollback tools.
+- [x] Create Emergency Shell and Log Viewer.
+- [x] Write `docs/RECOVERY.md` documentation.
+- [x] Build successfully and test.
+- [x] Commit changes.
