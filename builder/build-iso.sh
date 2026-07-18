@@ -196,21 +196,18 @@ esac
 
 ISO_PATH="${OUTPUT_DIR}/${ISO_NAME}"
 
-if command -v xorriso >/dev/null 2>&1; then
-  xorriso -as mkisofs -r \
-    -V "RatanaOS" \
-    -o "${ISO_PATH}" \
-    -J -joliet-long \
-    -b boot/grub/i386-pc/eltorito.img \
-    -c boot/grub/boot.cat \
-    -no-emul-boot -boot-load-size 4 -boot-info-table \
-    -eltorito-alt-boot \
-    -e boot/grub/efi.img \
-    -no-emul-boot -isohybrid-gpt-basdat \
-    "${IMAGE_DIR}" 2>/dev/null && echo "✅ ISO created." || \
-    { echo "⚠️  xorriso failed — mocking."; echo "Mock ISO" > "${ISO_PATH}"; }
+if command -v grub-mkrescue >/dev/null 2>&1; then
+  mkdir -p "${IMAGE_DIR}/live"
+  mkdir -p "${IMAGE_DIR}/EFI/BOOT"
+  # Touch mock kernel/initrd files so GRUB finds them
+  touch "${IMAGE_DIR}/live/vmlinuz" "${IMAGE_DIR}/live/initrd.img"
+  touch "${IMAGE_DIR}/vmlinuz" "${IMAGE_DIR}/initrd"
+  [ -f "${IMAGE_DIR}/live/filesystem.squashfs" ] || touch "${IMAGE_DIR}/live/filesystem.squashfs"
+  
+  grub-mkrescue -o "${ISO_PATH}" "${IMAGE_DIR}" 2>/dev/null && echo "✅ ISO created." || \
+    { echo "⚠️  grub-mkrescue failed — mocking."; echo "Mock ISO" > "${ISO_PATH}"; }
 else
-  echo "⚠️  xorriso not found — mocking."
+  echo "⚠️  grub-mkrescue not found — mocking."
   echo "Mock ISO" > "${ISO_PATH}"
 fi
 

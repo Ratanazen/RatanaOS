@@ -12,9 +12,10 @@ test:
 
 build:
 	@echo "Building RatanaOS ISO..."
-	@mkdir -p build/artifacts
-	@echo "This is a minimal ISO build artifact for RatanaOS $(VERSION)." > build/artifacts/ratanaos-$(VERSION)-amd64.iso
-	@echo "ISO successfully written to build/artifacts/ratanaos-$(VERSION)-amd64.iso"
+	@mkdir -p output
+	@chmod +x builder/build-iso.sh
+	@./builder/build-iso.sh ratana-standard amd64
+	@echo "ISO successfully written to output/RatanaOS-Standard.iso"
 
 clean:
 	@rm -rf build/artifacts/*
