@@ -52,8 +52,26 @@ class SettingsWindow : public QMainWindow {
     appearanceLayout->addWidget(density);
     appearanceLayout->addStretch();
 
-    auto *display = RatanaUI::makePanel("Display");
+    auto *display = RatanaUI::makePanel("Display & Resolutions");
     auto *displayLayout = qobject_cast<QVBoxLayout *>(display->layout());
+    
+    displayLayout->addWidget(new QLabel("Resolution Profile:"));
+    auto *resCombo = new QComboBox;
+    resCombo->addItems({
+      "Auto-detect (Recommended)",
+      "--- 16:9 ---",
+      "1280×720", "1600×900", "1920×1080", "2560×1440", "3840×2160",
+      "--- 16:10 ---",
+      "1280×800", "1920×1200", "2560×1600", "3840×2400",
+      "--- 21:9 Ultrawide ---",
+      "2560×1080", "3440×1440", "3840×1600",
+      "--- 4:3 ---",
+      "1280×960", "1600×1200", "1920×1440", "2560×1920",
+      "--- 5:4 ---",
+      "1280×1024", "1920×1536", "2560×2048"
+    });
+    displayLayout->addWidget(resCombo);
+    
     displayLayout->addWidget(new QCheckBox("Night light on schedule"));
     displayLayout->addWidget(new QCheckBox("Adaptive refresh rate"));
     displayLayout->addWidget(new QCheckBox("Scale dock on hover"));
