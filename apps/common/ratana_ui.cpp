@@ -1,6 +1,8 @@
 #include "ratana_ui.h"
 
 #include <QFont>
+#include <QFile>
+#include <QTextStream>
 
 namespace RatanaUI {
 

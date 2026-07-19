@@ -9,6 +9,7 @@
 #include <QDir>
 #include <QStringList>
 #include "customization_api.h"
+#include "ratana_ui.h"
 
 QStringList scanAssets(const QString &folder) {
     QDir dir("/home/ratana/RatanaOS/assets/" + folder);
