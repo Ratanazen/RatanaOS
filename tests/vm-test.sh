@@ -4,6 +4,10 @@ set -e
 
 ISO_PATH=$1
 if [ -z "$ISO_PATH" ]; then
+    ISO_PATH=$(find releases output .artifacts -name "RatanaOS*.iso" 2>/dev/null | head -n 1)
+fi
+
+if [ -z "$ISO_PATH" ] || [ ! -f "$ISO_PATH" ]; then
     echo "Usage: $0 <path_to_iso>"
     exit 1
 fi

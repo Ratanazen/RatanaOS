@@ -1,6 +1,6 @@
 # Live USB Boot Report
-Date: 2026-07-18T10:47:10Z
-ISO: RatanaOS-Live.iso
+Date: 2026-07-19T06:36:27Z
+ISO: RatanaOS-Cyber.iso
 
 ## Hardware Compatibility
 - [x] Boots on bare-metal BIOS machine
