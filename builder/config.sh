@@ -5,6 +5,9 @@ EDITION=${1:-standard}
 
 echo "Configuring for edition: $EDITION"
 
+# Remove old generated configs so live-build is forced to use our new Debian mode
+rm -f config/bootstrap config/chroot config/binary config/common config/source
+
 lb config noauto \
     --mode debian \
     --architectures amd64 \
