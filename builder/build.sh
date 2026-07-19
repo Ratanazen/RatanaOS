@@ -12,6 +12,9 @@ if [ -d "apps" ] && [ "$(ls -A apps)" ]; then
     cp -r apps/* config/includes.chroot/opt/ratanaos-apps/ 2>/dev/null || true
 fi
 
+# Create output directory for logs
+mkdir -p output
+
 # Run the build
 sudo lb build 2>&1 | tee output/build.log
 
