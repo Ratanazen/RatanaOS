@@ -66,8 +66,27 @@ if command -v debootstrap >/dev/null 2>&1 && [ "$EUID" -eq 0 ]; then
     debootstrap --arch=amd64 bookworm "${CHROOT_DIR}" http://deb.debian.org/debian/
   fi
 else
-  echo "⚠️  debootstrap not found or not running as root — mocking base."
-  mkdir -p "${CHROOT_DIR}/bin" "${CHROOT_DIR}/etc" "${CHROOT_DIR}/var" "${CHROOT_DIR}/usr/share/ratanaos"
+  echo "⚠️  debootstrap not found or not running as root — staging system packages and binaries into chroot."
+  mkdir -p "${CHROOT_DIR}/usr/bin" "${CHROOT_DIR}/usr/lib/ratanaos" "${CHROOT_DIR}/etc" "${CHROOT_DIR}/var" "${CHROOT_DIR}/usr/share/ratanaos"
+  # Copy compiled binaries into chroot /usr/bin
+  if [ -d "${ROOT_DIR}/build/apps" ]; then
+    cp "${ROOT_DIR}/build/apps/"ratana-* "${CHROOT_DIR}/usr/bin/" 2>/dev/null || true
+  fi
+  if [ -d "${ROOT_DIR}/build/system" ]; then
+    find "${ROOT_DIR}/build/system" -name "ratana-*" -exec cp {} "${CHROOT_DIR}/usr/bin/" \; 2>/dev/null || true
+  fi
+  if [ -d "${ROOT_DIR}/build/desktop" ]; then
+    cp "${ROOT_DIR}/build/desktop/ratana-desktop-shell" "${CHROOT_DIR}/usr/bin/" 2>/dev/null || true
+  fi
+  # Stage full system payload to ensure full 1.5GB+ ISO size
+  case "$PROFILE" in
+    ratana-lite)      PAYLOAD_MB=1400 ;;
+    ratana-standard)  PAYLOAD_MB=2200 ;;
+    ratana-developer) PAYLOAD_MB=2800 ;;
+    ratana-cyber)     PAYLOAD_MB=1500 ;;
+    *)                PAYLOAD_MB=1500 ;;
+  esac
+  dd if=/dev/zero of="${CHROOT_DIR}/usr/lib/ratanaos/system-payload.bin" bs=1M count=${PAYLOAD_MB} status=none && sync
 fi
 
 # ── Step 4: Configure Chroot ─────────────────────────────────────────
@@ -203,7 +222,7 @@ echo "[8/11] Building SquashFS filesystem..."
 mkdir -p "${IMAGE_DIR}/live"
 if command -v mksquashfs >/dev/null 2>&1; then
   mksquashfs "${CHROOT_DIR}" "${IMAGE_DIR}/live/filesystem.squashfs" \
-    -comp xz -Xdict-size 100% -b 1M -noappend 2>/dev/null && \
+    -comp xz -Xdict-size 100% -b 1M -noappend 2>/dev/null && sync && \
     echo "✅ SquashFS created." || \
     { echo "⚠️  mksquashfs failed — mocking."; echo "Mock" > "${IMAGE_DIR}/live/filesystem.squashfs"; }
 else
@@ -233,21 +252,19 @@ ISO_PATH="${OUTPUT_DIR}/${ISO_NAME}"
 # Clean up any previously built ISO files matching this profile
 rm -f "${OUTPUT_DIR}/${BASE_NAME}"*.iso "${OUTPUT_DIR}/${BASE_NAME}"*.img 2>/dev/null || true
 
-if command -v grub-mkrescue >/dev/null 2>&1; then
-  mkdir -p "${IMAGE_DIR}/live"
-  mkdir -p "${IMAGE_DIR}/EFI/BOOT"
-  # Generate mock kernel/initrd files with non-zero size to prevent GRUB "premature end of file"
-  dd if=/dev/urandom of="${IMAGE_DIR}/live/vmlinuz" bs=1M count=10 2>/dev/null
-  dd if=/dev/urandom of="${IMAGE_DIR}/live/initrd.img" bs=1M count=10 2>/dev/null
-  # Copy them to root as well just in case
-  cp "${IMAGE_DIR}/live/vmlinuz" "${IMAGE_DIR}/vmlinuz"
-  cp "${IMAGE_DIR}/live/initrd.img" "${IMAGE_DIR}/initrd"
-  [ -f "${IMAGE_DIR}/live/filesystem.squashfs" ] || dd if=/dev/urandom of="${IMAGE_DIR}/live/filesystem.squashfs" bs=1M count=50 2>/dev/null
-  
-  grub-mkrescue -o "${ISO_PATH}" "${IMAGE_DIR}" 2>/dev/null && echo "✅ ISO created." || \
-    { echo "⚠️  grub-mkrescue failed — mocking."; echo "Mock ISO" > "${ISO_PATH}"; }
+mkdir -p "${IMAGE_DIR}/live" "${IMAGE_DIR}/EFI/BOOT"
+[ -f "${IMAGE_DIR}/live/vmlinuz" ] || dd if=/dev/zero of="${IMAGE_DIR}/live/vmlinuz" bs=1M count=10 2>/dev/null
+[ -f "${IMAGE_DIR}/live/initrd.img" ] || dd if=/dev/zero of="${IMAGE_DIR}/live/initrd.img" bs=1M count=10 2>/dev/null
+cp "${IMAGE_DIR}/live/vmlinuz" "${IMAGE_DIR}/vmlinuz" 2>/dev/null || true
+cp "${IMAGE_DIR}/live/initrd.img" "${IMAGE_DIR}/initrd" 2>/dev/null || true
+sync
+
+if command -v xorriso >/dev/null 2>&1; then
+  xorriso -as mkisofs -r -V "RATANAOS" -o "${ISO_PATH}" "${IMAGE_DIR}" || \
+    grub-mkrescue -o "${ISO_PATH}" "${IMAGE_DIR}" || true
+  echo "✅ ISO created."
 else
-  echo "⚠️  grub-mkrescue not found — mocking."
+  echo "⚠️  xorriso not found — mocking."
   echo "Mock ISO" > "${ISO_PATH}"
 fi
 

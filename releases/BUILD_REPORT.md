@@ -2,10 +2,10 @@
 
 | Field | Value |
 |---|---|
-| Date | 2026-07-19T05:58:45Z |
+| Date | 2026-07-19T06:16:20Z |
 | Version | 12.0.0 |
 | Profile | ratana-cyber |
 | Architecture | amd64 |
 | Artifact | RatanaOS-Cyber-2026-07-19.iso |
-| SHA256 | 0680e9ab4a25a878860c56806fd711562e0675b1a70339f8963e91bb5ef480e8 |
+| SHA256 | 8b1efa612a335f3300aac27a553e9bcee89b7dba70f39527c569ac8407be04d9 |
 | Status | SUCCESS |
