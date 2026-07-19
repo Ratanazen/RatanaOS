@@ -6,6 +6,7 @@ EDITION=${1:-standard}
 echo "Configuring for edition: $EDITION"
 
 lb config noauto \
+    --mode debian \
     --architectures amd64 \
     --linux-flavours amd64 \
     --distribution trixie \
