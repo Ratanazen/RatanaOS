@@ -12,7 +12,6 @@ lb config noauto \
     --archive-areas "main contrib non-free non-free-firmware" \
     --bootappend-live "boot=live components quiet splash findiso=\${iso_path}" \
     --binary-images iso-hybrid \
-    --uefi-secure-boot enable \
     --iso-application "RatanaOS Live" \
     --iso-publisher "RatanaOS Project" \
     --iso-volume "RATANAOS_$EDITION" \
@@ -20,7 +19,6 @@ lb config noauto \
     --memtest none \
     --apt-indices none \
     --apt-recommends false \
-    --debootstrap-options "--variant=minbase" \
     --compression squashfs \
     --system live \
     "${@}"
