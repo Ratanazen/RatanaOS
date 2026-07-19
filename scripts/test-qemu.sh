@@ -11,6 +11,7 @@ fi
 
 echo "Booting $ISO_FILE in QEMU..."
 qemu-system-x86_64 -m 4096 -smp 4 \
+    -bios /usr/share/ovmf/OVMF.fd \
     -cdrom "$ISO_FILE" \
     -boot d \
     -machine accel=kvm:tcg \
