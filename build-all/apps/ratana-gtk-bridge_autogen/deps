@@ -1,0 +1,4 @@
+ratana-gtk-bridge_autogen/timestamp: \
+	/home/ratana/RatanaOS/apps/CMakeLists.txt \
+	/home/ratana/RatanaOS/apps/common/gtk_bridge.c \
+	/usr/bin/cmake

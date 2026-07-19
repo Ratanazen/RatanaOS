@@ -1,0 +1,4 @@
+ratana-login-manager_autogen/timestamp: \
+	/home/ratana/RatanaOS/apps/CMakeLists.txt \
+	/home/ratana/RatanaOS/apps/login-manager/main.cpp \
+	/usr/bin/cmake

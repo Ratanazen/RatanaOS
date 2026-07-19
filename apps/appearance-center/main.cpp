@@ -57,7 +57,8 @@ int main(int argc, char *argv[]) {
     QObject::connect(btnApply, &QPushButton::clicked, [&]() {
         RatanaOS::Customization::setTheme(comboTheme->currentText());
         RatanaOS::Customization::setWallpaper(comboWP->currentText());
-        QMessageBox::information(&window, "Settings Applied", "Your personalization settings have been updated.\n(Configuration saved).");
+        RatanaUI::applyAppTheme(app); // Reload CSS immediately for the current instance
+        QMessageBox::information(&window, "Settings Applied", "Your personalization settings have been updated.\n(System-wide CSS regenerated and applied).");
     });
 
     layout->addStretch();

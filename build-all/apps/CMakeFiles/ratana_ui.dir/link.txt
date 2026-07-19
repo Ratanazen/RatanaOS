@@ -1,0 +1,2 @@
+/usr/bin/ar qc libratana_ui.a CMakeFiles/ratana_ui.dir/ratana_ui_autogen/mocs_compilation.cpp.o CMakeFiles/ratana_ui.dir/common/ratana_ui.cpp.o CMakeFiles/ratana_ui.dir/common/customization_api.cpp.o
+/usr/bin/ranlib libratana_ui.a

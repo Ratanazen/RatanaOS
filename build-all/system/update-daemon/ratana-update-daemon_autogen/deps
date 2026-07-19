@@ -1,0 +1,4 @@
+ratana-update-daemon_autogen/timestamp: \
+	/home/ratana/RatanaOS/system/update-daemon/CMakeLists.txt \
+	/home/ratana/RatanaOS/system/update-daemon/main.cpp \
+	/usr/bin/cmake

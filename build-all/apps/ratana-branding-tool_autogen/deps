@@ -1,0 +1,4 @@
+ratana-branding-tool_autogen/timestamp: \
+	/home/ratana/RatanaOS/apps/CMakeLists.txt \
+	/home/ratana/RatanaOS/apps/branding-tool/main.cpp \
+	/usr/bin/cmake

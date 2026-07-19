@@ -1,30 +1,33 @@
 # RatanaOS Live Build Makefile
 
 EDITION ?= standard
-VERSION ?= 15.0
+VERSION ?= 18.0
 
 .PHONY: all config build clean rebuild iso verify vm release
 
 all: iso verify
 
 config:
-	@echo "==> Configuring live-build for RatanaOS (${EDITION})..."
-	@chmod +x builder/config.sh
-	@./builder/config.sh ${EDITION}
+	@echo "==> Configuration is now handled natively within the build scripts."
 
 build:
 	@echo "==> Building RatanaOS..."
-	@chmod +x builder/build.sh
-	@./builder/build.sh ${EDITION}
+	@if [ "${EDITION}" = "live" ]; then \
+		chmod +x builder/build-live-usb.sh; \
+		./builder/build-live-usb.sh; \
+	else \
+		chmod +x builder/build-iso.sh; \
+		./builder/build-iso.sh ${EDITION}; \
+	fi
 
 clean:
 	@echo "==> Cleaning live-build workspace..."
 	lb clean || true
-	rm -rf output/*
+	rm -rf releases/*
 
-rebuild: clean config build
+rebuild: clean build
 
-iso: config build
+iso: build
 
 verify:
 	@echo "==> Verifying ISO..."
@@ -38,5 +41,5 @@ vm:
 
 release: iso verify
 	@echo "==> Generating Release Checksums..."
-	@cd output && sha256sum RatanaOS-*.iso > SHA256SUMS
+	@cd releases && sha256sum RatanaOS-*.iso > SHA256SUMS
 	@echo "==> Release complete!"

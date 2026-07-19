@@ -1,0 +1,4 @@
+ratana-desktop-shell_autogen/timestamp: \
+	/home/ratana/RatanaOS/desktop/CMakeLists.txt \
+	/home/ratana/RatanaOS/desktop/src/main.cpp \
+	/usr/bin/cmake

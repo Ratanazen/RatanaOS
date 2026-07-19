@@ -5,62 +5,24 @@
 namespace RatanaUI {
 
 void applyAppTheme(QApplication &app) {
-  app.setStyleSheet(R"(
-    QWidget {
-      background: #f5efe4;
-      color: #1d1d1b;
-      font-family: "Noto Sans";
-      font-size: 14px;
-    }
-    QMainWindow, QFrame#ShellSurface {
-      background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
-        stop:0 #f8f1e6, stop:0.55 #efe2ca, stop:1 #d9c5a1);
-    }
-    QLabel#HeroTitle {
-      font-size: 28px;
-      font-weight: 700;
-    }
-    QLabel#SectionTitle {
-      font-size: 18px;
-      font-weight: 700;
-    }
-    QLabel#Eyebrow {
-      font-size: 11px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: #6a5d49;
-    }
-    QFrame#Panel, QFrame#Card, QListWidget, QTableWidget, QTextEdit, QLineEdit {
-      background: rgba(255, 252, 247, 0.82);
-      border: 1px solid rgba(96, 78, 43, 0.15);
-      border-radius: 18px;
-    }
-    QFrame#Sidebar {
-      background: rgba(54, 38, 22, 0.88);
-      color: #f7f1e6;
-      border-radius: 24px;
-    }
-    QPushButton {
-      border: 0;
-      border-radius: 16px;
-      padding: 10px 14px;
-      background: rgba(87, 70, 40, 0.08);
-    }
-    QPushButton:hover {
-      background: rgba(87, 70, 40, 0.14);
-    }
-    QPushButton[primary="true"] {
-      background: #b96f31;
-      color: white;
-      font-weight: 700;
-    }
-    QHeaderView::section {
-      background: rgba(87, 70, 40, 0.10);
-      border: 0;
-      padding: 8px;
-      font-weight: 700;
-    }
-  )");
+  QString cssPath = "/usr/share/ratanaos/assets/ratanaos.css";
+  QFile file(cssPath);
+  if (!file.exists()) {
+    cssPath = "/home/ratana/RatanaOS/assets/ratanaos.css";
+    file.setFileName(cssPath);
+  }
+
+  if (file.open(QFile::ReadOnly | QFile::Text)) {
+    QTextStream in(&file);
+    app.setStyleSheet(in.readAll());
+    file.close();
+  } else {
+    // Fallback if no CSS file exists
+    app.setStyleSheet(R"(
+      QWidget { background: #f5efe4; color: #1d1d1b; font-family: "Noto Sans"; font-size: 14px; }
+      QPushButton { border-radius: 16px; padding: 10px 14px; background: rgba(87, 70, 40, 0.08); }
+    )");
+  }
 
   QFont font("Noto Sans", 11);
   app.setFont(font);

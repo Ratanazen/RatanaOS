@@ -1,5 +1,27 @@
 # RatanaOS Changelog
 
+## v20.0.0 "Productivity & Customization"
+*A dynamic, real-time theming engine.*
+
+### Features
+- **Theme Manager API**: Updated `RatanaOS::Customization` API to dynamically rewrite the system CSS styling file upon theme selection.
+- **Real-Time Styling**: Applications like Appearance Center now automatically reload their Qt stylesheets in real-time when the system CSS changes, providing a seamless customization flow without requiring a system reboot.
+- **AMOLED & Light Profiles**: Packaged default dark, light, and high-contrast AMOLED styles directly into the theme engine.
+
+---
+
+## v19.0.0 "Hardware & Welcome Experience"
+*Seamless first-boot hardware detection and system configuration.*
+
+### Features
+- **Welcome Center Rewrite**: Completely overhauled the first-boot setup wizard.
+- **Hardware & Drivers**: Integrated hardware scanning, Driver Manager (Nouveau vs NVIDIA), and Wi-Fi firmware prompts.
+- **Peripherals & Display**: Added Bluetooth scanning, Network Printer detection, display scaling, and keyboard layout configuration.
+- **Accessibility & Performance**: Introduced high contrast themes, screen reader toggles, and performance profile selection.
+- **Centralized CSS Styling**: Extracted all Qt styling into a central `assets/ratanaos.css` file allowing for true CSS-based theme customization.
+
+---
+
 ## v18.0.0 "Recovery & Reliability"
 *A robust suite of rescue tools for mission-critical systems.*
 

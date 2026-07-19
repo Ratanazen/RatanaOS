@@ -15,3 +15,6 @@ build-tests/
 Release/
 wget-log*
 output/*.iso
+chroot/
+chroot.headers
+chroot.packages.install

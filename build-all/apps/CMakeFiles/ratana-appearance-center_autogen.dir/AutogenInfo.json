@@ -1,0 +1,118 @@
+{
+	"BUILD_DIR" : "/home/ratana/RatanaOS/build-all/apps/ratana-appearance-center_autogen",
+	"CMAKE_BINARY_DIR" : "/home/ratana/RatanaOS/build-all",
+	"CMAKE_CURRENT_BINARY_DIR" : "/home/ratana/RatanaOS/build-all/apps",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/home/ratana/RatanaOS/apps",
+	"CMAKE_EXECUTABLE" : "/usr/bin/cmake",
+	"CMAKE_LIST_FILES" : [ "/home/ratana/RatanaOS/apps/CMakeLists.txt" ],
+	"CMAKE_SOURCE_DIR" : "/home/ratana/RatanaOS",
+	"DEP_FILE" : "/home/ratana/RatanaOS/build-all/apps/ratana-appearance-center_autogen/deps",
+	"DEP_FILE_RULE_NAME" : "ratana-appearance-center_autogen/timestamp",
+	"HEADERS" : [],
+	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
+	"INCLUDE_DIR" : "/home/ratana/RatanaOS/build-all/apps/ratana-appearance-center_autogen/include",
+	"MOC_COMPILATION_FILE" : "/home/ratana/RatanaOS/build-all/apps/ratana-appearance-center_autogen/mocs_compilation.cpp",
+	"MOC_DEFINITIONS" : 
+	[
+		"QT_CORE_LIB",
+		"QT_GUI_LIB",
+		"QT_NO_DEBUG",
+		"QT_SQL_LIB",
+		"QT_WIDGETS_LIB"
+	],
+	"MOC_DEPEND_FILTERS" : 
+	[
+		[
+			"Q_PLUGIN_METADATA",
+			"[\n][ \t]*Q_PLUGIN_METADATA[ \t]*\\([^\\)]*FILE[ \t]*\"([^\"]+)\""
+		]
+	],
+	"MOC_INCLUDES" : 
+	[
+		"/home/ratana/RatanaOS/apps/common",
+		"/usr/include/x86_64-linux-gnu/qt6/QtWidgets",
+		"/usr/include/x86_64-linux-gnu/qt6",
+		"/usr/include/x86_64-linux-gnu/qt6/QtCore",
+		"/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++",
+		"/usr/include/x86_64-linux-gnu/qt6/QtGui",
+		"/usr/include/x86_64-linux-gnu/qt6/QtSql",
+		"/usr/include",
+		"/usr/include/c++/13",
+		"/usr/include/x86_64-linux-gnu/c++/13",
+		"/usr/include/c++/13/backward",
+		"/usr/lib/gcc/x86_64-linux-gnu/13/include",
+		"/usr/local/include",
+		"/usr/include/x86_64-linux-gnu"
+	],
+	"MOC_MACRO_NAMES" : 
+	[
+		"Q_OBJECT",
+		"Q_GADGET",
+		"Q_GADGET_EXPORT",
+		"Q_NAMESPACE",
+		"Q_NAMESPACE_EXPORT"
+	],
+	"MOC_OPTIONS" : [],
+	"MOC_PATH_PREFIX" : false,
+	"MOC_PREDEFS_CMD" : 
+	[
+		"/usr/bin/c++",
+		"-std=gnu++20",
+		"-dM",
+		"-E",
+		"-c",
+		"/usr/share/cmake-3.28/Modules/CMakeCXXCompilerABI.cpp"
+	],
+	"MOC_PREDEFS_FILE" : "/home/ratana/RatanaOS/build-all/apps/ratana-appearance-center_autogen/moc_predefs.h",
+	"MOC_RELAXED_MODE" : false,
+	"MOC_SKIP" : 
+	[
+		"/home/ratana/RatanaOS/build-all/apps/ratana-ai-assistant_autogen/mocs_compilation.cpp",
+		"/home/ratana/RatanaOS/build-all/apps/ratana-control-center_autogen/mocs_compilation.cpp",
+		"/home/ratana/RatanaOS/build-all/apps/ratana-file-manager_autogen/mocs_compilation.cpp",
+		"/home/ratana/RatanaOS/build-all/apps/ratana-installer_autogen/mocs_compilation.cpp",
+		"/home/ratana/RatanaOS/build-all/apps/ratana-login-manager_autogen/mocs_compilation.cpp",
+		"/home/ratana/RatanaOS/build-all/apps/ratana-profile-manager_autogen/mocs_compilation.cpp",
+		"/home/ratana/RatanaOS/build-all/apps/ratana-recovery_autogen/mocs_compilation.cpp",
+		"/home/ratana/RatanaOS/build-all/apps/ratana-settings_autogen/mocs_compilation.cpp",
+		"/home/ratana/RatanaOS/build-all/apps/ratana-software-center_autogen/mocs_compilation.cpp",
+		"/home/ratana/RatanaOS/build-all/apps/ratana-system-monitor_autogen/mocs_compilation.cpp",
+		"/home/ratana/RatanaOS/build-all/apps/ratana-terminal_autogen/mocs_compilation.cpp",
+		"/home/ratana/RatanaOS/build-all/apps/ratana-update-manager_autogen/mocs_compilation.cpp",
+		"/home/ratana/RatanaOS/build-all/apps/ratana-welcome_autogen/mocs_compilation.cpp",
+		"/home/ratana/RatanaOS/build-all/apps/ratana_ui_autogen/mocs_compilation.cpp"
+	],
+	"MULTI_CONFIG" : false,
+	"PARALLEL" : 4,
+	"PARSE_CACHE_FILE" : "/home/ratana/RatanaOS/build-all/apps/CMakeFiles/ratana-appearance-center_autogen.dir/ParseCache.txt",
+	"QT_MOC_EXECUTABLE" : "/usr/lib/qt6/libexec/moc",
+	"QT_UIC_EXECUTABLE" : "/usr/lib/qt6/libexec/uic",
+	"QT_VERSION_MAJOR" : 6,
+	"QT_VERSION_MINOR" : 4,
+	"SETTINGS_FILE" : "/home/ratana/RatanaOS/build-all/apps/CMakeFiles/ratana-appearance-center_autogen.dir/AutogenUsed.txt",
+	"SOURCES" : 
+	[
+		[ "/home/ratana/RatanaOS/apps/appearance-center/main.cpp", "MU", null ]
+	],
+	"UIC_OPTIONS" : [],
+	"UIC_SEARCH_PATHS" : [],
+	"UIC_SKIP" : 
+	[
+		"/home/ratana/RatanaOS/build-all/apps/ratana-ai-assistant_autogen/mocs_compilation.cpp",
+		"/home/ratana/RatanaOS/build-all/apps/ratana-control-center_autogen/mocs_compilation.cpp",
+		"/home/ratana/RatanaOS/build-all/apps/ratana-file-manager_autogen/mocs_compilation.cpp",
+		"/home/ratana/RatanaOS/build-all/apps/ratana-installer_autogen/mocs_compilation.cpp",
+		"/home/ratana/RatanaOS/build-all/apps/ratana-login-manager_autogen/mocs_compilation.cpp",
+		"/home/ratana/RatanaOS/build-all/apps/ratana-profile-manager_autogen/mocs_compilation.cpp",
+		"/home/ratana/RatanaOS/build-all/apps/ratana-recovery_autogen/mocs_compilation.cpp",
+		"/home/ratana/RatanaOS/build-all/apps/ratana-settings_autogen/mocs_compilation.cpp",
+		"/home/ratana/RatanaOS/build-all/apps/ratana-software-center_autogen/mocs_compilation.cpp",
+		"/home/ratana/RatanaOS/build-all/apps/ratana-system-monitor_autogen/mocs_compilation.cpp",
+		"/home/ratana/RatanaOS/build-all/apps/ratana-terminal_autogen/mocs_compilation.cpp",
+		"/home/ratana/RatanaOS/build-all/apps/ratana-update-manager_autogen/mocs_compilation.cpp",
+		"/home/ratana/RatanaOS/build-all/apps/ratana-welcome_autogen/mocs_compilation.cpp",
+		"/home/ratana/RatanaOS/build-all/apps/ratana_ui_autogen/mocs_compilation.cpp"
+	],
+	"UIC_UI_FILES" : [],
+	"VERBOSITY" : 0
+}

@@ -1,0 +1,4 @@
+ratana-file-manager_autogen/timestamp: \
+	/home/ratana/RatanaOS/apps/CMakeLists.txt \
+	/home/ratana/RatanaOS/apps/file-manager/main.cpp \
+	/usr/bin/cmake

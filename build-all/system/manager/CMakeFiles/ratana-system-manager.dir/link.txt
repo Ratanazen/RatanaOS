@@ -1,0 +1,1 @@
+/usr/bin/c++ "CMakeFiles/ratana-system-manager.dir/ratana-system-manager_autogen/mocs_compilation.cpp.o" "CMakeFiles/ratana-system-manager.dir/main.cpp.o" -o ratana-system-manager 

@@ -1,0 +1,7 @@
+ratana_ui_autogen/timestamp: \
+	/home/ratana/RatanaOS/apps/CMakeLists.txt \
+	/home/ratana/RatanaOS/apps/common/customization_api.cpp \
+	/home/ratana/RatanaOS/apps/common/customization_api.h \
+	/home/ratana/RatanaOS/apps/common/ratana_ui.cpp \
+	/home/ratana/RatanaOS/apps/common/ratana_ui.h \
+	/usr/bin/cmake

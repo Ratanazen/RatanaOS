@@ -1,0 +1,4 @@
+ratana-settings_autogen/timestamp: \
+	/home/ratana/RatanaOS/apps/CMakeLists.txt \
+	/home/ratana/RatanaOS/apps/settings/main.cpp \
+	/usr/bin/cmake

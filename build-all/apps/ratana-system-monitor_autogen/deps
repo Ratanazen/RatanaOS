@@ -1,0 +1,4 @@
+ratana-system-monitor_autogen/timestamp: \
+	/home/ratana/RatanaOS/apps/CMakeLists.txt \
+	/home/ratana/RatanaOS/apps/system-monitor/main.cpp \
+	/usr/bin/cmake

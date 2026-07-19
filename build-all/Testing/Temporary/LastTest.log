@@ -1,0 +1,19 @@
+Start testing: Jul 19 10:58 +07
+----------------------------------------------------------
+1/1 Testing: desktop-smoke
+1/1 Test: desktop-smoke
+Command: "/home/ratana/RatanaOS/tests/smoke_desktop.sh" "/home/ratana/RatanaOS"
+Directory: /home/ratana/RatanaOS/build-all
+"desktop-smoke" start time: Jul 19 10:58 +07
+Output:
+----------------------------------------------------------
+RatanaOS desktop smoke test passed.
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Passed.
+"desktop-smoke" end time: Jul 19 10:58 +07
+"desktop-smoke" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Jul 19 10:58 +07

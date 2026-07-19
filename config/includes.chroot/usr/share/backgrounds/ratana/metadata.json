@@ -1,0 +1,16 @@
+{
+    "wallpapers": [
+        {
+            "id": "default-dark",
+            "name": "Ratana Deep Space",
+            "filename": "deep_space.jpg",
+            "theme": "dark"
+        },
+        {
+            "id": "default-light",
+            "name": "Ratana Sunrise",
+            "filename": "sunrise.jpg",
+            "theme": "light"
+        }
+    ]
+}

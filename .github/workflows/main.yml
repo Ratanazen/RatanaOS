@@ -23,8 +23,8 @@ jobs:
 
       - name: Validate Pipeline Components
         run: |
-          bash -n builder/config.sh
-          bash -n builder/build.sh
+          bash -n builder/build-iso.sh
+          bash -n builder/build-live-usb.sh
           bash -n scripts/verify-iso.sh
           echo "✅ All scripts pass bash -n syntax check."
 
@@ -47,6 +47,7 @@ jobs:
           - ratana-standard
           - ratana-developer
           - ratana-cyber
+          - ratana-live
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -63,19 +64,19 @@ jobs:
 
       - name: Verify artifacts
         run: |
-          ls -lh output/
-          test -f output/RatanaOS-*.iso || test -f output/RatanaOS-*.img
-          test -f output/SHA256SUMS
-          test -f output/BUILD_REPORT.md
+          ls -lh releases/
+          test -f releases/RatanaOS-*.iso || test -f releases/RatanaOS-*.img
+          test -f releases/SHA256SUMS
+          test -f releases/BUILD_REPORT.md
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: RatanaOS-${{ matrix.profile }}-x86_64
           path: |
-            output/RatanaOS-*.iso
-            output/SHA256SUMS
-            output/BUILD_REPORT.md
+            releases/RatanaOS-*.iso
+            releases/SHA256SUMS
+            releases/BUILD_REPORT.md
           retention-days: 30
 
   # ───────────────────────────────────────────────────────────────────
@@ -94,31 +95,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: RatanaOS-ratana-standard-x86_64
-          path: output/
+          path: releases/
 
       - name: Run VM Tests
         run: |
           make vm EDITION=ratana-standard
-
-      - name: Run Installer Tests
-        run: |
-          echo "Skipping legacy installer tests..."
-
-      - name: Run System Tests
-        run: |
-          echo "Skipping legacy system validation..."
-
-      - name: Run Application Tests
-        run: |
-          echo "Skipping legacy application validation..."
-
-      - name: Run Performance Tests
-        run: |
-          echo "Skipping legacy performance tests..."
-
-      - name: Run Security Tests
-        run: |
-          echo "Skipping legacy security tests..."
 
       - name: Upload Test Reports
         uses: actions/upload-artifact@v4
@@ -151,24 +132,24 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           draft: true
-          tag_name: v10.1.0
-          name: "RatanaOS v10.1 Ultimate"
+          tag_name: v18.0.0
+          name: "RatanaOS v18.0 Ultimate"
           body: |
-            ## RatanaOS v10.1 Ultimate
+            ## RatanaOS v18.0 Ultimate
             
             New in this release:
-            - 4 Core Editions: Lite, Standard, Developer, Cyber
-            - Full VM testing (QEMU, VirtualBox, VMware)
+            - 5 Core Editions including Live USB Pipeline
+            - Dynamic Asset Loading (v16)
+            - Ratana Recovery & Reliability Tools (v18)
             - Comprehensive QA Reports
-            - Built via GitHub Actions Pipeline
             
-            See [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md) and [docs/USER_GUIDE.md](docs/USER_GUIDE.md) for details.
+            See [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md) for details.
           files: |
             release-artifacts/**/*.iso
             release-artifacts/**/*.img
             release-artifacts/**/SHA256SUMS
             release-artifacts/reports/*
             docs/RELEASE_NOTES.md
-            docs/USER_GUIDE.md
+            docs/RECOVERY.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
