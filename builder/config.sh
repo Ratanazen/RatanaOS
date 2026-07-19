@@ -10,6 +10,9 @@ lb config noauto \
     --architectures amd64 \
     --linux-flavours amd64 \
     --distribution trixie \
+    --mirror-bootstrap "http://deb.debian.org/debian/" \
+    --mirror-chroot "http://deb.debian.org/debian/" \
+    --mirror-binary "http://deb.debian.org/debian/" \
     --archive-areas "main contrib non-free non-free-firmware" \
     --bootappend-live "boot=live components quiet splash findiso=\${iso_path}" \
     --binary-images iso-hybrid \
