@@ -1,11 +1,11 @@
-# RatanaOS Development Plan (v13.0)
+# RatanaOS Development Plan (v20.0)
 
 ## Current State
-- Version: `13.0` (in development)
-- Last Release: `v12.0` (Universal Live USB & GUI Installer)
-- Codebase: Qt6 UI framework, Bash build scripts, Debian base.
+- Version: `20.0.0` (Productivity & Customization)
+- Last Major Milestones: `v18.0` (Recovery & Reliability), `v19.0` (Hardware & Welcome), `v20.0` (Real-Time Theming)
+- Codebase: Qt6 UI framework, Dynamic CSS engine, Bash build scripts, Debian base.
 
-## Milestone: v13.0 Foundation
+## Milestone: v20.0 Real-Time Customization Engine
 The next major milestone focuses on stabilizing the v12.0 installer features, resolving any technical debt, and preparing the architecture for the v13.0 feature set. 
 
 ### Roles & Responsibilities Workflow

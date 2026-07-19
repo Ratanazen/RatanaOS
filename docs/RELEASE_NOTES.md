@@ -2,6 +2,33 @@
 
 ---
 
+## v20.0.0 — Productivity & Customization
+
+### What's New in v20.0
+- **Dynamic Real-Time Theming**: Integrated `RatanaOS::Customization` API with live CSS stylesheet reloads across Qt6 applications without reboot.
+- **AMOLED & Light Profiles**: Added high-contrast AMOLED and Light theme presets.
+- **Fixed Compilation & UI Headers**: Applied clean compilation fixes for `ratana_ui` and `appearance-center`.
+
+---
+
+## v19.0.0 — Hardware & Welcome Experience
+
+### What's New in v19.0
+- **Welcome Center Rewrite**: Completely overhauled first-boot setup wizard.
+- **Hardware & Driver Scanning**: Integrated GPU (Nouveau vs NVIDIA), Wi-Fi firmware, Bluetooth, and network printer detection.
+- **Centralized CSS Styling**: Extracted all Qt default styles into unified `/assets/ratanaos.css`.
+
+---
+
+## v18.0.0 — Recovery & Reliability
+
+### What's New in v18.0
+- **Recovery Mode**: Boot entry booting directly into `ratana-recovery`.
+- **Emergency Rescue Tools**: Boot repair, log viewer, crash dumps, and hardware diagnostics.
+- **Documentation**: Added `docs/RECOVERY.md`.
+
+---
+
 ## v12.0 — Universal Live USB & GUI Installer
 
 ### What's New in v12.0
