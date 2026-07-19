@@ -13,6 +13,5 @@ echo "Booting $ISO_FILE in QEMU..."
 qemu-system-x86_64 -m 4096 -smp 4 \
     -cdrom "$ISO_FILE" \
     -boot d \
-    -enable-kvm \
-    -vga virtio \
-    -display sdl
+    -machine accel=kvm:tcg \
+    -vga virtio
