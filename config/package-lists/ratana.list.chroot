@@ -25,3 +25,7 @@ plymouth
 plymouth-themes
 grub-efi-amd64
 grub-pc
+linux-image-amd64
+live-boot
+live-config
+live-config-systemd
