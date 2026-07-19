@@ -13,6 +13,7 @@ lb config noauto \
     --architectures amd64 \
     --linux-flavours amd64 \
     --distribution trixie \
+    --security false \
     --mirror-bootstrap "http://deb.debian.org/debian/" \
     --mirror-chroot "http://deb.debian.org/debian/" \
     --mirror-binary "http://deb.debian.org/debian/" \
