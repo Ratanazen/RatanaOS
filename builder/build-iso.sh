@@ -48,8 +48,9 @@ else
   echo "⚠️  check-dependencies.sh not found — skipping."
 fi
 
-# ── Step 2: Create Workspace ─────────────────────────────────────────
-echo "[2/11] Creating workspace..."
+# ── Step 2: Create Workspace & Cleanup Old ISOs ───────────────────────
+echo "[2/11] Cleaning up old ISO files and creating workspace..."
+rm -f "${OUTPUT_DIR}"/*.iso "${OUTPUT_DIR}"/*.img "${ROOT_DIR}/build/artifacts"/*.iso "${ROOT_DIR}/builder/output"/*.iso "${ROOT_DIR}/.artifacts"/*.iso 2>/dev/null || true
 mkdir -p "${BUILD_DIR}" "${OUTPUT_DIR}" "${CHROOT_DIR}" "${IMAGE_DIR}"
 echo "Workspace: ${BUILD_DIR}"
 
@@ -213,19 +214,24 @@ fi
 # ── Step 9: Generate ISO ─────────────────────────────────────────────
 echo "[9/11] Generating ISO with xorriso..."
 
-# Named per v12.0 deliverables spec
+DATE_STAMP=$(date +%Y-%m-%d)
+
 case "$PROFILE" in
-  ratana-lite)      ISO_NAME="RatanaOS-Lite.iso" ;;
-  ratana-standard)  ISO_NAME="RatanaOS-Standard.iso" ;;
-  ratana-developer) ISO_NAME="RatanaOS-Developer.iso" ;;
-  ratana-cyber)     ISO_NAME="RatanaOS-Cyber.iso" ;;
-  ratana-live)      ISO_NAME="RatanaOS-Live.iso" ;;
-  ratana-server)    ISO_NAME="RatanaOS-Server.iso" ;;
-  ratana-arm)       ISO_NAME="RatanaOS-ARM64.img" ;;
-  *)                ISO_NAME="RatanaOS-${PROFILE}.iso" ;;
+  ratana-lite)      BASE_NAME="RatanaOS-Lite" ;;
+  ratana-standard)  BASE_NAME="RatanaOS-Standard" ;;
+  ratana-developer) BASE_NAME="RatanaOS-Developer" ;;
+  ratana-cyber)     BASE_NAME="RatanaOS-Cyber" ;;
+  ratana-live)      BASE_NAME="RatanaOS-Live" ;;
+  ratana-server)    BASE_NAME="RatanaOS-Server" ;;
+  ratana-arm)       BASE_NAME="RatanaOS-ARM64" ;;
+  *)                BASE_NAME="RatanaOS-${PROFILE}" ;;
 esac
 
+ISO_NAME="${BASE_NAME}-${DATE_STAMP}.iso"
 ISO_PATH="${OUTPUT_DIR}/${ISO_NAME}"
+
+# Clean up any previously built ISO files matching this profile
+rm -f "${OUTPUT_DIR}/${BASE_NAME}"*.iso "${OUTPUT_DIR}/${BASE_NAME}"*.img 2>/dev/null || true
 
 if command -v grub-mkrescue >/dev/null 2>&1; then
   mkdir -p "${IMAGE_DIR}/live"
@@ -245,13 +251,14 @@ else
   echo "Mock ISO" > "${ISO_PATH}"
 fi
 
+# Create convenient profile symlink (e.g. RatanaOS-Cyber.iso -> RatanaOS-Cyber-2026-07-19.iso)
+ln -sf "${ISO_NAME}" "${OUTPUT_DIR}/${BASE_NAME}.iso"
+
 # ── Step 10: Checksums ───────────────────────────────────────────────
 echo "[10/11] Generating SHA256 + SHA512 checksums..."
 cd "${OUTPUT_DIR}"
-# Remove stale placeholder ISO files (mock files from dry runs)
-find "${OUTPUT_DIR}" -name '*.iso' -size -10k -not -name "${ISO_NAME}" -delete 2>/dev/null || true
-sha256sum "${ISO_NAME}" >> SHA256SUMS
-sha512sum "${ISO_NAME}" >> SHA512SUMS
+sha256sum "${ISO_NAME}" > SHA256SUMS
+sha512sum "${ISO_NAME}" > SHA512SUMS
 echo "✅ Checksums written to SHA256SUMS and SHA512SUMS."
 
 # ── Step 11: Build Report ────────────────────────────────────────────
