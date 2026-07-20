@@ -132,16 +132,17 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           draft: true
-          tag_name: v18.0.0
-          name: "RatanaOS v18.0 Ultimate"
+          tag_name: v21.0.0
+          name: "RatanaOS v21.0 Ultimate"
           body: |
-            ## RatanaOS v18.0 Ultimate
+            ## RatanaOS v21.0 Ultimate
             
             New in this release:
-            - 5 Core Editions including Live USB Pipeline
-            - Dynamic Asset Loading (v16)
-            - Ratana Recovery & Reliability Tools (v18)
-            - Comprehensive QA Reports
+            - Fully Integrated React Desktop UI (Ratana Web UI v25)
+            - Complete Settings, Software Center, and Update Center
+            - Real-Time CSS Dynamic Theming Engine (Light, Dark, High Contrast, AMOLED)
+            - Ratana Recovery & Reliability Tools
+            - 5 Core ISO Editions
             
             See [docs/RELEASE_NOTES.md](docs/RELEASE_NOTES.md) for details.
           files: |

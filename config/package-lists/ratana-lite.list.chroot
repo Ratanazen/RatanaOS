@@ -1,4 +1,4 @@
-# Core Packages
+# Lite Edition Core
 linux-image-amd64
 live-boot
 systemd
@@ -16,13 +16,13 @@ rsync
 plymouth
 plymouth-themes
 
-# Desktop & Applications (Standard Edition)
-plasma-desktop
-sddm
-kde-standard
+# Desktop
+xfce4
+xfce4-goodies
+lightdm
+network-manager
+
+# Lite Apps
 firefox
-libreoffice
-vlc
-gimp
-kate
-ark
+mousepad
+thunar

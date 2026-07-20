@@ -1,4 +1,4 @@
-# Core Packages
+# Developer Edition Core
 linux-image-amd64
 live-boot
 systemd
@@ -16,13 +16,21 @@ rsync
 plymouth
 plymouth-themes
 
-# Desktop & Applications (Standard Edition)
+# Desktop
 plasma-desktop
 sddm
 kde-standard
+network-manager
+
+# Developer Packages
+gcc
+clang
+cmake
+python3
+git
+docker.io
+podman
+nodejs
+default-jdk
+code
 firefox
-libreoffice
-vlc
-gimp
-kate
-ark

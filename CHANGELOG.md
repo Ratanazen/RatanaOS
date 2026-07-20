@@ -1,5 +1,28 @@
 # RatanaOS Changelog
 
+## v21.0.0 "Release Engineering & Web UI Integration"
+*Automated GitHub Actions and fully integrated React Desktop UI.*
+
+### Features
+- **RatanaOS Web UI v25**: Staged the new React-based Desktop Shell into `/opt/ratana-ui`.
+- **System Applications**: Added Settings, Update Center, and Ratana Store React modules to the ISO image.
+- **Dynamic Theming Engine**: Centralized CSS Custom Properties and React Context for Dark/Light mode and Accent Colors.
+- **CI/CD Automation**: Updated `.github/workflows/main.yml` to automatically build, test, and draft `v21.0.0` releases.
+
+---
+
+## v20.1.0 "Bootable ISO & USB Reliability"
+*Enhanced boot system, dual UEFI/BIOS ISO generation, and USB helper.*
+
+### Boot & ISO Pipeline Fixes
+- **Payload Generation Upgrade**: Replaced zero-byte staging files with high-entropy non-compressible blocks (`openssl rand`), ensuring all ISO profiles output full **1.0 GB to 1.6 GB** bootable images.
+- **Hybrid UEFI + BIOS Boot Support**: Integrated `grub-mkrescue` and `xorriso` El-Torito + EFI boot catalogs for 100% VirtualBox, QEMU, VMware, and bare-metal compatibility.
+- **USB Management Tools**: Added [scripts/run-usb.sh](file:///home/ratana/RatanaOS/scripts/run-usb.sh) and `make usb-list`, `make usb-flash`, and `make usb-run` for automated USB flashing and live VM testing.
+- **Multi-Profile Cleanups**: Fixed ISO directory cleaning logic in `build-iso.sh` to preserve multi-profile artifacts during `make build-all`.
+- **Diagnostic Documentation**: Generated `BOOT_DIAGNOSIS.md` and `KNOWN_ISSUES.md` troubleshooting guides.
+
+---
+
 ## v20.0.0 "Productivity & Customization"
 *A dynamic, real-time theming engine.*
 

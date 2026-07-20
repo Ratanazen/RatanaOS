@@ -1,4 +1,4 @@
-# Core Packages
+# Standard Edition Core
 linux-image-amd64
 live-boot
 systemd
@@ -16,10 +16,13 @@ rsync
 plymouth
 plymouth-themes
 
-# Desktop & Applications (Standard Edition)
+# Desktop
 plasma-desktop
 sddm
 kde-standard
+network-manager
+
+# Standard Apps
 firefox
 libreoffice
 vlc

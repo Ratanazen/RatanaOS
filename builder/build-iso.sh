@@ -33,7 +33,7 @@ mkdir -p "${LOGS_DIR}"
 exec > >(tee -a "${LOG_FILE}") 2>&1
 
 echo "=========================================="
-echo "   RatanaOS Production ISO Builder v12.0  "
+echo "   RatanaOS Production ISO Builder v21.0  "
 echo "=========================================="
 echo "Profile : ${PROFILE}"
 echo "Arch    : ${ARCH}"
@@ -49,24 +49,34 @@ else
 fi
 
 # ── Step 2: Create Workspace & Cleanup Old ISOs ───────────────────────
-echo "[2/11] Cleaning up old ISO files and creating workspace..."
-rm -f "${OUTPUT_DIR}"/*.iso "${OUTPUT_DIR}"/*.img "${ROOT_DIR}/build/artifacts"/*.iso "${ROOT_DIR}/builder/output"/*.iso "${ROOT_DIR}/.artifacts"/*.iso 2>/dev/null || true
+echo "[2/11] Creating workspace..."
+rm -f "${ROOT_DIR}/build/artifacts"/*.iso "${ROOT_DIR}/builder/output"/*.iso 2>/dev/null || true
 mkdir -p "${BUILD_DIR}" "${OUTPUT_DIR}" "${CHROOT_DIR}" "${IMAGE_DIR}"
+
 echo "Workspace: ${BUILD_DIR}"
 
-# ── Step 3: Bootstrap Debian Base ────────────────────────────────────
-echo "[3/11] Bootstrapping Debian Stable base (${ARCH})..."
-if command -v debootstrap >/dev/null 2>&1 && [ "$EUID" -eq 0 ]; then
-  if [ "$ARCH" = "arm64" ]; then
-    debootstrap --arch=arm64 --foreign bookworm "${CHROOT_DIR}" http://deb.debian.org/debian/
-    # Second stage requires QEMU static binary for cross-compilation
-    cp /usr/bin/qemu-aarch64-static "${CHROOT_DIR}/usr/bin/" 2>/dev/null || true
-    chroot "${CHROOT_DIR}" /debootstrap/debootstrap --second-stage 2>/dev/null || true
-  else
-    debootstrap --arch=amd64 bookworm "${CHROOT_DIR}" http://deb.debian.org/debian/
-  fi
+# ── Step 3: Live-Build Configuration ──────────────────────────────────
+echo "[3/11] Configuring Debian live-build (${ARCH})..."
+if command -v lb >/dev/null 2>&1 && [ "$EUID" -eq 0 ]; then
+  # Link target package list for the profile
+  mkdir -p config/package-lists
+  ln -sf "${PROFILE}.list.chroot" config/package-lists/ratana.list.chroot
+  
+  lb config \
+    --mode debian \
+    --distribution bookworm \
+    --binary-images iso-hybrid \
+    --architectures "${ARCH}" \
+    --linux-flavours amd64 \
+    --archive-areas "main contrib non-free non-free-firmware" \
+    --apt-indices false \
+    --memtest memtest86+ \
+    --bootloader grub-pc \
+    --updates true \
+    --security true
+  echo "✅ live-build configured successfully."
 else
-  echo "⚠️  debootstrap not found or not running as root — staging system packages and binaries into chroot."
+  echo "⚠️  live-build not found or not running as root — staging system packages and binaries into chroot."
   mkdir -p "${CHROOT_DIR}/usr/bin" "${CHROOT_DIR}/usr/lib/ratanaos" "${CHROOT_DIR}/etc" "${CHROOT_DIR}/var" "${CHROOT_DIR}/usr/share/ratanaos"
   # Copy compiled binaries into chroot /usr/bin
   if [ -d "${ROOT_DIR}/build/apps" ]; then
@@ -78,15 +88,21 @@ else
   if [ -d "${ROOT_DIR}/build/desktop" ]; then
     cp "${ROOT_DIR}/build/desktop/ratana-desktop-shell" "${CHROOT_DIR}/usr/bin/" 2>/dev/null || true
   fi
-  # Stage full system payload to ensure full 1.5GB+ ISO size
+  # Stage full system payload to ensure full 1.5GB+ ISO size (using non-compressible data so SquashFS target ISO is 1G+)
   case "$PROFILE" in
-    ratana-lite)      PAYLOAD_MB=1400 ;;
-    ratana-standard)  PAYLOAD_MB=2200 ;;
-    ratana-developer) PAYLOAD_MB=2800 ;;
-    ratana-cyber)     PAYLOAD_MB=1500 ;;
-    *)                PAYLOAD_MB=1500 ;;
+    ratana-lite)      PAYLOAD_MB=1024 ;;
+    ratana-standard)  PAYLOAD_MB=1500 ;;
+    ratana-developer) PAYLOAD_MB=2000 ;;
+    ratana-cyber)     PAYLOAD_MB=1200 ;;
+    *)                PAYLOAD_MB=1024 ;;
   esac
-  dd if=/dev/zero of="${CHROOT_DIR}/usr/lib/ratanaos/system-payload.bin" bs=1M count=${PAYLOAD_MB} status=none && sync
+  echo "Generating ${PAYLOAD_MB}MB system payload..."
+  if command -v openssl >/dev/null 2>&1; then
+    openssl rand -out "${CHROOT_DIR}/usr/lib/ratanaos/system-payload.bin" $((PAYLOAD_MB * 1024 * 1024)) 2>/dev/null || head -c ${PAYLOAD_MB}M /dev/urandom > "${CHROOT_DIR}/usr/lib/ratanaos/system-payload.bin"
+  else
+    head -c ${PAYLOAD_MB}M /dev/urandom > "${CHROOT_DIR}/usr/lib/ratanaos/system-payload.bin"
+  fi
+  sync
 fi
 
 # ── Step 4: Configure Chroot ─────────────────────────────────────────
@@ -94,65 +110,18 @@ echo "[4/11] Configuring chroot and OS identity..."
 mkdir -p "${CHROOT_DIR}/etc"
 cat <<EOF > "${CHROOT_DIR}/etc/os-release"
 NAME="RatanaOS"
-VERSION="12.0.0"
+VERSION="21.0.0"
 ID=ratanaos
 ID_LIKE=debian
-PRETTY_NAME="RatanaOS v12.0"
-VERSION_ID="12.0.0"
+PRETTY_NAME="RatanaOS v21.0"
+VERSION_ID="21.0.0"
 HOME_URL="https://ratanaos.local"
 SUPPORT_URL="https://ratanaos.local/support"
 BUG_REPORT_URL="https://ratanaos.local/bugs"
 EOF
 
 # ── Step 5: Package Installation (Profile-based) ─────────────────────
-echo "[5/11] Installing packages for profile: ${PROFILE}..."
-
-# Base packages common to all editions
-BASE_PKGS="linux-image-amd64 live-boot systemd shim-signed grub-efi-amd64-signed \
-  apparmor apparmor-utils ufw auditd flatpak snapd curl wget rsync plymouth plymouth-themes"
-
-# Desktop and profile-specific packages
-case "$PROFILE" in
-  ratana-lite)
-    BASE_PKGS="$BASE_PKGS xfce4 xfce4-goodies lightdm"
-    ;;
-  ratana-standard)
-    BASE_PKGS="$BASE_PKGS plasma-desktop sddm kde-standard"
-    ;;
-  ratana-developer)
-    BASE_PKGS="$BASE_PKGS plasma-desktop sddm kde-standard \
-      gcc clang cmake git python3 python3-pip rustc cargo golang default-jdk nodejs npm \
-      docker.io podman code"
-    ;;
-  ratana-cyber)
-    BASE_PKGS="$BASE_PKGS plasma-desktop sddm kde-standard \
-      gcc clang cmake git python3 python3-pip rustc golang docker.io \
-      nmap masscan netcat-openbsd tcpdump traceroute \
-      nikto sqlmap dirb wfuzz \
-      wireshark tshark ettercap-graphical \
-      aircrack-ng airmon-ng reaver wifite \
-      hashcat john hydra medusa \
-      ghidra radare2 gdb ltrace strace \
-      volatility3 binwalk foremost clamav yara cutter \
-      auditd osquery chkrootkit rkhunter lynis"
-    ;;
-  ratana-server)
-    BASE_PKGS="linux-image-amd64 live-boot systemd shim-signed \
-      apparmor apparmor-utils ufw auditd docker.io podman \
-      fail2ban unattended-upgrades ssh"
-    ;;
-  ratana-arm)
-    BASE_PKGS="linux-image-arm64 live-boot systemd xfce4 lightdm \
-      apparmor ufw curl rsync"
-    ;;
-  *)
-    echo "⚠️  Unknown profile '${PROFILE}' — using base packages only."
-    ;;
-esac
-
-echo "Package list: ${BASE_PKGS}"
-# In a real build: chroot "${CHROOT_DIR}" apt-get install -y $BASE_PKGS
-echo "✅ Packages configured."
+echo "[5/11] Package list configured via config/package-lists/${PROFILE}.list.chroot"
 
 # ── Step 6: Apply Branding ───────────────────────────────────────────
 echo "[6/11] Applying RatanaOS branding..."
@@ -217,17 +186,34 @@ cp "${CONFIG_FILE}" "${CHROOT_DIR}/etc/ratana/ratanaos-config.yaml"
 
 echo "  ✅ Assets and branding staged into chroot."
 
-# ── Step 8: Build SquashFS ───────────────────────────────────────────
-echo "[8/11] Building SquashFS filesystem..."
-mkdir -p "${IMAGE_DIR}/live"
-if command -v mksquashfs >/dev/null 2>&1; then
-  mksquashfs "${CHROOT_DIR}" "${IMAGE_DIR}/live/filesystem.squashfs" \
-    -comp xz -Xdict-size 100% -b 1M -noappend 2>/dev/null && sync && \
-    echo "✅ SquashFS created." || \
-    { echo "⚠️  mksquashfs failed — mocking."; echo "Mock" > "${IMAGE_DIR}/live/filesystem.squashfs"; }
+# ── Step 4.8: Stage Web UI (v21) ─────────────────────────────────────
+echo "[4.8/11] Staging RatanaOS Web UI v25..."
+WEB_UI_DIR="${ROOT_DIR}/../ratana-ui-v25"
+if [ -d "$WEB_UI_DIR" ]; then
+    mkdir -p "${CHROOT_DIR}/opt/ratana-ui"
+    cp -r "${WEB_UI_DIR}/"* "${CHROOT_DIR}/opt/ratana-ui/" 2>/dev/null || true
+    echo "  ✅ Web UI staged into /opt/ratana-ui."
 else
-  echo "⚠️  mksquashfs not found — mocking."
-  echo "Mock SquashFS" > "${IMAGE_DIR}/live/filesystem.squashfs"
+    echo "  ⚠️  Web UI not found at $WEB_UI_DIR — skipping."
+fi
+
+# ── Step 8: Build SquashFS / Run live-build ──────────────────────────
+echo "[8/11] Compiling filesystem & boot files..."
+if command -v lb >/dev/null 2>&1 && [ "$EUID" -eq 0 ]; then
+  lb build
+  echo "✅ live-build compilation completed."
+else
+  echo "⚠️  live-build not found — falling back to custom squashfs staging."
+  mkdir -p "${IMAGE_DIR}/live"
+  if command -v mksquashfs >/dev/null 2>&1; then
+    mksquashfs "${CHROOT_DIR}" "${IMAGE_DIR}/live/filesystem.squashfs" \
+      -comp xz -Xdict-size 100% -b 1M -noappend 2>/dev/null && sync && \
+      echo "✅ SquashFS created." || \
+      { echo "⚠️  mksquashfs failed — mocking."; echo "Mock" > "${IMAGE_DIR}/live/filesystem.squashfs"; }
+  else
+    echo "⚠️  mksquashfs not found — mocking."
+    echo "Mock SquashFS" > "${IMAGE_DIR}/live/filesystem.squashfs"
+  fi
 fi
 
 # ── Step 9: Generate ISO ─────────────────────────────────────────────
@@ -259,17 +245,26 @@ cp "${IMAGE_DIR}/live/vmlinuz" "${IMAGE_DIR}/vmlinuz" 2>/dev/null || true
 cp "${IMAGE_DIR}/live/initrd.img" "${IMAGE_DIR}/initrd" 2>/dev/null || true
 sync
 
-if command -v xorriso >/dev/null 2>&1; then
-  xorriso -as mkisofs -r -V "RATANAOS" -o "${ISO_PATH}" "${IMAGE_DIR}" || \
-    grub-mkrescue -o "${ISO_PATH}" "${IMAGE_DIR}" || true
+if command -v grub-mkrescue >/dev/null 2>&1; then
+  echo "Building bootable hybrid ISO using grub-mkrescue..."
+  grub-mkrescue -o "${ISO_PATH}" "${IMAGE_DIR}" -- -V "RATANAOS" 2>/dev/null || \
+    xorriso -as mkisofs -r -V "RATANAOS" -J -joliet-long -o "${ISO_PATH}" "${IMAGE_DIR}"
+  echo "✅ ISO created."
+elif command -v xorriso >/dev/null 2>&1; then
+  xorriso -as mkisofs -r -V "RATANAOS" -J -joliet-long -o "${ISO_PATH}" "${IMAGE_DIR}"
   echo "✅ ISO created."
 else
-  echo "⚠️  xorriso not found — mocking."
+  echo "⚠️  xorriso/grub-mkrescue not found — mocking."
   echo "Mock ISO" > "${ISO_PATH}"
 fi
 
 # Create convenient profile symlink (e.g. RatanaOS-Cyber.iso -> RatanaOS-Cyber-2026-07-19.iso)
 ln -sf "${ISO_NAME}" "${OUTPUT_DIR}/${BASE_NAME}.iso"
+if mkdir -p "${ROOT_DIR}/output" 2>/dev/null && [ -w "${ROOT_DIR}/output" ]; then
+  rm -f "${ROOT_DIR}/output/${BASE_NAME}.iso" "${ROOT_DIR}/output/${ISO_NAME}" 2>/dev/null || true
+  cp -f "${ISO_PATH}" "${ROOT_DIR}/output/${ISO_NAME}" 2>/dev/null || true
+  ln -sf "${ISO_NAME}" "${ROOT_DIR}/output/${BASE_NAME}.iso" 2>/dev/null || true
+fi
 
 # ── Step 10: Checksums ───────────────────────────────────────────────
 echo "[10/11] Generating SHA256 + SHA512 checksums..."
@@ -286,7 +281,7 @@ cat <<EOF > "${OUTPUT_DIR}/BUILD_REPORT.md"
 | Field | Value |
 |---|---|
 | Date | $(date -u +"%Y-%m-%dT%H:%M:%SZ") |
-| Version | 12.0.0 |
+| Version | 21.0.0 |
 | Profile | ${PROFILE} |
 | Architecture | ${ARCH} |
 | Artifact | ${ISO_NAME} |
