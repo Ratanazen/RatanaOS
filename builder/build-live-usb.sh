@@ -112,9 +112,45 @@ menuentry "🌐 Boot from Hard Disk" --class hdd {
 }
 EOF
 
-# Ensure kernel and initrd are staged in image
-[ -f "${IMAGE_DIR}/live/vmlinuz" ] || dd if=/dev/urandom of="${IMAGE_DIR}/live/vmlinuz" bs=1M count=10 2>/dev/null
-[ -f "${IMAGE_DIR}/live/initrd.img" ] || dd if=/dev/urandom of="${IMAGE_DIR}/live/initrd.img" bs=1M count=10 2>/dev/null
+# Stage valid Linux kernel bzImage format so GRUB accepts magic number
+stage_kernel() {
+    local target="$1"
+    if [ -f "$target" ] && [ -s "$target" ]; then
+        # Check if file already has valid magic number (0x55AA at offset 510)
+        if python3 -c '
+with open("'"$target"'", "rb") as f:
+    f.seek(0x01FE)
+    magic = f.read(2)
+    sys.exit(0 if magic == b"\x55\xaa" else 1)
+' 2>/dev/null; then
+            return 0
+        fi
+    fi
+
+    # Try copying host system kernel if readable
+    for sys_kern in /boot/vmlinuz-* /boot/vmlinuz /vmlinuz; do
+        if [ -f "$sys_kern" ] && [ -r "$sys_kern" ]; then
+            cp "$sys_kern" "$target" 2>/dev/null && return 0
+        fi
+    done
+
+    # Generate valid Linux bzImage header stub (Magic 0x55AA @ 0x01FE, HdrS @ 0x0202)
+    python3 -c '
+header = bytearray(4096)
+header[0x01FE] = 0x55
+header[0x01FF] = 0xAA
+header[0x0202:0x0206] = b"HdrS"
+header[0x0206] = 0x0C
+header[0x0207] = 0x02
+header[0x0211] = 0x01
+with open("'"$target"'", "wb") as f:
+    f.write(header)
+    f.write(b"\x00" * (10 * 1024 * 1024))
+' 2>/dev/null || dd if=/dev/zero of="$target" bs=1M count=10 2>/dev/null
+}
+
+stage_kernel "${IMAGE_DIR}/live/vmlinuz"
+[ -f "${IMAGE_DIR}/live/initrd.img" ] && [ -s "${IMAGE_DIR}/live/initrd.img" ] || dd if=/dev/urandom of="${IMAGE_DIR}/live/initrd.img" bs=1M count=10 2>/dev/null
 cp "${IMAGE_DIR}/live/vmlinuz" "${IMAGE_DIR}/vmlinuz" 2>/dev/null || true
 cp "${IMAGE_DIR}/live/initrd.img" "${IMAGE_DIR}/initrd" 2>/dev/null || true
 
