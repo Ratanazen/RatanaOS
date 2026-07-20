@@ -1,0 +1,55 @@
+#!/bin/bash
+# =============================================================================
+# RatanaOS Matrix Rain (ratana-matrix v31.0)
+# Animated terminal digital rain for RatanaOS Cyber & Standard editions
+# =============================================================================
+
+stty --file=/dev/tty -echo 2>/dev/null || true
+tput civis 2>/dev/null || true
+trap 'tput cnorm 2>/dev/null; stty --file=/dev/tty echo 2>/dev/null; clear; exit' INT TERM EXIT
+
+clear
+LINES=$(tput lines 2>/dev/null || echo 24)
+COLUMNS=$(tput cols 2>/dev/null || echo 80)
+
+# Character set (Khmer numbers & symbols mixed with Matrix code)
+CHARS="0123456789ABCDEFរតនា០១២៣៤៥៦៧៨៩$#@%&*"
+
+declare -A drops
+
+for ((i=0; i<COLUMNS; i+=2)); do
+    drops[$i]=$((RANDOM % LINES))
+done
+
+counter=0
+echo -e "\033[1;32mPress Ctrl+C to exit RatanaOS Cyber Rain Matrix...\033[0m"
+sleep 1
+clear
+
+while true; do
+    for ((i=0; i<COLUMNS; i+=2)); do
+        char_idx=$((RANDOM % ${#CHARS}))
+        char="${CHARS:$char_idx:1}"
+        y=${drops[$i]}
+
+        # Print bright head
+        tput cup $y $i 2>/dev/null || echo -ne "\033[${y};${i}H"
+        echo -ne "\033[1;37m$char\033[0m"
+
+        # Print green body behind
+        prev_y=$(( (y - 1 + LINES) % LINES ))
+        tput cup $prev_y $i 2>/dev/null || true
+        echo -ne "\033[1;32m$char\033[0m"
+
+        # Fade tail
+        tail_y=$(( (y - 8 + LINES) % LINES ))
+        tput cup $tail_y $i 2>/dev/null || true
+        echo -ne " "
+
+        drops[$i]=$(( (y + 1) % LINES ))
+    done
+    
+    sleep 0.05
+    counter=$((counter + 1))
+    if [ $counter -gt 300 ]; then break; fi # Auto-stop after 300 frames in non-interactive tests
+done

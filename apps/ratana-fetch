@@ -1,0 +1,38 @@
+#!/bin/bash
+# =============================================================================
+# RatanaOS Fetch (ratana-fetch v31.0)
+# A stylish ASCII system information tool for RatanaOS
+# =============================================================================
+
+c0="\033[0m"
+c1="\033[1;33m" # Gold / Orange (Ratana Accent)
+c2="\033[1;36m" # Cyan
+c3="\033[1;32m" # Green
+c4="\033[1;35m" # Magenta
+c5="\033[1;31m" # Red
+c6="\033[1;34m" # Blue
+
+USER_NAME="${USER:-ratana}"
+HOST_NAME="$(hostname 2>/dev/null || echo 'ratana-pc')"
+OS_NAME="RatanaOS v21.0 / v31 Ultimate"
+KERNEL="$(uname -r 2>/dev/null || echo '6.6.13-ratana-generic')"
+UPTIME="$(uptime -p 2>/dev/null | sed 's/up //' || echo '3 hours, 42 mins')"
+SHELL_NAME="${SHELL:-/bin/bash}"
+MEM_FREE="$(free -h 2>/dev/null | awk '/Mem:/ {print $3 "/" $2}' || echo '1.2Gi / 4.0Gi')"
+DESKTOP_ENV="${XDG_CURRENT_DESKTOP:-KDE Plasma / Ratana Web UI}"
+
+clear
+cat << EOF
+
+${c1}    ____        __                     ____  _____ ${c0}  ${c1}${USER_NAME}${c0}@${c2}${HOST_NAME}${c0}
+${c1}   / __ \____ _/ /______ _____  ____  / __ \/ ___/ ${c0}  ---------------------
+${c1}  / /_/ / __ \`/ __/ __ \`/ __ \`/ __ \/ / / /\__ \  ${c0}  ${c2}OS:${c0}      ${OS_NAME}
+${c1} / _, _/ /_/ / /_/ /_/ / /_/ / /_/ / /_/ /___/ /  ${c0}  ${c2}Kernel:${c0}  ${KERNEL}
+${c1}/_/ |_|\__,_/\__/\__,_/\__,_/\__,_/\____//____/   ${c0}  ${c2}Uptime:${c0}  ${UPTIME}
+${c0}                                                  ${c2}Shell:${c0}   ${SHELL_NAME}
+${c2}   🇰🇭  រតនាOS - Next Gen Linux Distribution     ${c0}  ${c2}DE/UI:${c0}   ${DESKTOP_ENV}
+${c0}                                                  ${c2}Memory:${c0}  ${MEM_FREE}
+
+  ${c5}████${c3}████${c1}████${c6}████${c4}████${c2}████${c0}
+
+EOF

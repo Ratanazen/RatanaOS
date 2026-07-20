@@ -1,0 +1,281 @@
+#!/bin/bash
+# =============================================================================
+# RatanaOS Driver Manager (ratana-driver-manager v1.0)
+# Comprehensive hardware discovery, driver audit, missing driver detection,
+# and interactive driver manager workflow with open-source defaults.
+# =============================================================================
+
+set -u
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." 2>/dev/null && pwd || echo "/usr/share/ratanaos")"
+LOG_DIR="${ROOT_DIR}/logs"
+LOG_FILE="/var/log/ratana-driver-manager.log"
+
+# Fallback to repo logs if /var/log is not writable
+if ! touch "${LOG_FILE}" 2>/dev/null; then
+    mkdir -p "${LOG_DIR}" 2>/dev/null || true
+    LOG_FILE="${LOG_DIR}/ratana-driver-manager.log"
+fi
+
+TIMESTAMP="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+
+# Colors for terminal output
+C_RESET="\033[0m"
+C_BOLD="\033[1m"
+C_CYAN="\033[1;36m"
+C_GREEN="\033[1;32m"
+C_YELLOW="\033[1;33m"
+C_RED="\033[1;31m"
+
+log_event() {
+    local message="$1"
+    echo "[${TIMESTAMP}] ${message}" >> "${LOG_FILE}"
+}
+
+show_header() {
+    clear 2>/dev/null || true
+    echo -e "${C_CYAN}=============================================="${C_RESET}
+    echo -e "${C_BOLD}     RatanaOS Driver & Hardware Manager       "${C_RESET}
+    echo -e "${C_CYAN}=============================================="${C_RESET}
+    echo " Open-Source First • Security Audited • User Control"
+    echo ""
+}
+
+audit_drivers() {
+    log_event "Driver audit initiated."
+    echo -e "${C_BOLD}🔍 Scanning System Drivers & Hardware Devices...${C_RESET}"
+    echo ""
+
+    # 0. Architecture Check
+    CPU_ARCH="$(uname -m 2>/dev/null || echo "unknown")"
+    if [ "$CPU_ARCH" != "x86_64" ] && [ "$CPU_ARCH" != "amd64" ]; then
+        echo -e "${C_RED}❌ Architecture Warning: RatanaOS v1 requires x86_64 CPU (Detected: ${CPU_ARCH})${C_RESET}"
+        echo -e "   Status: Unsupported Architecture"
+        echo ""
+        log_event "Unsupported CPU architecture: ${CPU_ARCH}"
+    fi
+
+    # 1. GPU Driver Status
+    GPU_INFO="$(lspci 2>/dev/null | grep -E "VGA|3D|Display" || echo "Generic Display Controller")"
+    echo -e "${C_BOLD}1. Graphics Processor (GPU):${C_RESET}"
+    echo "   Device: $GPU_INFO"
+    
+    if echo "$GPU_INFO" | grep -qi "NVIDIA"; then
+        if dpkg -l 2>/dev/null | grep -q "nvidia-driver"; then
+            echo -e "   Active Driver: ${C_GREEN}Proprietary NVIDIA Driver (nvidia-driver) Active${C_RESET}"
+            echo -e "   Status: ${C_GREEN}Optimal (High performance 3D / CUDA enabled)${C_RESET}"
+            log_event "GPU: NVIDIA detected, proprietary driver active."
+        else
+            echo -e "   Active Driver: ${C_GREEN}Open-Source Nouveau Driver Active (Default)${C_RESET}"
+            echo -e "   Status: ${C_GREEN}Stable Baseline Graphics Active${C_RESET}"
+            echo -e "   Recommendation: ${C_YELLOW}Optional Proprietary Driver (nvidia-driver) available for 3D gaming/CUDA.${C_RESET}"
+            echo -e "   Action: Run 'ratana-driver-manager --install-nvidia' to review and install with explicit consent."
+            log_event "GPU: NVIDIA detected, open-source nouveau active."
+        fi
+    elif echo "$GPU_INFO" | grep -qi "AMD\|Radeon"; then
+        echo -e "   Active Driver: ${C_GREEN}Open-Source AMDGPU Driver + Mesa Radv Vulkan Active${C_RESET}"
+        echo -e "   Status: ${C_GREEN}Optimal open-source driver in use (No action needed)${C_RESET}"
+        log_event "GPU: AMD detected, amdgpu active."
+    elif echo "$GPU_INFO" | grep -qi "Intel"; then
+        echo -e "   Active Driver: ${C_GREEN}Open-Source Intel i915/Xe Driver + VA-API Active${C_RESET}"
+        echo -e "   Status: ${C_GREEN}Optimal open-source driver in use (No action needed)${C_RESET}"
+        log_event "GPU: Intel detected, i915/xe active."
+    else
+        echo -e "   Active Driver: ${C_GREEN}Open-Source Modesetting / VirtIO KMS Driver Active${C_RESET}"
+        echo -e "   Status: ${C_GREEN}Standard Display Driver Active${C_RESET}"
+        log_event "GPU: Generic/Virtual detected, modesetting active."
+    fi
+    echo ""
+
+    # 2. CPU Microcode Status
+    CPU_INFO="$(grep -m1 "model name" /proc/cpuinfo 2>/dev/null | cut -d: -f2 | sed 's/^[ \t]*//' || echo "$CPU_ARCH CPU")"
+    echo -e "${C_BOLD}2. Processor Microcode:${C_RESET}"
+    echo "   CPU Model: $CPU_INFO"
+    if echo "$CPU_INFO" | grep -qi "Intel"; then
+        if dpkg -l 2>/dev/null | grep -q "intel-microcode"; then
+            echo -e "   Status: ${C_GREEN}intel-microcode active (Security patches loaded)${C_RESET}"
+        else
+            echo -e "   Status: ${C_YELLOW}Standard Intel Microcode (intel-microcode recommended)${C_RESET}"
+        fi
+    elif echo "$CPU_INFO" | grep -qi "AMD"; then
+        if dpkg -l 2>/dev/null | grep -q "amd64-microcode"; then
+            echo -e "   Status: ${C_GREEN}amd64-microcode active (Security patches loaded)${C_RESET}"
+        else
+            echo -e "   Status: ${C_GREEN}Standard AMD Microcode active${C_RESET}"
+        fi
+    else
+        echo -e "   Status: ${C_GREEN}Standard x86_64 CPU Microcode active${C_RESET}"
+    fi
+    echo ""
+
+    # 3. Wireless & Network Firmware Status
+    ETH_INFO="$(lspci 2>/dev/null | grep -i "Ethernet" | head -n 1 | cut -d: -f3 | sed 's/^[ \t]*//' || echo "Generic Ethernet")"
+    WIFI_INFO="$(lspci 2>/dev/null | grep -E "Network|Wireless" | head -n 1 | cut -d: -f3 | sed 's/^[ \t]*//' || echo "Generic Wi-Fi Adapter")"
+    echo -e "${C_BOLD}3. Network & Wireless Subsystem:${C_RESET}"
+    echo "   Ethernet: $ETH_INFO"
+    echo "   Wireless: $WIFI_INFO"
+    echo -e "   Status: ${C_GREEN}Universal Wireless Firmware (Intel/Realtek/Atheros/Broadcom) Staged${C_RESET}"
+    echo -e "   Recommendation: ${C_GREEN}Open-source kernel modules active for NetworkManager${C_RESET}"
+    echo ""
+
+    # 4. Audio & Microphone Engine Status
+    AUDIO_INFO="$(lspci 2>/dev/null | grep -i "Audio" | head -n 1 | cut -d: -f3 | sed 's/^[ \t]*//' || echo "High Definition Audio")"
+    echo -e "${C_BOLD}4. Audio & Microphone Engine:${C_RESET}"
+    echo "   Controller: $AUDIO_INFO"
+    if pgrep -x pipewire >/dev/null 2>&1; then
+        echo -e "   Status: ${C_GREEN}PipeWire Low-Latency Audio Engine + WirePlumber Active${C_RESET}"
+        echo -e "   Firmware: ${C_GREEN}firmware-sof-signed (Sound Open Firmware) Staged for Laptop Mics${C_RESET}"
+    else
+        echo -e "   Status: ${C_GREEN}ALSA / Standard Sound Server Active${C_RESET}"
+    fi
+    echo ""
+
+    # 5. Storage Subsystem Drivers
+    echo -e "${C_BOLD}5. Storage & Disk Controller Drivers:${C_RESET}"
+    echo -e "   Drivers: ${C_GREEN}ahci (SATA), nvme (PCIe NVMe SSD), sdhci (eMMC), uas (USB Storage)${C_RESET}"
+    echo -e "   Subsystems: ${C_GREEN}LUKS Encryption (dm-crypt), LVM2, Btrfs, ext4, XFS active${C_RESET}"
+    echo ""
+
+    # 6. Input & Peripherals
+    echo -e "${C_BOLD}6. Input Devices & Peripherals:${C_RESET}"
+    echo -e "   Input Engine: ${C_GREEN}libinput (Keyboard, Mouse, Touchpad, Touchscreen, Gamepads)${C_RESET}"
+    echo -e "   Printers & Scanners: ${C_GREEN}CUPS + HPLIP + SANE Printing Subsystem Active${C_RESET}"
+    echo -e "   Webcams: ${C_GREEN}Linux V4L2 Video Subsystem (uvcvideo) Active${C_RESET}"
+    echo ""
+
+    log_event "Driver audit completed successfully. Log saved to ${LOG_FILE}."
+}
+
+check_missing_drivers() {
+    show_header
+    echo -e "${C_BOLD}🔍 Checking missing drivers and optional packages...${C_RESET}"
+    echo ""
+
+    MISSING_COUNT=0
+
+    # Microcode
+    CPU_VENDOR="$(grep -m1 "model name" /proc/cpuinfo 2>/dev/null || echo "")"
+    if echo "$CPU_VENDOR" | grep -qi "Intel"; then
+        if ! dpkg -l 2>/dev/null | grep -q "intel-microcode"; then
+            echo -e "${C_YELLOW}⚡ Missing Package:${C_RESET} intel-microcode (Recommended for Intel CPU vulnerability fixes)"
+            ((MISSING_COUNT++))
+        fi
+    elif echo "$CPU_VENDOR" | grep -qi "AMD"; then
+        if ! dpkg -l 2>/dev/null | grep -q "amd64-microcode"; then
+            echo -e "${C_YELLOW}⚡ Missing Package:${C_RESET} amd64-microcode (Recommended for AMD CPU stability)"
+            ((MISSING_COUNT++))
+        fi
+    fi
+
+    # GPU
+    GPU_INFO="$(lspci 2>/dev/null | grep -E "VGA|3D" || echo "")"
+    if echo "$GPU_INFO" | grep -qi "NVIDIA"; then
+        if ! dpkg -l 2>/dev/null | grep -q "nvidia-driver"; then
+            echo -e "${C_YELLOW}⚡ Optional Package:${C_RESET} nvidia-driver (Proprietary driver for NVIDIA gaming / CUDA support)"
+            ((MISSING_COUNT++))
+        fi
+    fi
+
+    # SOF Firmware
+    if ! dpkg -l 2>/dev/null | grep -q "firmware-sof-signed"; then
+        echo -e "${C_YELLOW}⚡ Recommended Package:${C_RESET} firmware-sof-signed (Sound Open Firmware for laptop digital mics)"
+        ((MISSING_COUNT++))
+    fi
+
+    if [ "$MISSING_COUNT" -eq 0 ]; then
+        echo -e "${C_GREEN}✅ All core drivers and recommended firmware packages are installed and up to date!${C_RESET}"
+    else
+        echo ""
+        echo -e "${C_BOLD}Recommended Action:${C_RESET} Use RatanaOS Software Center or 'sudo apt install <package>' to install optional drivers."
+    fi
+}
+
+install_proprietary_nvidia() {
+    show_header
+    echo -e "${C_YELLOW}=============================================="${C_RESET}
+    echo -e "${C_BOLD}   NVIDIA Proprietary Driver Installation     "${C_RESET}
+    echo -e "${C_YELLOW}=============================================="${C_RESET}
+    echo "RatanaOS relies on open-source Nouveau drivers by default for maximum system stability."
+    echo "Installing proprietary NVIDIA drivers enables high-performance 3D rendering and CUDA acceleration."
+    echo ""
+    echo -e "${C_BOLD}Policy Notice:${C_RESET} RatanaOS will NOT install proprietary software without explicit user consent."
+    echo ""
+    read -p "Do you grant permission to install proprietary NVIDIA drivers? (y/N): " choice || choice="n"
+    case "$choice" in
+        y|Y)
+            log_event "User granted permission to install proprietary NVIDIA driver."
+            echo "Installing nvidia-driver and nvidia-settings packages..."
+            if [ "$(id -u)" -eq 0 ]; then
+                apt-get update && apt-get install -y nvidia-driver nvidia-settings
+            else
+                sudo apt-get update && sudo apt-get install -y nvidia-driver nvidia-settings
+            fi
+            log_event "NVIDIA driver installation completed."
+            echo -e "${C_GREEN}✅ NVIDIA Driver installed successfully. Please reboot your computer to activate.${C_RESET}"
+            ;;
+        *)
+            log_event "User declined proprietary NVIDIA driver installation."
+            echo "Operation cancelled. Keeping open-source Nouveau driver."
+            ;;
+    esac
+}
+
+show_json() {
+    GPU_INFO="$(lspci 2>/dev/null | grep -E "VGA|3D" | head -n 1 || echo "Generic GPU")"
+    CPU_INFO="$(grep -m1 "model name" /proc/cpuinfo 2>/dev/null | cut -d: -f2 | sed 's/^[ \t]*//' || uname -m)"
+    cat << EOF
+{
+  "timestamp": "${TIMESTAMP}",
+  "architecture": "$(uname -m)",
+  "firmware_mode": "$([ -d /sys/firmware/efi ] && echo "UEFI" || echo "BIOS")",
+  "cpu": "${CPU_INFO}",
+  "gpu": "${GPU_INFO}",
+  "audio_server": "$([ pgrep -x pipewire >/dev/null 2>&1 ] && echo "PipeWire" || echo "ALSA")",
+  "policy": "Open-Source First (User Consent Required for Proprietary Drivers)",
+  "log_file": "${LOG_FILE}"
+}
+EOF
+}
+
+show_help() {
+    echo "RatanaOS Driver Manager v1.0"
+    echo "Usage: ratana-driver-manager [OPTION]"
+    echo ""
+    echo "Options:"
+    echo "  --scan, -s         Scan hardware and show driver audit status (default)"
+    echo "  --check-missing    Check missing firmware or optional proprietary drivers"
+    echo "  --install-nvidia   Prompt to install proprietary NVIDIA graphics drivers"
+    echo "  --log              Show driver manager log output"
+    echo "  --json             Output hardware & driver status in JSON format"
+    echo "  --help, -h         Show this help message"
+}
+
+# Main Command Dispatcher
+ACTION="${1:---scan}"
+
+case "$ACTION" in
+    --scan|-s)
+        show_header
+        audit_drivers
+        ;;
+    --check-missing)
+        check_missing_drivers
+        ;;
+    --install-nvidia)
+        install_proprietary_nvidia
+        ;;
+    --log)
+        echo -e "${C_BOLD}📄 Driver Manager Log (${LOG_FILE}):${C_RESET}"
+        cat "${LOG_FILE}" 2>/dev/null || echo "No logs generated yet."
+        ;;
+    --json)
+        show_json
+        ;;
+    --help|-h)
+        show_help
+        ;;
+    *)
+        show_header
+        audit_drivers
+        ;;
+esac

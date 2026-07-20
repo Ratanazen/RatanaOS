@@ -1,6 +1,6 @@
 # QEMU Boot Test Report
-Date: 2026-07-19T06:36:27Z
-ISO: RatanaOS-Cyber.iso
+Date: 2026-07-20T02:54:10Z
+ISO: RatanaOS-Standard.iso
 
 ## BIOS Mode
 - [x] ISO boots to GRUB menu

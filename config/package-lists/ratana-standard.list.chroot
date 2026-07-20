@@ -1,26 +1,77 @@
-# Standard Edition Core
+# Base System & Utils
 linux-image-amd64
 live-boot
+live-boot-initramfs-tools
+live-config
+live-config-systemd
 systemd
-shim-signed
-grub-efi-amd64-signed
+systemd-sysv
 apparmor
 apparmor-utils
 ufw
 auditd
 flatpak
-snapd
 curl
 wget
 rsync
+network-manager
+network-manager-gnome
+ca-certificates
+apt-transport-https
 plymouth
 plymouth-themes
+usbutils
+pciutils
+lm-sensors
 
-# Desktop
+# CPU Microcode (Intel & AMD)
+intel-microcode
+amd64-microcode
+
+# Hardware Drivers (Wi-Fi, Ethernet, Bluetooth)
+firmware-linux
+firmware-linux-free
+firmware-linux-nonfree
+firmware-misc-nonfree
+firmware-iwlwifi
+firmware-realtek
+firmware-atheros
+firmware-brcm80211
+firmware-libertas
+bluez
+bluez-tools
+
+# GPU Drivers & Hardware Acceleration (Intel, AMD, NVIDIA)
+xserver-xorg-video-all
+xserver-xorg-video-amdgpu
+xserver-xorg-video-intel
+xserver-xorg-video-nouveau
+firmware-amd-graphics
+mesa-vulkan-drivers
+va-driver-all
+vdpau-driver-all
+
+# Sound & Microphone Drivers (PipeWire + Laptop Audio Firmware)
+pipewire
+wireplumber
+pipewire-audio
+pipewire-pulse
+firmware-sof-signed
+alsa-utils
+
+# Touchpad & Input Drivers
+xserver-xorg-input-libinput
+xserver-xorg-input-synaptics
+
+# Printer & Peripheral Drivers
+cups
+printer-driver-all
+hplip
+
+# Desktop Environment
 plasma-desktop
 sddm
 kde-standard
-network-manager
 
 # Standard Apps
 firefox

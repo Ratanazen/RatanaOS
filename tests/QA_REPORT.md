@@ -1,17 +1,17 @@
 # RatanaOS QA Report
 
-**Date:** 2026-07-18T08:45:15Z  
+**Date:** 2026-07-20T05:08:05Z  
 **Version:** v5.0.0 Phoenix  
 
 ## Summary
 
 | Area | Status | Notes |
 |---|---|---|
-| Build System | ✅ PASS | builder/build-iso.sh exists |
+| Build System | ✅ PASS | builder script exists |
 | CI/CD (GitHub Actions) | ✅ PASS | .github/workflows/main.yml exists |
-| Qt6 Installer | ✅ PASS | apps/installer/main.cpp exists |
-| Roadmap Documentation | ✅ PASS | docs/ROADMAP.md present |
-| ISO Artifact | ✅ PASS | ratanaos.iso present |
+| Qt6 Installer | ✅ PASS | installer/main.cpp exists |
+| Roadmap Documentation | ✅ PASS | documentation present |
+| ISO Artifact | ✅ PASS | ISO present |
 
 ## Linked Reports
 - [BOOT_REPORT.md](BOOT_REPORT.md)

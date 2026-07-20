@@ -3,6 +3,7 @@ output/
 *.img
 logs/
 build/live-build/
+builder/live-build/
 cache/
 .artifacts/
 *.sha256

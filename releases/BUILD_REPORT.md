@@ -1,11 +1,10 @@
-# RatanaOS Build Report
+# RatanaOS Live USB Build Report
 
-| Field | Value |
+| Field        | Value                                    |
 |---|---|
-| Date | 2026-07-19T06:36:33Z |
-| Version | 12.0.0 |
-| Profile | ratana-cyber |
-| Architecture | amd64 |
-| Artifact | RatanaOS-Cyber-2026-07-19.iso |
-| SHA256 | 2b4422abc2b7c336cb6a569205474ebd4a815e1b39a1b73c88fef2e61a77fce3 |
-| Status | SUCCESS |
+| Date         | 2026-07-20T05:31:15Z        |
+| Version      | 21.0.0                                    |
+| Artifact     | RatanaOS-Live.iso                              |
+| SHA256       | 51645d0b75f06693c0dc49ca8695ed7beb0d59739a24d9a3527bc8bcb49a4ff3 |
+| Boot Support | UEFI + BIOS Hybrid                        |
+| Status       | SUCCESS                                  |

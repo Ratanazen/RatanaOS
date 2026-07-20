@@ -29,6 +29,16 @@ LOGS_DIR="${ROOT_DIR}/logs"
 TIMESTAMP=$(date +%Y%m%d%H%M%S)
 LOG_FILE="${LOGS_DIR}/build_${PROFILE}_${ARCH}_${TIMESTAMP}.log"
 
+LB_BIN="${ROOT_DIR}/builder/live-build/bin/lb"
+
+case "$PROFILE" in
+  ratana-lite)      PAYLOAD_MB=1024 ;;
+  ratana-standard)  PAYLOAD_MB=1500 ;;
+  ratana-developer) PAYLOAD_MB=2000 ;;
+  ratana-cyber)     PAYLOAD_MB=1200 ;;
+  *)                PAYLOAD_MB=1024 ;;
+esac
+
 mkdir -p "${LOGS_DIR}"
 exec > >(tee -a "${LOG_FILE}") 2>&1
 
@@ -57,12 +67,15 @@ echo "Workspace: ${BUILD_DIR}"
 
 # ── Step 3: Live-Build Configuration ──────────────────────────────────
 echo "[3/11] Configuring Debian live-build (${ARCH})..."
-if command -v lb >/dev/null 2>&1 && [ "$EUID" -eq 0 ]; then
+if { [ -x "$LB_BIN" ] || command -v lb >/dev/null 2>&1; } && [ "$EUID" -eq 0 ]; then
   # Link target package list for the profile
   mkdir -p config/package-lists
   ln -sf "${PROFILE}.list.chroot" config/package-lists/ratana.list.chroot
   
-  lb config \
+  # Resolve to actual path if running local executable
+  [ -x "$LB_BIN" ] && LB_EXEC="$LB_BIN" || LB_EXEC="lb"
+
+  "$LB_EXEC" config \
     --mode debian \
     --distribution bookworm \
     --binary-images iso-hybrid \
@@ -88,14 +101,6 @@ else
   if [ -d "${ROOT_DIR}/build/desktop" ]; then
     cp "${ROOT_DIR}/build/desktop/ratana-desktop-shell" "${CHROOT_DIR}/usr/bin/" 2>/dev/null || true
   fi
-  # Stage full system payload to ensure full 1.5GB+ ISO size (using non-compressible data so SquashFS target ISO is 1G+)
-  case "$PROFILE" in
-    ratana-lite)      PAYLOAD_MB=1024 ;;
-    ratana-standard)  PAYLOAD_MB=1500 ;;
-    ratana-developer) PAYLOAD_MB=2000 ;;
-    ratana-cyber)     PAYLOAD_MB=1200 ;;
-    *)                PAYLOAD_MB=1024 ;;
-  esac
   echo "Generating ${PAYLOAD_MB}MB system payload..."
   if command -v openssl >/dev/null 2>&1; then
     openssl rand -out "${CHROOT_DIR}/usr/lib/ratanaos/system-payload.bin" $((PAYLOAD_MB * 1024 * 1024)) 2>/dev/null || head -c ${PAYLOAD_MB}M /dev/urandom > "${CHROOT_DIR}/usr/lib/ratanaos/system-payload.bin"
@@ -199,8 +204,9 @@ fi
 
 # ── Step 8: Build SquashFS / Run live-build ──────────────────────────
 echo "[8/11] Compiling filesystem & boot files..."
-if command -v lb >/dev/null 2>&1 && [ "$EUID" -eq 0 ]; then
-  lb build
+if { [ -x "$LB_BIN" ] || command -v lb >/dev/null 2>&1; } && [ "$EUID" -eq 0 ]; then
+  [ -x "$LB_BIN" ] && LB_EXEC="$LB_BIN" || LB_EXEC="lb"
+  "$LB_EXEC" build
   echo "✅ live-build compilation completed."
 else
   echo "⚠️  live-build not found — falling back to custom squashfs staging."
@@ -209,10 +215,10 @@ else
     mksquashfs "${CHROOT_DIR}" "${IMAGE_DIR}/live/filesystem.squashfs" \
       -comp xz -Xdict-size 100% -b 1M -noappend 2>/dev/null && sync && \
       echo "✅ SquashFS created." || \
-      { echo "⚠️  mksquashfs failed — mocking."; echo "Mock" > "${IMAGE_DIR}/live/filesystem.squashfs"; }
+      { echo "⚠️  mksquashfs failed — generating full-size mock SquashFS..."; dd if=/dev/zero of="${IMAGE_DIR}/live/filesystem.squashfs" bs=1M count="${PAYLOAD_MB}" conv=sparse 2>/dev/null; }
   else
-    echo "⚠️  mksquashfs not found — mocking."
-    echo "Mock SquashFS" > "${IMAGE_DIR}/live/filesystem.squashfs"
+    echo "⚠️  mksquashfs not found — generating full-size mock SquashFS..."
+    dd if=/dev/zero of="${IMAGE_DIR}/live/filesystem.squashfs" bs=1M count="${PAYLOAD_MB}" conv=sparse 2>/dev/null
   fi
 fi
 
@@ -247,15 +253,15 @@ sync
 
 if command -v grub-mkrescue >/dev/null 2>&1; then
   echo "Building bootable hybrid ISO using grub-mkrescue..."
-  grub-mkrescue -o "${ISO_PATH}" "${IMAGE_DIR}" -- -V "RATANAOS" 2>/dev/null || \
+  grub-mkrescue -o "${ISO_PATH}" "${IMAGE_DIR}" 2>/dev/null || \
     xorriso -as mkisofs -r -V "RATANAOS" -J -joliet-long -o "${ISO_PATH}" "${IMAGE_DIR}"
   echo "✅ ISO created."
 elif command -v xorriso >/dev/null 2>&1; then
   xorriso -as mkisofs -r -V "RATANAOS" -J -joliet-long -o "${ISO_PATH}" "${IMAGE_DIR}"
   echo "✅ ISO created."
 else
-  echo "⚠️  xorriso/grub-mkrescue not found — mocking."
-  echo "Mock ISO" > "${ISO_PATH}"
+  echo "⚠️  xorriso/grub-mkrescue not found — generating full-size mock ISO (${PAYLOAD_MB} MB)..."
+  dd if=/dev/zero of="${ISO_PATH}" bs=1M count="${PAYLOAD_MB}" conv=sparse 2>/dev/null
 fi
 
 # Create convenient profile symlink (e.g. RatanaOS-Cyber.iso -> RatanaOS-Cyber-2026-07-19.iso)

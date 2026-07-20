@@ -1,0 +1,79 @@
+#!/bin/bash
+# =============================================================================
+# RatanaOS Arcade Snake (ratana-snake v31.0)
+# A fun mini terminal game preinstalled on RatanaOS
+# =============================================================================
+
+echo "=============================================="
+echo "  🐍 RatanaOS Retro Snake Arcade v31.0"
+echo "=============================================="
+echo "  Controls: W (Up), A (Left), S (Down), D (Right)"
+echo "  Press Enter to start or 'q' to quit..."
+read -r -n 1 choice
+if [ "$choice" = "q" ]; then exit 0; fi
+
+width=40
+height=15
+score=0
+snake_x=(20 19 18)
+snake_y=(7 7 7)
+food_x=10
+food_y=5
+dir_x=1
+dir_y=0
+
+tput civis 2>/dev/null || true
+trap 'tput cnorm 2>/dev/null; clear; exit' INT TERM EXIT
+
+clear
+for ((frame=0; frame<50; frame++)); do
+    # Render board
+    tput cup 0 0 2>/dev/null
+    echo " Score: $score | RatanaOS Arcade"
+    echo "+"$(printf '%*s' "$width" '' | tr ' ' '-')"+"
+    
+    for ((y=0; y<height; y++)); do
+        line="|"
+        for ((x=0; x<width; x++)); do
+            is_snake=0
+            for ((i=0; i<${#snake_x[@]}; i++)); do
+                if [ ${snake_x[$i]} -eq $x ] && [ ${snake_y[$i]} -eq $y ]; then
+                    is_snake=1
+                    break
+                fi
+            done
+            if [ $is_snake -eq 1 ]; then
+                line="${line}O"
+            elif [ $x -eq $food_x ] && [ $y -eq $food_y ]; then
+                line="${line}*"
+            else
+                line="${line} "
+            fi
+        done
+        echo "${line}|"
+    done
+    echo "+"$(printf '%*s' "$width" '' | tr ' ' '-')"+"
+    
+    # Move head
+    new_head_x=$(( (snake_x[0] + dir_x + width) % width ))
+    new_head_y=$(( (snake_y[0] + dir_y + height) % height ))
+    
+    # Check food collision
+    if [ $new_head_x -eq $food_x ] && [ $new_head_y -eq $food_y ]; then
+        score=$((score + 10))
+        food_x=$(( (RANDOM % (width - 2)) + 1 ))
+        food_y=$(( (RANDOM % (height - 2)) + 1 ))
+        snake_x=($new_head_x "${snake_x[@]}")
+        snake_y=($new_head_y "${snake_y[@]}")
+    else
+        snake_x=($new_head_x "${snake_x[@]:0:${#snake_x[@]}-1}")
+        snake_y=($new_head_y "${snake_y[@]:0:${#snake_y[@]}-1}")
+    fi
+    
+    sleep 0.15
+done
+
+tput cnorm 2>/dev/null || true
+echo ""
+echo "🎉 Game Demo Over! Final Score: $score"
+echo "Thanks for playing RatanaOS Arcade!"
