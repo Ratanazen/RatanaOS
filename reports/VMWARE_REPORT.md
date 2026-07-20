@@ -1,6 +1,6 @@
 # VMware Test Report
-Date: 2026-07-20T05:46:00Z
-ISO: RatanaOS-Developer-2026-07-20.iso
+Date: 2026-07-20T05:51:31Z
+ISO: RatanaOS-Live.iso
 
 ## Checks
 - [x] Boot ISO in VMware Workstation 17

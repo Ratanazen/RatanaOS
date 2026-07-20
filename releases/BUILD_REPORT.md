@@ -2,9 +2,9 @@
 
 | Field        | Value                                    |
 |---|---|
-| Date         | 2026-07-20T05:50:11Z        |
+| Date         | 2026-07-20T05:51:30Z        |
 | Version      | 21.0.0                                    |
 | Artifact     | RatanaOS-Live.iso                              |
-| SHA256       | 6ba6b61b8262e08d66b2492ef16a9f3116f56f16115631de1886c7efd10ac676 |
+| SHA256       | 9bf53f8c93032c4b099a13758f8f74704da547c5938bca661f9fe639ff191ccb |
 | Boot Support | UEFI + BIOS Hybrid                        |
 | Status       | SUCCESS                                  |
