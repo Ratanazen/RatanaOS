@@ -1,10 +1,11 @@
-# RatanaOS Live USB Build Report
+# RatanaOS Build Report
 
-| Field        | Value                                    |
+| Field | Value |
 |---|---|
-| Date         | 2026-07-20T05:31:15Z        |
-| Version      | 21.0.0                                    |
-| Artifact     | RatanaOS-Live.iso                              |
-| SHA256       | 51645d0b75f06693c0dc49ca8695ed7beb0d59739a24d9a3527bc8bcb49a4ff3 |
-| Boot Support | UEFI + BIOS Hybrid                        |
-| Status       | SUCCESS                                  |
+| Date | 2026-07-20T05:45:50Z |
+| Version | 21.0.0 |
+| Profile | ratana-developer |
+| Architecture | amd64 |
+| Artifact | RatanaOS-Developer-2026-07-20.iso |
+| SHA256 | 2914257388f1c5778ecae0de965c29f10ffffa09bf6d2d82d7c4dc2080ab3ad5 |
+| Status | SUCCESS |
