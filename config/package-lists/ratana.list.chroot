@@ -1,20 +1,28 @@
-# Core Packages
+# Core Base Packages
 linux-image-amd64
 live-boot
+live-boot-initramfs-tools
+live-config
+live-config-systemd
 systemd
-shim-signed
+systemd-sysv
+grub-pc-bin
+grub-efi-amd64-bin
 grub-efi-amd64-signed
+shim-signed
 apparmor
 apparmor-utils
 ufw
 auditd
 flatpak
-snapd
 curl
 wget
 rsync
 plymouth
 plymouth-themes
+squashfs-tools
+debootstrap
+xorriso
 
 # Desktop & Applications (Standard Edition)
 plasma-desktop

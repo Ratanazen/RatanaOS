@@ -1,4 +1,4 @@
-# Base System & Utils
+# Base System & Bootloader Packages
 linux-image-amd64
 live-boot
 live-boot-initramfs-tools
@@ -6,6 +6,10 @@ live-config
 live-config-systemd
 systemd
 systemd-sysv
+grub-pc-bin
+grub-efi-amd64-bin
+grub-efi-amd64-signed
+shim-signed
 apparmor
 apparmor-utils
 ufw
@@ -23,6 +27,9 @@ plymouth-themes
 usbutils
 pciutils
 lm-sensors
+squashfs-tools
+debootstrap
+xorriso
 
 # CPU Microcode (Intel & AMD)
 intel-microcode

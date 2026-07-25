@@ -47,7 +47,7 @@ verify:
 vm:
 	@echo "==> Running VM Test..."
 	@chmod +x scripts/test-qemu.sh
-	@./scripts/test-qemu.sh ${EDITION}
+	@./scripts/test-qemu.sh $(EDITION)
 
 release: iso verify
 	@echo "==> Generating Release Checksums..."

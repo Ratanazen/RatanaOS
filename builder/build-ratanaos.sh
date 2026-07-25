@@ -123,14 +123,10 @@ lb config \
     --architectures amd64 \
     --linux-flavours amd64 \
     --archive-areas "main contrib non-free non-free-firmware" \
-    --mirror-bootstrap "http://deb.debian.org/debian/" \
-    --mirror-chroot "http://deb.debian.org/debian/" \
-    --mirror-chroot-security "http://security.debian.org/debian-security/" \
-    --mirror-binary "http://deb.debian.org/debian/" \
-    --mirror-binary-security "http://security.debian.org/debian-security/" \
     --apt-indices false \
+    --security false \
+    --updates false \
     --iso-volume "${LABEL}" \
-    --bootloader grub-pc \
     --memtest none
 
 # Write package list
@@ -326,12 +322,7 @@ FINAL_ISO="${OUTPUT_DIR}/${ISO_BASE}-${DATE_STAMP}.iso"
 cp "${BUILT_ISO}" "${FINAL_ISO}"
 ln -sf "${ISO_BASE}-${DATE_STAMP}.iso" "${OUTPUT_DIR}/${ISO_BASE}.iso"
 
-# Apply isohybrid to make ISO bootable on physical USB drives (BIOS + UEFI)
-if command -v isohybrid >/dev/null 2>&1; then
-    echo "  Applying isohybrid (UEFI+BIOS USB partition headers)..."
-    isohybrid --uefi "${FINAL_ISO}" 2>/dev/null || isohybrid "${FINAL_ISO}" 2>/dev/null || true
-    echo "✅ Hybrid USB boot headers applied."
-fi
+    echo "✅ ISO staged successfully."
 
 # ==========================================================================
 # STEP 8: Generate checksums and report
