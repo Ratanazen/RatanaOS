@@ -1,105 +1,109 @@
-# RatanaOS (32-bit x86 Operating System)
+# RatanaOS (2026 Full-Feature Edition)
 
+![Year](https://img.shields.io/badge/Edition-2026_Full--Feature-blueviolet)
 ![Architecture](https://img.shields.io/badge/Architecture-x86_%7C_i686-blue)
 ![Language](https://img.shields.io/badge/Language-C23_%2F_NASM-orange)
+![Build](https://img.shields.io/badge/Build-Passing-brightgreen)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-**RatanaOS** is a modular 32-bit x86 operating system kernel developed from scratch with low-level hardware drivers, interrupt management, and an interactive shell.
+**RatanaOS 2026** is a modular, high-performance 32-bit x86 operating system kernel with full hardware drivers, memory management, peripheral subsystem support, and an interactive CLI shell with games and utilities.
 
 ---
 
-## Features & Subsystems
+## Key Subsystems & Architecture
 
-- **Bootloader**: Multiboot-compliant assembly bootloader supporting GRUB and direct QEMU execution.
-- **Memory Management**: 5-segment Global Descriptor Table (GDT) for Kernel/User Code & Data segmentation.
-- **Interrupts & Exceptions**:
-  - 256-entry Interrupt Descriptor Table (IDT).
-  - CPU Exception handlers (Divide by zero, GPF, Page Fault, etc.) with detailed panic registers display.
-  - Dual 8259 PIC remapping (IRQs 0–15).
-- **Timers**: 8254 PIT (Programmable Interval Timer) calibrated at 100 Hz for system ticks and `timer_sleep_ms`.
-- **Drivers**:
-  - **VGA Text Driver**: 80x25 screen with full 16-color palette, cursor control, backspace handling, and smooth hardware scrolling.
-  - **PS/2 Keyboard Driver**: Interrupt-driven (IRQ1) with US-QWERTY key mapping, Shift, and Caps Lock support.
-- **Kernel Standard Library (`libk`)**:
-  - `string.h`: `strlen`, `strcmp`, `strncmp`, `strcpy`, `strcat`, `memset`, `memcpy`, `itoa`, `atoi`.
-  - `stdio.h`: Formatted `kprintf` supporting `%s`, `%d`, `%u`, `%x`, `%X`, `%c`, `%p`.
-- **Interactive Shell (`RatanaSH`)**:
-  - `fetch`: Custom Neofetch-style system info banner with RatanaOS ASCII logo.
-  - `help`: Built-in command manual.
-  - `calc <num1> <op> <num2>`: Arithmetic calculator (`+`, `-`, `*`, `/`, `%`).
-  - `color <fg> [bg]`: Change VGA terminal color scheme in real time.
-  - `echo <text>`: Print text.
-  - `uptime`: Show uptime in seconds and timer ticks.
-  - `about`: Developer info and kernel specifications.
-  - `reboot`: ACPI / 8042 keyboard controller pulse reboot.
-  - `halt`: Halt CPU.
-
----
-
-## Directory Structure
-
-```text
-RatanaOS/
-├── Makefile                # Build and execution targets
-├── README.md               # Documentation and quickstart
-├── iso/                    # GRUB ISO generation directory
-│   └── boot/grub/grub.cfg
-└── src/
-    ├── boot/
-    │   ├── boot.asm        # Multiboot header & entry point
-    │   └── linker.ld       # 1MB alignment linker script
-    ├── drivers/
-    │   ├── keyboard.c      # PS/2 keyboard driver
-    │   └── vga.c           # VGA text mode display driver
-    ├── include/            # Header definitions
-    │   ├── gdt.h
-    │   ├── idt.h
-    │   ├── io.h
-    │   ├── isr.h
-    │   ├── keyboard.h
-    │   ├── pic.h
-    │   ├── shell.h
-    │   ├── stdio.h
-    │   ├── string.h
-    │   ├── timer.h
-    │   ├── types.h
-    │   └── vga.h
-    ├── kernel/
-    │   ├── gdt.c           # GDT setup
-    │   ├── gdt_flush.asm   # GDT segment register flush
-    │   ├── idt.c           # IDT initialization
-    │   ├── interrupts.asm  # ISR & IRQ low-level assembly stubs
-    │   ├── isr.c           # Exception & IRQ dispatcher
-    │   ├── kernel.c        # Main kernel initialization sequence
-    │   ├── pic.c           # 8259 PIC remapping & EOI
-    │   ├── shell.c         # Interactive CLI & commands
-    │   └── timer.c         # PIT timer (100 Hz)
-    └── lib/
-        ├── stdio.c         # Kernel formatted printing (kprintf)
-        └── string.c        # String & memory operations
+```
+                                  +---------------------------------------+
+                                  |            RatanaSH 2026              |
+                                  | (fetch, date, pci, mem, matrix, snake)|
+                                  +-------------------+-------------------+
+                                                      |
+                   +----------------------------------+----------------------------------+
+                   |                                  |                                  |
+            +------v-------+                   +------v-------+                   +------v-------+
+            |  VGA Driver  |                   |  PS/2 Driver |                   | CMOS / RTC   |
+            | (80x25 Color)|                   |  (Keyboard)  |                   | (2026 Clock) |
+            +------+-------+                   +------+-------+                   +------+-------+
+                   |                                  |                                  |
+            +------v-------+                   +------v-------+                   +------v-------+
+            | PC Speaker   |                   | Serial COM1  |                   | PCI Bus      |
+            | (PIT Sound)  |                   | (Debug Logs) |                   | (Enumerator) |
+            +------+-------+                   +------+-------+                   +------+-------+
+                   |                                  |                                  |
++------------------v----------------------------------v----------------------------------v------------------+
+|                                              Kernel Core                                                  |
+|  +--------------------+  +--------------------+  +--------------------+  +--------------------+           |
+|  | GDT (Segmentation) |  | IDT & ISR (0-31)   |  | PIC 8259 & PIT 100 |  | CPUID Inspector    |           |
+|  +--------------------+  +--------------------+  +--------------------+  +--------------------+           |
+|  +--------------------------------------------+  +--------------------------------------------+           |
+|  | PMM (128MB Bitmap Allocator)               |  | Kernel Heap (kmalloc, kcalloc, kfree)      |           |
+|  +--------------------------------------------+  +--------------------------------------------+           |
++-----------------------------------------------------+-----------------------------------------------------+
+                                                      |
+                                      +---------------v----------------+
+                                      |    Multiboot Bootloader (ASM)  |
+                                      +--------------------------------+
 ```
 
 ---
 
-## Building & Running (Arch / Garuda Linux)
+## Features
 
-### 1. Requirements
-Ensure build tools are installed:
+### 1. Memory Management
+- **Physical Memory Manager (PMM)**: Bitmap page frame allocator managing 128MB of physical RAM in 4KB frames.
+- **Dynamic Kernel Heap**: `kmalloc()`, `kcalloc()`, `krealloc()`, and `kfree()` with block splitting and automatic coalescing.
+
+### 2. Hardware Subsystems & Drivers
+- **CMOS Real-Time Clock (RTC)**: Accurate date and time synchronization for 2026 timestamps.
+- **Serial COM1 (`0x3F8`)**: Early kernel debugging and headless logging.
+- **PC Speaker Driver**: Tone generator and frequency synthesis using PIT channel 2 and port `0x61`.
+- **PCI Bus Scanner**: Enumerate PCI buses 0-255, identifying vendor IDs, device IDs, and device classes (VGA, Storage, Network, Bridge).
+- **CPUID Subsystem**: Query CPU vendor, brand string, family/model, and hardware feature flags (FPU, MMX, SSE, SSE2, SSE3, HTT).
+- **VGA Color Display**: 80x25 text mode with 16 foreground/background colors, hardware cursor control, backspace, and smooth scrolling.
+- **PS/2 Keyboard Driver**: Interrupt-driven (IRQ1) with US-QWERTY key mapping, Shift, and Caps Lock support.
+
+### 3. Interactive Shell Commands (`RatanaSH 2026`)
+
+| Command | Description |
+| :--- | :--- |
+| `fetch` | System overview with custom RatanaOS ASCII logo & hardware stats |
+| `date` / `time` | Query hardware CMOS Real-Time Clock (2026) |
+| `mem` / `free` | Display Physical Memory & Kernel Heap stats |
+| `pci` | Scan and display all connected PCI devices |
+| `cpuid` | Inspect CPU vendor, brand name, and feature flags |
+| `calc <a> <op> <b>` | Built-in arithmetic calculator (`+`, `-`, `*`, `/`, `%`) |
+| `beep [freq] [ms]` | Play sound tone through PC speaker |
+| `theme <name>` | Apply preset themes (`arch`, `cyber2026`, `matrix`, `ocean`, `amber`) |
+| `matrix` | Digital rain screensaver in VGA text mode |
+| `snake` | Playable interactive Snake arcade game inside the kernel |
+| `color <fg> [bg]` | Set custom foreground and background colors (0-15) |
+| `uptime` | System uptime in seconds and timer ticks |
+| `clear` | Clear the screen |
+| `echo <text>` | Print text to console |
+| `about` | Developer info and specifications |
+| `reboot` | Reboot machine via keyboard controller reset |
+| `halt` | Halt CPU |
+
+---
+
+## Building & Testing
+
+### 1. Requirements (Garuda / Arch Linux)
 ```bash
 sudo pacman -S gcc nasm qemu-system-x86 grub
 ```
 
 ### 2. Build Kernel
 ```bash
-make build
+make clean && make
 ```
 
-### 3. Run in QEMU
+### 3. Run in QEMU (Direct Kernel Boot + Serial Logging)
 ```bash
 make run
 ```
 
-### 4. Build Bootable ISO
+### 4. Build & Run Bootable ISO
 ```bash
 make iso
 make run-iso

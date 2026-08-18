@@ -7,6 +7,13 @@
 #include "../include/pic.h"
 #include "../include/timer.h"
 #include "../include/keyboard.h"
+#include "../include/pmm.h"
+#include "../include/heap.h"
+#include "../include/rtc.h"
+#include "../include/serial.h"
+#include "../include/speaker.h"
+#include "../include/pci.h"
+#include "../include/cpuid.h"
 #include "../include/shell.h"
 
 static void print_status(const char* message) {
@@ -16,48 +23,71 @@ static void print_status(const char* message) {
     vga_set_color(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
     kprintf("%s\n", message);
     vga_set_color(old);
+
+    serial_printf("[KERNEL OK] %s\n", message);
 }
 
 void kernel_main(uint32_t magic, uint32_t addr) {
     (void)magic;
     (void)addr;
 
-    // 1. Initialize VGA text display driver
+    // 1. Initialize Serial COM1 port (early logging)
+    serial_init();
+    serial_printf("=== RatanaOS 2026 Initializing ===\n");
+
+    // 2. Initialize VGA display driver
     vga_init();
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK));
     kprintf("================================================================================\n");
-    kprintf("                    Welcome to RatanaOS (32-bit x86 Kernel)                     \n");
+    kprintf("                Welcome to RatanaOS (2026 Full-Feature Edition)                 \n");
     kprintf("================================================================================\n\n");
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK));
 
-    // 2. Initialize GDT (Global Descriptor Table)
+    // 3. Initialize GDT (Global Descriptor Table)
     gdt_init();
     print_status("Global Descriptor Table (GDT) initialized");
 
-    // 3. Initialize IDT (Interrupt Descriptor Table) & CPU ISRs
+    // 4. Initialize IDT (Interrupt Descriptor Table) & CPU ISRs
     idt_init();
     isr_init();
     print_status("Interrupt Descriptor Table (IDT & ISRs) loaded");
 
-    // 4. Remap 8259 Programmable Interrupt Controller (PIC)
+    // 5. Remap 8259 Dual PIC
     pic_remap(0x20, 0x28);
     print_status("Dual 8259 PIC remapped (IRQs 0-15 -> vectors 32-47)");
 
-    // 5. Initialize PIT Timer (100 Hz)
+    // 6. Initialize PIT Timer (100 Hz)
     timer_init(100);
     print_status("Programmable Interval Timer (PIT) calibrated at 100 Hz");
 
-    // 6. Initialize PS/2 Keyboard Driver
-    keyboard_init();
-    print_status("PS/2 Keyboard driver active");
+    // 7. Initialize Physical Memory Manager (PMM) & Kernel Heap
+    pmm_init(128 * 1024 * 1024); // 128MB RAM
+    heap_init(0x00400000, 4 * 1024 * 1024); // 4MB Heap at 4MB-8MB
+    print_status("PMM (128MB bitmap) & Kernel Heap (4MB) initialized");
 
-    // 7. Enable hardware interrupts
+    // 8. Initialize CMOS Real-Time Clock (RTC)
+    rtc_init();
+    print_status("CMOS Real-Time Clock (RTC) synchronized (2026)");
+
+    // 9. Initialize CPUID & PCI Bus
+    cpuid_init();
+    pci_init();
+    print_status("CPUID feature detector & PCI Bus scanner ready");
+
+    // 10. Initialize PS/2 Keyboard Driver
+    keyboard_init();
+    print_status("PS/2 Keyboard driver initialized");
+
+    // 11. Enable Hardware Interrupts
     __asm__ volatile ("sti");
     print_status("Hardware interrupts enabled (STI)");
 
-    kprintf("\nInitialization complete! Type 'fetch' or 'help' to begin.\n\n");
+    // Chirp PC Speaker on boot
+    speaker_beep(1000, 40);
 
-    // 8. Launch Interactive Shell
+    kprintf("\nRatanaOS 2026 is ready! Type 'fetch', 'date', 'pci', or 'help'.\n\n");
+
+    // 12. Launch Interactive Shell
     shell_init();
 
     // Main Kernel Idle & Event Loop
@@ -66,7 +96,6 @@ void kernel_main(uint32_t magic, uint32_t addr) {
             char c = keyboard_getchar();
             shell_update(c);
         } else {
-            // Halt CPU until next interrupt arrives to save power
             __asm__ volatile ("hlt");
         }
     }

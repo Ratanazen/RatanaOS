@@ -4,6 +4,14 @@
 #include "../include/vga.h"
 #include "../include/timer.h"
 #include "../include/io.h"
+#include "../include/rtc.h"
+#include "../include/heap.h"
+#include "../include/pmm.h"
+#include "../include/pci.h"
+#include "../include/cpuid.h"
+#include "../include/speaker.h"
+#include "../include/matrix.h"
+#include "../include/snake.h"
 
 static char command_buffer[SHELL_BUFFER_SIZE];
 static size_t command_len = 0;
@@ -15,7 +23,7 @@ void shell_prompt(void) {
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_MAGENTA, VGA_COLOR_BLACK));
     kprintf("@");
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_BLUE, VGA_COLOR_BLACK));
-    kprintf("os");
+    kprintf("os-2026");
     vga_set_color(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
     kprintf(" > ");
     vga_set_color(old_color);
@@ -28,82 +36,163 @@ void shell_init(void) {
 }
 
 static void cmd_help(void) {
-    kprintf("\nAvailable Commands:\n");
-    kprintf("  fetch             - Display system overview and ASCII logo\n");
-    kprintf("  help              - Show this help menu\n");
-    kprintf("  clear             - Clear the screen\n");
-    kprintf("  echo <text>       - Print text to standard output\n");
-    kprintf("  calc <a> <op> <b> - Simple math (+, -, *, /, %%)\n");
+    kprintf("\nRatanaOS 2026 Built-in Commands:\n");
+    kprintf("  fetch             - System overview & RatanaOS ASCII art\n");
+    kprintf("  date / time       - Query hardware CMOS Real-Time Clock (2026)\n");
+    kprintf("  mem / free        - Physical memory & Kernel Heap allocation stats\n");
+    kprintf("  pci               - Scan and enumerate all PCI bus devices\n");
+    kprintf("  cpuid             - Query CPU architecture, vendor, and feature flags\n");
+    kprintf("  calc <a> <op> <b> - Arithmetic calculator (+, -, *, /, %%)\n");
+    kprintf("  beep [freq] [ms]  - Play tone through PC speaker (default 440Hz 200ms)\n");
+    kprintf("  theme <name>      - Apply theme (arch, cyber2026, matrix, ocean, amber)\n");
+    kprintf("  matrix            - Animated digital rain screensaver\n");
+    kprintf("  snake             - Play interactive Snake arcade game\n");
     kprintf("  color <fg> [bg]   - Set terminal colors (0-15)\n");
-    kprintf("  uptime            - Show system uptime\n");
+    kprintf("  clear             - Clear terminal screen\n");
+    kprintf("  echo <text>       - Print text to console\n");
+    kprintf("  uptime            - Display system uptime and PIT timer ticks\n");
     kprintf("  about             - System and developer details\n");
-    kprintf("  reboot            - Restart the machine\n");
-    kprintf("  halt              - Halt CPU execution\n");
+    kprintf("  reboot            - Pulse CPU reset line\n");
+    kprintf("  halt              - Halt processor execution\n");
 }
 
 static void cmd_fetch(void) {
     uint8_t old = vga_get_color();
     uint32_t ticks = timer_get_ticks();
     uint32_t sec = ticks / 100;
+    rtc_time_t t = rtc_get_time();
+    heap_stats_t hstats = heap_get_stats();
+    cpu_info_t cpu = cpuid_get_info();
 
     kprintf("\n");
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK));
-    kprintf("      /\\        ");
+    kprintf("       /\\        ");
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK));
     kprintf("OS:        ");
     vga_set_color(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
-    kprintf("RatanaOS x86 v1.0 (Arch-inspired)\n");
+    kprintf("RatanaOS (2026 Edition)\n");
 
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK));
-    kprintf("     /  \\       ");
+    kprintf("      /  \\       ");
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK));
     kprintf("Kernel:    ");
     vga_set_color(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
-    kprintf("32-bit x86 Protected Mode (ELF)\n");
+    kprintf("32-bit x86 Protected Mode (Multiboot ELF)\n");
 
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK));
-    kprintf("    / /\\ \\      ");
+    kprintf("     / /\\ \\      ");
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK));
-    kprintf("Arch:      ");
+    kprintf("CPU:       ");
     vga_set_color(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
-    kprintf("i686 / x86_64 compatible\n");
+    kprintf("%s\n", cpu.brand);
 
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK));
-    kprintf("   / /__\\ \\     ");
+    kprintf("    / /__\\ \\     ");
+    vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK));
+    kprintf("Date/Time: ");
+    vga_set_color(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
+    kprintf("%u-%s%u-%s%u %s%u:%s%u:%s%u UTC\n",
+            t.year, t.month < 10 ? "0" : "", t.month, t.day < 10 ? "0" : "", t.day,
+            t.hour < 10 ? "0" : "", t.hour, t.minute < 10 ? "0" : "", t.minute, t.second < 10 ? "0" : "", t.second);
+
+    vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK));
+    kprintf("   / /____\\ \\    ");
+    vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK));
+    kprintf("Memory:    ");
+    vga_set_color(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
+    kprintf("Heap: %u KB used / %u KB total (%u blocks)\n",
+            (uint32_t)(hstats.used_size / 1024), (uint32_t)(hstats.total_size / 1024), (uint32_t)hstats.num_allocations);
+
+    vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK));
+    kprintf("  /_/      \\_\\   ");
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK));
     kprintf("Uptime:    ");
     vga_set_color(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
-    kprintf("%u seconds (%u ticks)\n", sec, ticks);
+    kprintf("%u seconds (%u ticks @ 100Hz)\n", sec, ticks);
 
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK));
-    kprintf("  /_/    \\_\\    ");
+    kprintf("                 ");
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK));
     kprintf("Shell:     ");
     vga_set_color(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
-    kprintf("RatanaSH v1.0\n");
+    kprintf("RatanaSH v2.0 (2026)\n");
 
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK));
-    kprintf("                ");
-    vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK));
-    kprintf("Display:   ");
-    vga_set_color(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
-    kprintf("VGA Text Mode 80x25 (16 Colors)\n");
-
-    vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK));
-    kprintf("                ");
+    kprintf("                 ");
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK));
     kprintf("Palette:   ");
     for (int i = 0; i < 8; i++) {
         vga_set_color(vga_entry_color((enum vga_color)i, (enum vga_color)i));
         kprintf("  ");
     }
-    kprintf("\n                Palette:   ");
+    kprintf("\n                 Palette:   ");
     for (int i = 8; i < 16; i++) {
         vga_set_color(vga_entry_color((enum vga_color)i, (enum vga_color)i));
         kprintf("  ");
     }
     kprintf("\n");
     vga_set_color(old);
+}
+
+static void cmd_mem(void) {
+    heap_stats_t hstats = heap_get_stats();
+    size_t free_pgs = pmm_get_free_pages();
+    size_t total_pgs = pmm_get_total_pages();
+
+    kprintf("\nMemory Status:\n");
+    kprintf(" -----------------------------------------------------\n");
+    kprintf(" Physical Memory: %u MB Total (%u pages, 4KB/page)\n",
+            (uint32_t)((total_pgs * 4) / 1024), (uint32_t)total_pgs);
+    kprintf(" Free Pages:      %u (%u MB free)\n",
+            (uint32_t)free_pgs, (uint32_t)((free_pgs * 4) / 1024));
+    kprintf(" Kernel Heap:     %u KB Total\n", (uint32_t)(hstats.total_size / 1024));
+    kprintf(" Used Heap:       %u bytes (%u KB)\n", (uint32_t)hstats.used_size, (uint32_t)(hstats.used_size / 1024));
+    kprintf(" Free Heap:       %u bytes (%u KB)\n", (uint32_t)hstats.free_size, (uint32_t)(hstats.free_size / 1024));
+    kprintf(" Active Blocks:   %u\n", (uint32_t)hstats.num_allocations);
+}
+
+static void cmd_beep(char* args) {
+    while (*args == ' ') args++;
+    uint32_t freq = 440;
+    uint32_t duration = 200;
+
+    if (*args != '\0') {
+        freq = (uint32_t)atoi(args);
+        while (*args && *args != ' ') args++;
+        while (*args == ' ') args++;
+        if (*args != '\0') {
+            duration = (uint32_t)atoi(args);
+        }
+    }
+
+    if (freq < 20 || freq > 20000) freq = 440;
+    if (duration > 5000) duration = 5000;
+
+    kprintf("Beeping at %u Hz for %u ms...\n", freq, duration);
+    speaker_beep(freq, duration);
+}
+
+static void cmd_theme(char* args) {
+    while (*args == ' ') args++;
+    if (strcmp(args, "arch") == 0) {
+        vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK));
+        kprintf("Applied 'Arch' theme.\n");
+    } else if (strcmp(args, "cyber2026") == 0) {
+        vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_MAGENTA, VGA_COLOR_BLACK));
+        kprintf("Applied 'Cyber 2026' theme.\n");
+    } else if (strcmp(args, "matrix") == 0) {
+        vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK));
+        kprintf("Applied 'Matrix' theme.\n");
+    } else if (strcmp(args, "ocean") == 0) {
+        vga_set_color(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLUE));
+        vga_clear();
+        kprintf("Applied 'Ocean' theme.\n");
+    } else if (strcmp(args, "amber") == 0) {
+        vga_set_color(vga_entry_color(VGA_COLOR_BROWN, VGA_COLOR_BLACK));
+        kprintf("Applied 'Amber CRT' theme.\n");
+    } else {
+        kprintf("Usage: theme <arch | cyber2026 | matrix | ocean | amber>\n");
+    }
 }
 
 static void cmd_calc(char* args) {
@@ -116,7 +205,6 @@ static void cmd_calc(char* args) {
     char* p = args;
     int a = atoi(p);
 
-    // Skip first number
     if (*p == '-' || *p == '+') p++;
     while (*p >= '0' && *p <= '9') p++;
     while (*p == ' ') p++;
@@ -126,7 +214,7 @@ static void cmd_calc(char* args) {
         kprintf("Error: Missing operator (+, -, *, /, %%)\n");
         return;
     }
-    p++; // Skip operator
+    p++;
     while (*p == ' ') p++;
 
     if (*p == '\0') {
@@ -166,8 +254,6 @@ static void cmd_color(char* args) {
     while (*args == ' ') args++;
     if (*args == '\0') {
         kprintf("Usage: color <fg:0-15> [bg:0-15]\n");
-        kprintf("Colors: 0=Black, 1=Blue, 2=Green, 3=Cyan, 4=Red, 5=Magenta, 6=Brown, 7=LightGrey\n");
-        kprintf("        8=DarkGrey, 9=LightBlue, 10=LightGreen, 11=LightCyan, 12=LightRed, 13=Pink, 14=Yellow, 15=White\n");
         return;
     }
 
@@ -186,13 +272,7 @@ static void cmd_color(char* args) {
     }
 
     vga_set_color(vga_entry_color((enum vga_color)fg, (enum vga_color)bg));
-    kprintf("Terminal color updated (fg=%d, bg=%d).\n", fg, bg);
-}
-
-static void cmd_about(void) {
-    kprintf("\nRatanaOS - High-Performance Lightweight 32-bit x86 Kernel\n");
-    kprintf("Author: Ratanazen\n");
-    kprintf("Features: Protected Mode GDT, IDT, PIC 8259, PIT Timer, PS/2 Keyboard, Color VGA CLI\n");
+    kprintf("Color scheme updated.\n");
 }
 
 static void cmd_reboot(void) {
@@ -201,7 +281,7 @@ static void cmd_reboot(void) {
     while (good & 0x02) {
         good = inb(0x64);
     }
-    outb(0x64, 0xFE); // Pulse CPU reset line
+    outb(0x64, 0xFE);
     __asm__ volatile ("cli; hlt");
 }
 
@@ -215,6 +295,22 @@ void shell_execute(char* command) {
         cmd_fetch();
     } else if (strcmp(command, "clear") == 0) {
         vga_clear();
+    } else if (strcmp(command, "date") == 0 || strcmp(command, "time") == 0) {
+        rtc_print_formatted();
+    } else if (strcmp(command, "mem") == 0 || strcmp(command, "free") == 0) {
+        cmd_mem();
+    } else if (strcmp(command, "pci") == 0) {
+        pci_scan_all_buses();
+    } else if (strcmp(command, "cpuid") == 0) {
+        cpuid_print_info();
+    } else if (strncmp(command, "beep", 4) == 0 && (command[4] == ' ' || command[4] == '\0')) {
+        cmd_beep(command + 4);
+    } else if (strncmp(command, "theme", 5) == 0 && (command[5] == ' ' || command[5] == '\0')) {
+        cmd_theme(command + 5);
+    } else if (strcmp(command, "matrix") == 0) {
+        matrix_run();
+    } else if (strcmp(command, "snake") == 0) {
+        snake_game_start();
     } else if (strncmp(command, "echo", 4) == 0 && (command[4] == ' ' || command[4] == '\0')) {
         char* text = command + 4;
         while (*text == ' ') text++;
@@ -227,7 +323,9 @@ void shell_execute(char* command) {
         uint32_t ticks = timer_get_ticks();
         kprintf("Uptime: %u seconds (%u ticks @ 100Hz)\n", ticks / 100, ticks);
     } else if (strcmp(command, "about") == 0) {
-        cmd_about();
+        kprintf("\nRatanaOS 2026 - Educational & Modular 32-bit x86 Operating System\n");
+        kprintf("Author: Ratanazen\n");
+        kprintf("Subsystems: GDT, IDT, PIC, PIT, PMM, Dynamic Heap, RTC, Serial COM1, Speaker, PCI, CPUID\n");
     } else if (strcmp(command, "reboot") == 0) {
         cmd_reboot();
     } else if (strcmp(command, "halt") == 0) {
