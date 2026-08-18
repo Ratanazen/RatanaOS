@@ -12,6 +12,7 @@
 #include "../include/speaker.h"
 #include "../include/matrix.h"
 #include "../include/snake.h"
+#include "../include/gui.h"
 
 static char command_buffer[SHELL_BUFFER_SIZE];
 static size_t command_len = 0;
@@ -37,6 +38,7 @@ void shell_init(void) {
 
 static void cmd_help(void) {
     kprintf("\nRatanaOS 2026 Built-in Commands:\n");
+    kprintf("  gui               - Launch Full-Feature Linux-like GUI Desktop\n");
     kprintf("  fetch             - System overview & RatanaOS ASCII art\n");
     kprintf("  date / time       - Query hardware CMOS Real-Time Clock (2026)\n");
     kprintf("  mem / free        - Physical memory & Kernel Heap allocation stats\n");
@@ -70,7 +72,7 @@ static void cmd_fetch(void) {
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK));
     kprintf("OS:        ");
     vga_set_color(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
-    kprintf("RatanaOS (2026 Edition)\n");
+    kprintf("RatanaOS (2026 Full GUI Edition)\n");
 
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK));
     kprintf("      /  \\       ");
@@ -91,9 +93,8 @@ static void cmd_fetch(void) {
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK));
     kprintf("Date/Time: ");
     vga_set_color(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
-    kprintf("%u-%s%u-%s%u %s%u:%s%u:%s%u UTC\n",
-            t.year, t.month < 10 ? "0" : "", t.month, t.day < 10 ? "0" : "", t.day,
-            t.hour < 10 ? "0" : "", t.hour, t.minute < 10 ? "0" : "", t.minute, t.second < 10 ? "0" : "", t.second);
+    kprintf("%u-%02u-%02u %02u:%02u:%02u UTC\n",
+            t.year, t.month, t.day, t.hour, t.minute, t.second);
 
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK));
     kprintf("   / /____\\ \\    ");
@@ -109,6 +110,13 @@ static void cmd_fetch(void) {
     kprintf("Uptime:    ");
     vga_set_color(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
     kprintf("%u seconds (%u ticks @ 100Hz)\n", sec, ticks);
+
+    vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK));
+    kprintf("                 ");
+    vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK));
+    kprintf("Desktop:   ");
+    vga_set_color(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
+    kprintf("RatanaWM (VBE 1024x768x32 Linear FB)\n");
 
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK));
     kprintf("                 ");
@@ -289,7 +297,11 @@ void shell_execute(char* command) {
     while (*command == ' ') command++;
     if (*command == '\0') return;
 
-    if (strcmp(command, "help") == 0) {
+    if (strcmp(command, "gui") == 0 || strcmp(command, "startx") == 0 || strcmp(command, "desktop") == 0) {
+        kprintf("Starting RatanaOS GUI Desktop Environment...\n");
+        gui_start();
+        kprintf("\nReturned to RatanaOS CLI.\n");
+    } else if (strcmp(command, "help") == 0) {
         cmd_help();
     } else if (strcmp(command, "fetch") == 0) {
         cmd_fetch();
@@ -325,7 +337,7 @@ void shell_execute(char* command) {
     } else if (strcmp(command, "about") == 0) {
         kprintf("\nRatanaOS 2026 - Educational & Modular 32-bit x86 Operating System\n");
         kprintf("Author: Ratanazen\n");
-        kprintf("Subsystems: GDT, IDT, PIC, PIT, PMM, Dynamic Heap, RTC, Serial COM1, Speaker, PCI, CPUID\n");
+        kprintf("Subsystems: GDT, IDT, PIC, PIT, PMM, Dynamic Heap, RTC, Serial COM1, Speaker, PCI, CPUID, VBE GUI\n");
     } else if (strcmp(command, "reboot") == 0) {
         cmd_reboot();
     } else if (strcmp(command, "halt") == 0) {

@@ -1,110 +1,87 @@
-# RatanaOS (2026 Full-Feature Edition)
+# RatanaOS (2026 Full GUI Desktop Edition)
 
-![Year](https://img.shields.io/badge/Edition-2026_Full--Feature-blueviolet)
+![Year](https://img.shields.io/badge/Edition-2026_Full_GUI_Desktop-blueviolet)
 ![Architecture](https://img.shields.io/badge/Architecture-x86_%7C_i686-blue)
+![Graphics](https://img.shields.io/badge/GUI-VBE_32--bit_Framebuffer-brightgreen)
 ![Language](https://img.shields.io/badge/Language-C23_%2F_NASM-orange)
 ![Build](https://img.shields.io/badge/Build-Passing-brightgreen)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-**RatanaOS 2026** is a modular, high-performance 32-bit x86 operating system kernel with full hardware drivers, memory management, peripheral subsystem support, and an interactive CLI shell with games and utilities.
+**RatanaOS 2026** is a modular 32-bit x86 operating system kernel featuring a full **Linux-like Graphical User Interface (GUI) Desktop Environment**, hardware PS/2 mouse support (IRQ12), VBE 32-bit linear framebuffer rendering, memory management, and built-in desktop applications.
 
 ---
 
-## Key Subsystems & Architecture
+## GUI Desktop Environment (`RatanaWM`)
 
 ```
-                                  +---------------------------------------+
-                                  |            RatanaSH 2026              |
-                                  | (fetch, date, pci, mem, matrix, snake)|
-                                  +-------------------+-------------------+
-                                                      |
-                   +----------------------------------+----------------------------------+
-                   |                                  |                                  |
-            +------v-------+                   +------v-------+                   +------v-------+
-            |  VGA Driver  |                   |  PS/2 Driver |                   | CMOS / RTC   |
-            | (80x25 Color)|                   |  (Keyboard)  |                   | (2026 Clock) |
-            +------+-------+                   +------+-------+                   +------+-------+
-                   |                                  |                                  |
-            +------v-------+                   +------v-------+                   +------v-------+
-            | PC Speaker   |                   | Serial COM1  |                   | PCI Bus      |
-            | (PIT Sound)  |                   | (Debug Logs) |                   | (Enumerator) |
-            +------+-------+                   +------+-------+                   +------+-------+
-                   |                                  |                                  |
-+------------------v----------------------------------v----------------------------------v------------------+
-|                                              Kernel Core                                                  |
-|  +--------------------+  +--------------------+  +--------------------+  +--------------------+           |
-|  | GDT (Segmentation) |  | IDT & ISR (0-31)   |  | PIC 8259 & PIT 100 |  | CPUID Inspector    |           |
-|  +--------------------+  +--------------------+  +--------------------+  +--------------------+           |
-|  +--------------------------------------------+  +--------------------------------------------+           |
-|  | PMM (128MB Bitmap Allocator)               |  | Kernel Heap (kmalloc, kcalloc, kfree)      |           |
-|  +--------------------------------------------+  +--------------------------------------------+           |
-+-----------------------------------------------------+-----------------------------------------------------+
-                                                      |
-                                      +---------------v----------------+
-                                      |    Multiboot Bootloader (ASM)  |
-                                      +--------------------------------+
++-----------------------------------------------------------------------------+
+|  +--------------------+  +--------------------+  +--------------------+     |
+|  | Terminal Console   |  | System Monitor     |  | Calculator / Paint |     |
+|  | (ratana@os-2026 >) |  | (CPU, RAM, Uptime) |  | (Clickable Buttons)|     |
+|  +--------------------+  +--------------------+  +--------------------+     |
+|                                                                             |
+|                                                     [RatanaOS 2026]         |
++-----------------------------------------------------------------------------+
+| [RatanaOS Start] | [Terminal] [SysMon] [Calc] | [RAM: 24KB] | [2026-08-18]  |
++-----------------------------------------------------------------------------+
 ```
+
+### Desktop Features & Applications:
+1. **Window Manager (`RatanaWM`)**:
+   - Draggable windows with active focus management and Z-order layering.
+   - Titlebars with **Close [X]** and **Minimize [_]** buttons.
+2. **Taskbar & Start Menu**:
+   - **Start Menu**: App launcher popup and option to exit back to CLI.
+   - **Active Window Tabs**: Taskbar buttons to switch, restore, or minimize windows.
+   - **RTC 2026 Clock Widget**: Live real-time clock synchronized with CMOS hardware.
+   - **RAM Usage Widget**: Real-time memory allocation indicator.
+3. **Built-in Desktop Applications**:
+   - **Terminal Console**: Live interactive terminal with commands.
+   - **System Monitor**: Visual resource bars for Physical 128MB RAM and 8MB Dynamic Heap.
+   - **GUI Calculator**: Clickable button matrix (`0-9`, `+`, `-`, `*`, `/`, `=`, `C`).
+   - **Paint Canvas**: Color palette bar and freehand brush drawing with mouse drag.
+   - **About RatanaOS**: System information and specifications.
 
 ---
 
-## Features
+## Core Subsystems & Hardware Drivers
 
-### 1. Memory Management
-- **Physical Memory Manager (PMM)**: Bitmap page frame allocator managing 128MB of physical RAM in 4KB frames.
-- **Dynamic Kernel Heap**: `kmalloc()`, `kcalloc()`, `krealloc()`, and `kfree()` with block splitting and automatic coalescing.
-
-### 2. Hardware Subsystems & Drivers
-- **CMOS Real-Time Clock (RTC)**: Accurate date and time synchronization for 2026 timestamps.
-- **Serial COM1 (`0x3F8`)**: Early kernel debugging and headless logging.
-- **PC Speaker Driver**: Tone generator and frequency synthesis using PIT channel 2 and port `0x61`.
-- **PCI Bus Scanner**: Enumerate PCI buses 0-255, identifying vendor IDs, device IDs, and device classes (VGA, Storage, Network, Bridge).
-- **CPUID Subsystem**: Query CPU vendor, brand string, family/model, and hardware feature flags (FPU, MMX, SSE, SSE2, SSE3, HTT).
-- **VGA Color Display**: 80x25 text mode with 16 foreground/background colors, hardware cursor control, backspace, and smooth scrolling.
-- **PS/2 Keyboard Driver**: Interrupt-driven (IRQ1) with US-QWERTY key mapping, Shift, and Caps Lock support.
-
-### 3. Interactive Shell Commands (`RatanaSH 2026`)
-
-| Command | Description |
-| :--- | :--- |
-| `fetch` | System overview with custom RatanaOS ASCII logo & hardware stats |
-| `date` / `time` | Query hardware CMOS Real-Time Clock (2026) |
-| `mem` / `free` | Display Physical Memory & Kernel Heap stats |
-| `pci` | Scan and display all connected PCI devices |
-| `cpuid` | Inspect CPU vendor, brand name, and feature flags |
-| `calc <a> <op> <b>` | Built-in arithmetic calculator (`+`, `-`, `*`, `/`, `%`) |
-| `beep [freq] [ms]` | Play sound tone through PC speaker |
-| `theme <name>` | Apply preset themes (`arch`, `cyber2026`, `matrix`, `ocean`, `amber`) |
-| `matrix` | Digital rain screensaver in VGA text mode |
-| `snake` | Playable interactive Snake arcade game inside the kernel |
-| `color <fg> [bg]` | Set custom foreground and background colors (0-15) |
-| `uptime` | System uptime in seconds and timer ticks |
-| `clear` | Clear the screen |
-| `echo <text>` | Print text to console |
-| `about` | Developer info and specifications |
-| `reboot` | Reboot machine via keyboard controller reset |
-| `halt` | Halt CPU |
+- **Graphics Engine (`gfx.h/c`)**:
+  - VBE 32-bit linear framebuffer (`1024x768x32 bpp`).
+  - Smooth double-buffered backbuffer swap (`60 FPS` tear-free).
+  - Primitives: rectangles, outlines, gradients, circles, lines, and embedded 8x16 bitmap font.
+- **PS/2 Mouse Driver (`mouse.h/c`)**:
+  - Interrupt-driven (IRQ12) with 3-byte packet decoding.
+  - Coordinate tracking with screen boundary clamping and hardware cursor rendering.
+- **Memory Management**:
+  - 128MB Physical Memory Bitmap Allocator (PMM).
+  - 8MB Dynamic Kernel Heap (`kmalloc`, `kcalloc`, `krealloc`, `kfree`).
+- **Core CPU & Interrupts**:
+  - 5-segment GDT, 256-gate IDT, Dual 8259 PIC remapping.
+  - 8254 PIT timer (100 Hz), CMOS RTC (2026 timestamps), PC Speaker sound driver.
+  - Serial COM1 (`0x3F8`) debug logger, PCI Bus scanner, CPUID inspector.
 
 ---
 
-## Building & Testing
+## Quickstart & Testing
 
-### 1. Requirements (Garuda / Arch Linux)
-```bash
-sudo pacman -S gcc nasm qemu-system-x86 grub
-```
-
-### 2. Build Kernel
+### 1. Build Kernel & GUI
 ```bash
 make clean && make
 ```
 
-### 3. Run in QEMU (Direct Kernel Boot + Serial Logging)
+### 2. Run Automated Integrity Tests
+```bash
+make test
+```
+
+### 3. Launch in QEMU
 ```bash
 make run
 ```
+*Tip: Once the system boots, type `gui` in the shell to launch the desktop environment, or press `ESC` inside the GUI to return to CLI.*
 
-### 4. Build & Run Bootable ISO
+### 4. Run inside Terminal (Curses Mode)
 ```bash
-make iso
-make run-iso
+make run-curses
 ```

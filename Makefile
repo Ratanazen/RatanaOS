@@ -31,6 +31,9 @@ C_OBJS = $(BUILD_DIR)/kernel.o \
          $(BUILD_DIR)/serial.o \
          $(BUILD_DIR)/speaker.o \
          $(BUILD_DIR)/pci.o \
+         $(BUILD_DIR)/gfx.o \
+         $(BUILD_DIR)/mouse.o \
+         $(BUILD_DIR)/gui.o \
          $(BUILD_DIR)/string.o \
          $(BUILD_DIR)/stdio.o
 
@@ -92,6 +95,9 @@ $(BUILD_DIR)/matrix.o: $(SRC_DIR)/kernel/matrix.c
 $(BUILD_DIR)/snake.o: $(SRC_DIR)/kernel/snake.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(BUILD_DIR)/gui.o: $(SRC_DIR)/kernel/gui.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 # Driver C Objects
 $(BUILD_DIR)/vga.o: $(SRC_DIR)/drivers/vga.c
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -111,6 +117,12 @@ $(BUILD_DIR)/speaker.o: $(SRC_DIR)/drivers/speaker.c
 $(BUILD_DIR)/pci.o: $(SRC_DIR)/drivers/pci.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(BUILD_DIR)/gfx.o: $(SRC_DIR)/drivers/gfx.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/mouse.o: $(SRC_DIR)/drivers/mouse.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 # Library C Objects
 $(BUILD_DIR)/string.o: $(SRC_DIR)/lib/string.c
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -121,11 +133,11 @@ $(BUILD_DIR)/stdio.o: $(SRC_DIR)/lib/stdio.c
 # Link Kernel Binary
 $(TARGET): $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJS)
-	@echo "\n>>> Successfully built RatanaOS 2026 Kernel: $(TARGET) <<<\n"
+	@echo "\n>>> Successfully built RatanaOS 2026 GUI Kernel: $(TARGET) <<<\n"
 
 # Create Bootable ISO (requires xorriso)
 iso: $(TARGET)
-	@which xorriso >/dev/null 2>&1 || (echo "Notice: xorriso is not installed. To build bootable ISOs, run 'sudo pacman -S xorriso'."; exit 1)
+	@which xorriso >/dev/null 2>&1 || (echo "Notice: xorriso is not installed. Run 'sudo pacman -S xorriso' to build ISOs."; exit 1)
 	@mkdir -p iso/boot
 	@cp $(TARGET) iso/boot/ratanaos.bin
 	grub-mkrescue -o $(ISO_TARGET) iso
@@ -133,11 +145,11 @@ iso: $(TARGET)
 
 # Run in QEMU GUI with direct kernel boot & COM1 serial redirect to stdio
 run: $(TARGET)
-	qemu-system-x86_64 -kernel $(TARGET) -serial stdio
+	qemu-system-x86_64 -kernel $(TARGET) -serial stdio -vga std
 
 # Run ISO in QEMU
 run-iso: iso
-	qemu-system-x86_64 -cdrom $(ISO_TARGET) -serial stdio
+	qemu-system-x86_64 -cdrom $(ISO_TARGET) -serial stdio -vga std
 
 # Run in QEMU Curses Mode (in terminal)
 run-curses: $(TARGET)
@@ -155,8 +167,8 @@ test: all
 	@readelf -S $(TARGET) | grep -E "\.text|\.rodata|\.data|\.bss"
 	@echo "  [PASS] ELF 32-bit sections aligned on page boundaries."
 	@echo "\n[TEST 3] Kernel Symbol Table..."
-	@nm $(TARGET) | grep -E "kernel_main|gdt_init|idt_init|pmm_init|heap_init"
-	@echo "  [PASS] Core entry symbols verified."
+	@nm $(TARGET) | grep -E "kernel_main|gdt_init|idt_init|pmm_init|heap_init|gui_init"
+	@echo "  [PASS] Core entry and GUI symbols verified."
 	@echo "\n=============================================="
 	@echo "   ALL AUTOMATED INTEGRITY TESTS PASSED!      "
 	@echo "==============================================\n"

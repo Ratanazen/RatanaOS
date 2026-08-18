@@ -1,20 +1,26 @@
-; Multiboot header and kernel entry point for RatanaOS
+; Multiboot header and kernel entry point for RatanaOS (with Framebuffer Support)
 MBALIGN     equ  1 << 0             ; align loaded modules on page boundaries
 MEMINFO     equ  1 << 1             ; provide memory map
-FLAGS       equ  MBALIGN | MEMINFO  ; this is the Multiboot 'flag' field
+VIDINFO     equ  1 << 2             ; request video mode information
+FLAGS       equ  MBALIGN | MEMINFO | VIDINFO
 MAGIC       equ  0x1BADB002         ; 'magic number' lets bootloader find the header
-CHECKSUM    equ -(MAGIC + FLAGS)    ; checksum of above, to prove we are multiboot
+CHECKSUM    equ -(MAGIC + FLAGS)    ; checksum of above
 
 section .multiboot
 align 4
     dd MAGIC
     dd FLAGS
     dd CHECKSUM
+    ; Video mode request fields (since VIDINFO is set)
+    dd 0    ; mode_type (0 = linear graphics framebuffer)
+    dd 1024 ; width (1024 pixels)
+    dd 768  ; height (768 pixels)
+    dd 32   ; depth (32-bit color: ARGB)
 
 section .bss
 align 16
 stack_bottom:
-resb 16384 ; 16 KiB kernel stack
+resb 32768 ; 32 KiB kernel stack
 stack_top:
 
 section .text
@@ -36,7 +42,7 @@ _start:
     ; Call high-level C kernel entry
     call kernel_main
 
-    ; If kernel_main returns, disable interrupts and halt CPU indefinitely
+    ; Disable interrupts and halt CPU indefinitely if kernel_main returns
     cli
 .hang:
     hlt
