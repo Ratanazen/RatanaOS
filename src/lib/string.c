@@ -141,7 +141,7 @@ char* itoa(int val, char* str, int base) {
     uint32_t uval;
     if (val < 0 && base == 10) {
         is_negative = true;
-        uval = (uint32_t)(-(int64_t)val); // Safe against INT32_MIN overflow
+        uval = (uint32_t)(-(int64_t)val);
     } else {
         uval = (uint32_t)val;
     }
@@ -171,6 +171,26 @@ char* utoa(uint32_t val, char* str, int base) {
 
     while (val != 0) {
         uint32_t rem = val % base;
+        str[i++] = (rem > 9) ? (char)((rem - 10) + 'a') : (char)(rem + '0');
+        val = val / base;
+    }
+
+    str[i] = '\0';
+    reverse_str(str, i);
+    return str;
+}
+
+char* utoa64(uint64_t val, char* str, int base) {
+    int i = 0;
+
+    if (val == 0) {
+        str[0] = '0';
+        str[1] = '\0';
+        return str;
+    }
+
+    while (val != 0) {
+        uint64_t rem = val % base;
         str[i++] = (rem > 9) ? (char)((rem - 10) + 'a') : (char)(rem + '0');
         val = val / base;
     }

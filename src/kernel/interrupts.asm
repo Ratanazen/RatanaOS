@@ -1,27 +1,26 @@
-[bits 32]
+[bits 64]
 section .text
 global idt_flush
 extern isr_handler
 extern irq_handler
 
 idt_flush:
-    mov eax, [esp+4]  ; Pointer to idt_ptr passed as argument
-    lidt [eax]
+    lidt [rdi]
     ret
 
-; Macros for CPU Exception ISRs
+; Macros for 64-bit ISRs
 %macro ISR_NOERRCODE 1
 global isr%1
 isr%1:
-    push dword 0        ; Dummy error code
-    push dword %1       ; Interrupt number
+    push qword 0        ; dummy error code
+    push qword %1       ; interrupt number
     jmp isr_common_stub
 %endmacro
 
 %macro ISR_ERRCODE 1
 global isr%1
 isr%1:
-    push dword %1       ; Interrupt number (error code already pushed by CPU)
+    push qword %1       ; interrupt number (error code pushed by CPU)
     jmp isr_common_stub
 %endmacro
 
@@ -59,37 +58,50 @@ ISR_ERRCODE   30
 ISR_NOERRCODE 31
 
 isr_common_stub:
-    pusha
+    push rax
+    push rbx
+    push rcx
+    push rdx
+    push rsi
+    push rdi
+    push rbp
+    push r8
+    push r9
+    push r10
+    push r11
+    push r12
+    push r13
+    push r14
+    push r15
 
-    mov ax, ds
-    push eax
-
-    mov ax, 0x10
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-
-    push esp
+    mov rdi, rsp
     call isr_handler
-    add esp, 4
 
-    pop eax
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+    pop r11
+    pop r10
+    pop r9
+    pop r8
+    pop rbp
+    pop rdi
+    pop rsi
+    pop rdx
+    pop rcx
+    pop rbx
+    pop rax
 
-    popa
-    add esp, 8
-    iret
+    add rsp, 16
+    iretq
 
-; Macros for Hardware IRQs
+; Macros for 64-bit IRQs
 %macro IRQ 2
 global irq%1
 irq%1:
-    push dword 0
-    push dword %2
+    push qword 0
+    push qword %2
     jmp irq_common_stub
 %endmacro
 
@@ -111,27 +123,40 @@ IRQ 14, 46
 IRQ 15, 47
 
 irq_common_stub:
-    pusha
+    push rax
+    push rbx
+    push rcx
+    push rdx
+    push rsi
+    push rdi
+    push rbp
+    push r8
+    push r9
+    push r10
+    push r11
+    push r12
+    push r13
+    push r14
+    push r15
 
-    mov ax, ds
-    push eax
-
-    mov ax, 0x10
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-
-    push esp
+    mov rdi, rsp
     call irq_handler
-    add esp, 4
 
-    pop eax
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+    pop r11
+    pop r10
+    pop r9
+    pop r8
+    pop rbp
+    pop rdi
+    pop rsi
+    pop rdx
+    pop rcx
+    pop rbx
+    pop rax
 
-    popa
-    add esp, 8
-    iret
+    add rsp, 16
+    iretq

@@ -92,7 +92,7 @@ int kvprintf(const char* format, va_list args) {
                     uintptr_t p = (uintptr_t)va_arg(args, void*);
                     vga_writestring("0x");
                     printed += 2;
-                    utoa(p, buffer, 16);
+                    utoa64((uint64_t)p, buffer, 16);
                     print_padded(buffer, width, pad_char, &printed);
                     break;
                 }

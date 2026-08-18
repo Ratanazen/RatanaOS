@@ -15,11 +15,10 @@ typedef struct gdt_entry_struct gdt_entry_t;
 
 struct gdt_ptr_struct {
     uint16_t limit;
-    uint32_t base;
+    uint64_t base;
 } __attribute__((packed));
 typedef struct gdt_ptr_struct gdt_ptr_t;
 
 void gdt_init(void);
-void gdt_set_gate(int32_t num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran);
 
 #endif // GDT_H

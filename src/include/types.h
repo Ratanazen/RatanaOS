@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-typedef int32_t ssize_t;
+typedef int64_t ssize_t;
 
 #ifndef NULL
 #define NULL ((void*)0)

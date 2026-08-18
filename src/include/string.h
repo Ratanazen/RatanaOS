@@ -17,6 +17,7 @@ int memcmp(const void* s1, const void* s2, size_t n);
 
 char* itoa(int val, char* str, int base);
 char* utoa(uint32_t val, char* str, int base);
+char* utoa64(uint64_t val, char* str, int base);
 int atoi(const char* str);
 
 #endif // STRING_H

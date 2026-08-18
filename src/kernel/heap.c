@@ -12,8 +12,8 @@ typedef struct block_header {
 static block_header_t* heap_start = NULL;
 static size_t heap_total_size = 0;
 
-void heap_init(uint32_t start_addr, size_t size) {
-    heap_start = (block_header_t*)start_addr;
+void heap_init(uint64_t start_addr, size_t size) {
+    heap_start = (block_header_t*)(uintptr_t)start_addr;
     heap_total_size = size;
 
     heap_start->size = size - HEADER_SIZE;
@@ -24,14 +24,13 @@ void heap_init(uint32_t start_addr, size_t size) {
 void* kmalloc(size_t size) {
     if (size == 0 || heap_start == NULL) return NULL;
 
-    // 8-byte alignment
-    size = (size + 7) & ~7;
+    // 16-byte alignment for 64-bit SIMD / ABI
+    size = (size + 15) & ~15;
 
     block_header_t* current = heap_start;
     while (current) {
         if (current->is_free && current->size >= size) {
-            // Split block if excess space is sufficient
-            if (current->size >= size + HEADER_SIZE + 16) {
+            if (current->size >= size + HEADER_SIZE + 32) {
                 block_header_t* new_block = (block_header_t*)((uint8_t*)current + HEADER_SIZE + size);
                 new_block->size = current->size - size - HEADER_SIZE;
                 new_block->is_free = true;
@@ -46,7 +45,7 @@ void* kmalloc(size_t size) {
         current = current->next;
     }
 
-    return NULL; // Out of memory
+    return NULL;
 }
 
 void kfree(void* ptr) {
@@ -56,7 +55,6 @@ void kfree(void* ptr) {
     uintptr_t start = (uintptr_t)heap_start;
     uintptr_t end = start + heap_total_size;
 
-    // Pointer must reside within heap boundaries
     if (addr < start + HEADER_SIZE || addr >= end) {
         return;
     }
@@ -64,7 +62,6 @@ void kfree(void* ptr) {
     block_header_t* header = (block_header_t*)((uint8_t*)ptr - HEADER_SIZE);
     header->is_free = true;
 
-    // Coalesce adjacent free blocks
     block_header_t* current = heap_start;
     while (current && current->next) {
         if (current->is_free && current->next->is_free) {

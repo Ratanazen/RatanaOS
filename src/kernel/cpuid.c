@@ -51,7 +51,7 @@ void cpuid_init(void) {
         memcpy(global_cpu_info.brand, brand, 48);
         global_cpu_info.brand[48] = '\0';
     } else {
-        strcpy(global_cpu_info.brand, "x86 Compatible Processor");
+        strcpy(global_cpu_info.brand, "x86_64 Long Mode Processor");
     }
 }
 
@@ -60,11 +60,12 @@ cpu_info_t cpuid_get_info(void) {
 }
 
 void cpuid_print_info(void) {
-    kprintf("\nProcessor Information (CPUID):\n");
+    kprintf("\nProcessor Information (CPUID 64-bit):\n");
     kprintf(" Vendor:     %s\n", global_cpu_info.vendor);
     kprintf(" Brand:      %s\n", global_cpu_info.brand);
     kprintf(" Family:     %u | Model: %u | Stepping: %u\n",
             global_cpu_info.family, global_cpu_info.model, global_cpu_info.stepping);
+    kprintf(" Mode:       64-bit Long Mode (IA-32e / AMD64)\n");
     kprintf(" Features:   [");
     if (global_cpu_info.has_fpu)  kprintf(" FPU");
     if (global_cpu_info.has_tsc)  kprintf(" TSC");

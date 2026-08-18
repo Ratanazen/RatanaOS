@@ -1,87 +1,84 @@
-# RatanaOS (2026 Full GUI Desktop Edition)
+# RatanaOS (64-bit x86_64 Long Mode Edition)
 
-![Year](https://img.shields.io/badge/Edition-2026_Full_GUI_Desktop-blueviolet)
-![Architecture](https://img.shields.io/badge/Architecture-x86_%7C_i686-blue)
+![Year](https://img.shields.io/badge/Edition-64--bit_Long_Mode-blueviolet)
+![Architecture](https://img.shields.io/badge/Architecture-x86__64_%7C_AMD64-blue)
 ![Graphics](https://img.shields.io/badge/GUI-VBE_32--bit_Framebuffer-brightgreen)
-![Language](https://img.shields.io/badge/Language-C23_%2F_NASM-orange)
+![Language](https://img.shields.io/badge/Language-C23_%2F_NASM_64-orange)
 ![Build](https://img.shields.io/badge/Build-Passing-brightgreen)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-**RatanaOS 2026** is a modular 32-bit x86 operating system kernel featuring a full **Linux-like Graphical User Interface (GUI) Desktop Environment**, hardware PS/2 mouse support (IRQ12), VBE 32-bit linear framebuffer rendering, memory management, and built-in desktop applications.
+**RatanaOS 64-bit** is a high-performance operating system kernel operating natively in **64-bit x86_64 Long Mode**. It features a 4-level paging memory manager (PML4), 64-bit GDT/IDT, 64-bit dynamic heap allocator, hardware PS/2 mouse & keyboard drivers, and a full **Linux-like Graphical User Interface (GUI) Desktop Environment**.
 
 ---
 
-## GUI Desktop Environment (`RatanaWM`)
+## 64-bit Kernel Architecture
 
 ```
-+-----------------------------------------------------------------------------+
-|  +--------------------+  +--------------------+  +--------------------+     |
-|  | Terminal Console   |  | System Monitor     |  | Calculator / Paint |     |
-|  | (ratana@os-2026 >) |  | (CPU, RAM, Uptime) |  | (Clickable Buttons)|     |
-|  +--------------------+  +--------------------+  +--------------------+     |
-|                                                                             |
-|                                                     [RatanaOS 2026]         |
-+-----------------------------------------------------------------------------+
-| [RatanaOS Start] | [Terminal] [SysMon] [Calc] | [RAM: 24KB] | [2026-08-18]  |
-+-----------------------------------------------------------------------------+
+                      +------------------------------------------+
+                      |        RatanaOS 64-bit (x86_64)          |
+                      |       (CLI Shell & RatanaWM GUI)         |
+                      +--------------------+---------------------+
+                                           |
++------------------------------------------v------------------------------------------+
+|                                64-bit Kernel Core                                   |
+|   +---------------------+  +----------------------+  +--------------------------+   |
+|   | 64-bit GDT & TSS    |  | 64-bit 16-byte IDT   |  | 64-bit PMM & 16MB Heap   |   |
+|   | (Null, KCode, KData)|  | (ISRs & IRQs, iretq) |  | (64-bit Virtual Space)   |   |
+|   +---------------------+  +----------------------+  +--------------------------+   |
++------------------------------------------+------------------------------------------+
+                                           |
++------------------------------------------v------------------------------------------+
+|                           x86_64 Long Mode Transition                               |
+|   1. Verify CPUID Long Mode Support (EFER / MSR 0xC0000080)                         |
+|   2. Build 4-Level Paging Hierarchy: PML4 -> PDPT -> PD (2MB Large Pages)           |
+|   3. Enable PAE (CR4 bit 5) -> Enable LME in EFER MSR -> Enable Paging (CR0 bit 31)  |
+|   4. 64-bit Far Jump to Code Segment 0x08 -> Entry into Native 64-bit Long Mode     |
++-------------------------------------------------------------------------------------+
 ```
-
-### Desktop Features & Applications:
-1. **Window Manager (`RatanaWM`)**:
-   - Draggable windows with active focus management and Z-order layering.
-   - Titlebars with **Close [X]** and **Minimize [_]** buttons.
-2. **Taskbar & Start Menu**:
-   - **Start Menu**: App launcher popup and option to exit back to CLI.
-   - **Active Window Tabs**: Taskbar buttons to switch, restore, or minimize windows.
-   - **RTC 2026 Clock Widget**: Live real-time clock synchronized with CMOS hardware.
-   - **RAM Usage Widget**: Real-time memory allocation indicator.
-3. **Built-in Desktop Applications**:
-   - **Terminal Console**: Live interactive terminal with commands.
-   - **System Monitor**: Visual resource bars for Physical 128MB RAM and 8MB Dynamic Heap.
-   - **GUI Calculator**: Clickable button matrix (`0-9`, `+`, `-`, `*`, `/`, `=`, `C`).
-   - **Paint Canvas**: Color palette bar and freehand brush drawing with mouse drag.
-   - **About RatanaOS**: System information and specifications.
 
 ---
 
-## Core Subsystems & Hardware Drivers
+## Subsystems & Features
 
-- **Graphics Engine (`gfx.h/c`)**:
-  - VBE 32-bit linear framebuffer (`1024x768x32 bpp`).
-  - Smooth double-buffered backbuffer swap (`60 FPS` tear-free).
-  - Primitives: rectangles, outlines, gradients, circles, lines, and embedded 8x16 bitmap font.
-- **PS/2 Mouse Driver (`mouse.h/c`)**:
-  - Interrupt-driven (IRQ12) with 3-byte packet decoding.
-  - Coordinate tracking with screen boundary clamping and hardware cursor rendering.
-- **Memory Management**:
-  - 128MB Physical Memory Bitmap Allocator (PMM).
-  - 8MB Dynamic Kernel Heap (`kmalloc`, `kcalloc`, `krealloc`, `kfree`).
-- **Core CPU & Interrupts**:
-  - 5-segment GDT, 256-gate IDT, Dual 8259 PIC remapping.
-  - 8254 PIT timer (100 Hz), CMOS RTC (2026 timestamps), PC Speaker sound driver.
-  - Serial COM1 (`0x3F8`) debug logger, PCI Bus scanner, CPUID inspector.
+### 1. 64-bit Memory & CPU Management
+- **4-Level Paging**: PML4, PDPT, and Page Directory identity-mapping the first 1GB with 2MB huge pages.
+- **Physical Memory Manager (PMM)**: 256MB Physical Memory Bitmap frame allocator.
+- **Dynamic Kernel Heap**: 16MB 64-bit heap (`kmalloc`, `kcalloc`, `krealloc`, `kfree`) with 16-byte alignment.
+- **64-bit GDT & IDT**: 16-byte IDT gate descriptors, 64-bit ISR/IRQ stubs with register preservation and `iretq`.
+
+### 2. Full 64-bit GUI Desktop Environment (`RatanaWM`)
+- High-resolution `1024x768x32` linear framebuffer graphics engine with double buffering (`60 FPS`).
+- Hardware PS/2 mouse driver (IRQ12) with screen boundary clipping and cursor rendering.
+- Movable windows with active focus management, titlebars, and **Close [X]** / **Minimize [_]** controls.
+- Bottom Taskbar with **Start Menu**, active window tabs, **RTC 2026 Clock**, and **RAM Usage Widget**.
+- Built-in Applications: **Terminal Console**, **System Monitor**, **GUI Calculator**, **Paint Canvas**, and **About RatanaOS**.
+
+### 3. Hardware Drivers & Shell Utilities
+- **CMOS RTC**: Accurate hardware clock reporting Year 2026 timestamps (`date` / `time`).
+- **Drivers**: Serial COM1 (`0x3F8`), PC Speaker synthesizer (`beep`), PCI bus enumerator (`pci`), and CPUID inspector (`cpuid`).
+- **Arcade & Visuals**: Matrix digital rain animation (`matrix`) and playable Snake game (`snake`).
 
 ---
 
 ## Quickstart & Testing
 
-### 1. Build Kernel & GUI
+### 1. Build 64-bit Kernel
 ```bash
 make clean && make
 ```
 
-### 2. Run Automated Integrity Tests
+### 2. Run Automated 64-bit Test Suite
 ```bash
 make test
 ```
 
-### 3. Launch in QEMU
+### 3. Run in QEMU
 ```bash
 make run
 ```
 *Tip: Once the system boots, type `gui` in the shell to launch the desktop environment, or press `ESC` inside the GUI to return to CLI.*
 
-### 4. Run inside Terminal (Curses Mode)
+### 4. Run in Terminal (Curses Mode)
 ```bash
 make run-curses
 ```

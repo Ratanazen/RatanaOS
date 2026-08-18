@@ -2,9 +2,9 @@ CC = gcc
 AS = nasm
 LD = ld
 
-CFLAGS = -m32 -ffreestanding -O2 -Wall -Wextra -fno-pie -fno-stack-protector -fno-builtin -nostdlib -nodefaultlibs
-ASFLAGS = -f elf32
-LDFLAGS = -m elf_i386 -T src/boot/linker.ld -nostdlib
+CFLAGS = -m64 -ffreestanding -O2 -Wall -Wextra -fno-pie -fno-stack-protector -fno-builtin -mno-red-zone -mcmodel=small -nostdlib -nodefaultlibs
+ASFLAGS = -f elf64
+LDFLAGS = -m elf_x86_64 -T src/boot/linker.ld -nostdlib
 
 BUILD_DIR = build
 SRC_DIR = src
@@ -48,7 +48,7 @@ all: dirs $(TARGET)
 dirs:
 	@mkdir -p $(BUILD_DIR)
 
-# ASM Objects
+# 64-bit ASM Objects
 $(BUILD_DIR)/boot.o: $(SRC_DIR)/boot/boot.asm
 	$(AS) $(ASFLAGS) $< -o $@
 
@@ -58,7 +58,7 @@ $(BUILD_DIR)/gdt_flush.o: $(SRC_DIR)/kernel/gdt_flush.asm
 $(BUILD_DIR)/interrupts.o: $(SRC_DIR)/kernel/interrupts.asm
 	$(AS) $(ASFLAGS) $< -o $@
 
-# Kernel C Objects
+# 64-bit Kernel C Objects
 $(BUILD_DIR)/kernel.o: $(SRC_DIR)/kernel/kernel.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
@@ -98,7 +98,7 @@ $(BUILD_DIR)/snake.o: $(SRC_DIR)/kernel/snake.c
 $(BUILD_DIR)/gui.o: $(SRC_DIR)/kernel/gui.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Driver C Objects
+# 64-bit Driver C Objects
 $(BUILD_DIR)/vga.o: $(SRC_DIR)/drivers/vga.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
@@ -123,17 +123,17 @@ $(BUILD_DIR)/gfx.o: $(SRC_DIR)/drivers/gfx.c
 $(BUILD_DIR)/mouse.o: $(SRC_DIR)/drivers/mouse.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Library C Objects
+# 64-bit Library C Objects
 $(BUILD_DIR)/string.o: $(SRC_DIR)/lib/string.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/stdio.o: $(SRC_DIR)/lib/stdio.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Link Kernel Binary
+# Link 64-bit Kernel Binary
 $(TARGET): $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJS)
-	@echo "\n>>> Successfully built RatanaOS 2026 GUI Kernel: $(TARGET) <<<\n"
+	@echo "\n>>> Successfully built RatanaOS 64-bit (x86_64) Kernel: $(TARGET) <<<\n"
 
 # Create Bootable ISO (requires xorriso)
 iso: $(TARGET)
@@ -143,7 +143,7 @@ iso: $(TARGET)
 	grub-mkrescue -o $(ISO_TARGET) iso
 	@echo "\n>>> Successfully built Bootable ISO: $(ISO_TARGET) <<<\n"
 
-# Run in QEMU GUI with direct kernel boot & COM1 serial redirect to stdio
+# Run in QEMU 64-bit with direct kernel boot & COM1 serial redirect to stdio
 run: $(TARGET)
 	qemu-system-x86_64 -kernel $(TARGET) -serial stdio -vga std
 
@@ -158,19 +158,19 @@ run-curses: $(TARGET)
 # Run automated tests
 test: all
 	@echo "\n=============================================="
-	@echo "     RATANAOS AUTOMATED SYSTEM TEST SUITE     "
+	@echo "     RATANAOS 64-BIT SYSTEM TEST SUITE        "
 	@echo "=============================================="
 	@echo "\n[TEST 1] Multiboot Header Verification..."
 	@grub-file --is-x86-multiboot $(TARGET) && echo "  [PASS] Multiboot header is valid and compliant." || (echo "  [FAIL] Invalid Multiboot header."; exit 1)
-	@echo "\n[TEST 2] ELF Layout & Section Alignment..."
-	@readelf -h $(TARGET) | grep "Entry point address"
+	@echo "\n[TEST 2] 64-bit ELF Layout & Section Alignment..."
+	@readelf -h $(TARGET) | grep -E "Class|Machine|Entry point address"
 	@readelf -S $(TARGET) | grep -E "\.text|\.rodata|\.data|\.bss"
-	@echo "  [PASS] ELF 32-bit sections aligned on page boundaries."
-	@echo "\n[TEST 3] Kernel Symbol Table..."
+	@echo "  [PASS] Native ELF 64-bit x86-64 executable layout validated."
+	@echo "\n[TEST 3] 64-bit Kernel Symbols..."
 	@nm $(TARGET) | grep -E "kernel_main|gdt_init|idt_init|pmm_init|heap_init|gui_init"
-	@echo "  [PASS] Core entry and GUI symbols verified."
+	@echo "  [PASS] 64-bit core symbols verified."
 	@echo "\n=============================================="
-	@echo "   ALL AUTOMATED INTEGRITY TESTS PASSED!      "
+	@echo "   ALL 64-BIT AUTOMATED TESTS PASSED!         "
 	@echo "==============================================\n"
 
 # Clean

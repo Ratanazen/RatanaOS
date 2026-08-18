@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-void heap_init(uint32_t start_addr, size_t size);
+void heap_init(uint64_t start_addr, size_t size);
 void* kmalloc(size_t size);
 void* kcalloc(size_t num, size_t size);
 void* krealloc(void* ptr, size_t size);

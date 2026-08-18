@@ -56,13 +56,12 @@ void isr_handler(registers_t* regs) {
     } else {
         uint8_t old_color = vga_get_color();
         vga_set_color(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_RED));
-        kprintf("\n [KERNEL PANIC] CPU Exception %d: %s \n", regs->int_no,
+        kprintf("\n [64-BIT KERNEL PANIC] CPU Exception %u: %s \n", (uint32_t)regs->int_no,
                 regs->int_no < 32 ? exception_messages[regs->int_no] : "Unknown");
-        kprintf(" Error Code: 0x%x | EIP: 0x%x | CS: 0x%x | EFLAGS: 0x%x\n",
-                regs->err_code, regs->eip, regs->cs, regs->eflags);
+        kprintf(" RIP: 0x%p | CS: 0x%x | RFLAGS: 0x%p | ERR: 0x%x\n",
+                (void*)regs->rip, (uint32_t)regs->cs, (void*)regs->rflags, (uint32_t)regs->err_code);
         vga_set_color(old_color);
         
-        // Halt system on unhandled exception
         __asm__ volatile ("cli; hlt");
     }
 }

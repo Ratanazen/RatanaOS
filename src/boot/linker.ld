@@ -1,37 +1,34 @@
-/* Linker script for RatanaOS 32-bit kernel */
+/* Linker script for RatanaOS 64-bit x86_64 kernel */
 ENTRY(_start)
 
 SECTIONS
 {
-    /* The kernel will live at 1MB (0x100000) */
+    /* The kernel starts at 1MB (0x100000) */
     . = 1M;
 
-    /* First put the multiboot header, as it is required to be within the first 8KiB */
+    /* Multiboot header must be within the first 8KiB */
     .text BLOCK(4K) : ALIGN(4K)
     {
         *(.multiboot)
         *(.text)
     }
 
-    /* Read-only data. */
+    /* Read-only data */
     .rodata BLOCK(4K) : ALIGN(4K)
     {
         *(.rodata*)
     }
 
-    /* Read-write data (initialized) */
+    /* Initialized read-write data */
     .data BLOCK(4K) : ALIGN(4K)
     {
         *(.data)
     }
 
-    /* Read-write data (uninitialized) and stack */
+    /* Uninitialized data and stack / page tables */
     .bss BLOCK(4K) : ALIGN(4K)
     {
         *(COMMON)
         *(.bss)
     }
-
-    /* The compiler may produce other sections, put them in the proper place in
-       in this file, if you'd like to include them in the binary */
 }
