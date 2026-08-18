@@ -22,7 +22,7 @@ void heap_init(uint32_t start_addr, size_t size) {
 }
 
 void* kmalloc(size_t size) {
-    if (size == 0) return NULL;
+    if (size == 0 || heap_start == NULL) return NULL;
 
     // 8-byte alignment
     size = (size + 7) & ~7;
@@ -30,7 +30,7 @@ void* kmalloc(size_t size) {
     block_header_t* current = heap_start;
     while (current) {
         if (current->is_free && current->size >= size) {
-            // Check if we can split the block
+            // Split block if excess space is sufficient
             if (current->size >= size + HEADER_SIZE + 16) {
                 block_header_t* new_block = (block_header_t*)((uint8_t*)current + HEADER_SIZE + size);
                 new_block->size = current->size - size - HEADER_SIZE;
@@ -50,7 +50,16 @@ void* kmalloc(size_t size) {
 }
 
 void kfree(void* ptr) {
-    if (!ptr) return;
+    if (!ptr || !heap_start) return;
+
+    uintptr_t addr = (uintptr_t)ptr;
+    uintptr_t start = (uintptr_t)heap_start;
+    uintptr_t end = start + heap_total_size;
+
+    // Pointer must reside within heap boundaries
+    if (addr < start + HEADER_SIZE || addr >= end) {
+        return;
+    }
 
     block_header_t* header = (block_header_t*)((uint8_t*)ptr - HEADER_SIZE);
     header->is_free = true;
@@ -68,6 +77,7 @@ void kfree(void* ptr) {
 }
 
 void* kcalloc(size_t num, size_t size) {
+    if (num == 0 || size == 0) return NULL;
     size_t total = num * size;
     void* ptr = kmalloc(total);
     if (ptr) {

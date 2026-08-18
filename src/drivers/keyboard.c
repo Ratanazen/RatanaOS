@@ -6,11 +6,12 @@
 #define KEYBOARD_BUFFER_SIZE 128
 
 static char key_buffer[KEYBOARD_BUFFER_SIZE];
-static int  buffer_head = 0;
-static int  buffer_tail = 0;
+static volatile int buffer_head = 0;
+static volatile int buffer_tail = 0;
 
 static bool shift_pressed = false;
 static bool caps_lock = false;
+static bool extended_scancode = false;
 
 // Scan code table for US QWERTY keyboard (scancodes 0x00 to 0x58)
 static const char scancodes_normal[128] = {
@@ -29,22 +30,22 @@ static const char scancodes_normal[128] = {
     0,   /* Num lock */
     0,   /* Scroll lock */
     0,   /* Home */
-    0,   /* Up Arrow */
+    (char)KEY_UP,    /* Up Arrow */
     0,   /* Page Up */
     '-',
-    0,   /* Left Arrow */
+    (char)KEY_LEFT,  /* Left Arrow */
     0,
-    0,   /* Right Arrow */
+    (char)KEY_RIGHT, /* Right Arrow */
     '+',
     0,   /* End */
-    0,   /* Down Arrow */
+    (char)KEY_DOWN,  /* Down Arrow */
     0,   /* Page Down */
     0,   /* Insert */
     0,   /* Delete */
     0, 0, 0,
     0,   /* F11 */
     0,   /* F12 */
-    0    /* All other keys undefined */
+    0
 };
 
 static const char scancodes_shifted[128] = {
@@ -63,15 +64,15 @@ static const char scancodes_shifted[128] = {
     0,   /* Num lock */
     0,   /* Scroll lock */
     0,   /* Home */
-    0,   /* Up Arrow */
+    (char)KEY_UP,    /* Up Arrow */
     0,   /* Page Up */
     '-',
-    0,   /* Left Arrow */
+    (char)KEY_LEFT,  /* Left Arrow */
     0,
-    0,   /* Right Arrow */
+    (char)KEY_RIGHT, /* Right Arrow */
     '+',
     0,   /* End */
-    0,   /* Down Arrow */
+    (char)KEY_DOWN,  /* Down Arrow */
     0,   /* Page Down */
     0,   /* Insert */
     0,   /* Delete */
@@ -85,28 +86,50 @@ static void keyboard_callback(registers_t* regs) {
     (void)regs;
     uint8_t scancode = inb(0x60);
 
+    // Check for extended key prefix
+    if (scancode == 0xE0) {
+        extended_scancode = true;
+        return;
+    }
+
     if (scancode & 0x80) {
+        // Key release
         uint8_t released_key = scancode & 0x7F;
         if (released_key == 0x2A || released_key == 0x36) {
             shift_pressed = false;
         }
+        extended_scancode = false;
     } else {
+        // Key press
         if (scancode == 0x2A || scancode == 0x36) {
             shift_pressed = true;
+            extended_scancode = false;
             return;
         }
         if (scancode == 0x3A) {
             caps_lock = !caps_lock;
+            extended_scancode = false;
             return;
         }
 
         char c = 0;
-        if (shift_pressed) {
-            c = scancodes_shifted[scancode];
-        } else {
-            c = scancodes_normal[scancode];
-            if (caps_lock && (c >= 'a' && c <= 'z')) {
-                c = c - 'a' + 'A';
+        if (extended_scancode) {
+            switch (scancode) {
+                case 0x48: c = (char)KEY_UP; break;
+                case 0x50: c = (char)KEY_DOWN; break;
+                case 0x4B: c = (char)KEY_LEFT; break;
+                case 0x4D: c = (char)KEY_RIGHT; break;
+                default: break;
+            }
+            extended_scancode = false;
+        } else if (scancode < 128) {
+            if (shift_pressed) {
+                c = scancodes_shifted[scancode];
+            } else {
+                c = scancodes_normal[scancode];
+                if (caps_lock && (c >= 'a' && c <= 'z')) {
+                    c = c - 'a' + 'A';
+                }
             }
         }
 
@@ -125,6 +148,7 @@ void keyboard_init(void) {
     buffer_tail = 0;
     shift_pressed = false;
     caps_lock = false;
+    extended_scancode = false;
     register_interrupt_handler(IRQ1, keyboard_callback);
 }
 

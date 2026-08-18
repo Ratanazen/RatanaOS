@@ -2,12 +2,16 @@
 
 size_t strlen(const char* str) {
     size_t len = 0;
-    while (str[len])
+    while (str && str[len])
         len++;
     return len;
 }
 
 int strcmp(const char* s1, const char* s2) {
+    if (!s1 && !s2) return 0;
+    if (!s1) return -1;
+    if (!s2) return 1;
+
     while (*s1 && (*s1 == *s2)) {
         s1++;
         s2++;
@@ -16,32 +20,41 @@ int strcmp(const char* s1, const char* s2) {
 }
 
 int strncmp(const char* s1, const char* s2, size_t n) {
+    if (n == 0) return 0;
+    if (!s1 && !s2) return 0;
+    if (!s1) return -1;
+    if (!s2) return 1;
+
     while (n && *s1 && (*s1 == *s2)) {
         s1++;
         s2++;
         n--;
     }
-    if (n == 0)
-        return 0;
+    if (n == 0) return 0;
     return *(const unsigned char*)s1 - *(const unsigned char*)s2;
 }
 
 char* strcpy(char* dest, const char* src) {
+    if (!dest || !src) return dest;
     char* orig = dest;
     while ((*dest++ = *src++));
     return orig;
 }
 
 char* strncpy(char* dest, const char* src, size_t n) {
-    char* orig = dest;
-    while (n && (*dest++ = *src++))
-        n--;
-    while (n--)
-        *dest++ = '\0';
-    return orig;
+    if (!dest || !src || n == 0) return dest;
+    size_t i;
+    for (i = 0; i < n && src[i] != '\0'; i++) {
+        dest[i] = src[i];
+    }
+    for (; i < n; i++) {
+        dest[i] = '\0';
+    }
+    return dest;
 }
 
 char* strcat(char* dest, const char* src) {
+    if (!dest || !src) return dest;
     char* orig = dest;
     while (*dest)
         dest++;
@@ -50,6 +63,7 @@ char* strcat(char* dest, const char* src) {
 }
 
 char* strchr(const char* s, int c) {
+    if (!s) return NULL;
     while (*s) {
         if (*s == (char)c)
             return (char*)s;
@@ -119,20 +133,23 @@ char* itoa(int val, char* str, int base) {
     bool is_negative = false;
 
     if (val == 0) {
-        str[i++] = '0';
-        str[i] = '\0';
+        str[0] = '0';
+        str[1] = '\0';
         return str;
     }
 
+    uint32_t uval;
     if (val < 0 && base == 10) {
         is_negative = true;
-        val = -val;
+        uval = (uint32_t)(-(int64_t)val); // Safe against INT32_MIN overflow
+    } else {
+        uval = (uint32_t)val;
     }
 
-    while (val != 0) {
-        int rem = val % base;
+    while (uval != 0) {
+        uint32_t rem = uval % base;
         str[i++] = (rem > 9) ? (char)((rem - 10) + 'a') : (char)(rem + '0');
-        val = val / base;
+        uval = uval / base;
     }
 
     if (is_negative)
@@ -147,8 +164,8 @@ char* utoa(uint32_t val, char* str, int base) {
     int i = 0;
 
     if (val == 0) {
-        str[i++] = '0';
-        str[i] = '\0';
+        str[0] = '0';
+        str[1] = '\0';
         return str;
     }
 
@@ -164,6 +181,7 @@ char* utoa(uint32_t val, char* str, int base) {
 }
 
 int atoi(const char* str) {
+    if (!str) return 0;
     int res = 0;
     int sign = 1;
     int i = 0;
