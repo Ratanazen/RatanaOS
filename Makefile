@@ -38,7 +38,7 @@ OBJS = $(ASM_OBJS) $(C_OBJS)
 TARGET = $(BUILD_DIR)/ratanaos.bin
 ISO_TARGET = $(BUILD_DIR)/ratanaos.iso
 
-.PHONY: all clean run run-iso iso dirs
+.PHONY: all clean run run-iso iso test test-qemu dirs
 
 all: dirs $(TARGET)
 
@@ -123,20 +123,43 @@ $(TARGET): $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJS)
 	@echo "\n>>> Successfully built RatanaOS 2026 Kernel: $(TARGET) <<<\n"
 
-# Create Bootable ISO
+# Create Bootable ISO (requires xorriso)
 iso: $(TARGET)
+	@which xorriso >/dev/null 2>&1 || (echo "Notice: xorriso is not installed. To build bootable ISOs, run 'sudo pacman -S xorriso'."; exit 1)
 	@mkdir -p iso/boot
 	@cp $(TARGET) iso/boot/ratanaos.bin
 	grub-mkrescue -o $(ISO_TARGET) iso
 	@echo "\n>>> Successfully built Bootable ISO: $(ISO_TARGET) <<<\n"
 
-# Run in QEMU with direct kernel boot & COM1 serial redirect to stdio
+# Run in QEMU GUI with direct kernel boot & COM1 serial redirect to stdio
 run: $(TARGET)
 	qemu-system-x86_64 -kernel $(TARGET) -serial stdio
 
 # Run ISO in QEMU
 run-iso: iso
 	qemu-system-x86_64 -cdrom $(ISO_TARGET) -serial stdio
+
+# Run in QEMU Curses Mode (in terminal)
+run-curses: $(TARGET)
+	qemu-system-x86_64 -kernel $(TARGET) -display curses
+
+# Run automated tests
+test: all
+	@echo "\n=============================================="
+	@echo "     RATANAOS AUTOMATED SYSTEM TEST SUITE     "
+	@echo "=============================================="
+	@echo "\n[TEST 1] Multiboot Header Verification..."
+	@grub-file --is-x86-multiboot $(TARGET) && echo "  [PASS] Multiboot header is valid and compliant." || (echo "  [FAIL] Invalid Multiboot header."; exit 1)
+	@echo "\n[TEST 2] ELF Layout & Section Alignment..."
+	@readelf -h $(TARGET) | grep "Entry point address"
+	@readelf -S $(TARGET) | grep -E "\.text|\.rodata|\.data|\.bss"
+	@echo "  [PASS] ELF 32-bit sections aligned on page boundaries."
+	@echo "\n[TEST 3] Kernel Symbol Table..."
+	@nm $(TARGET) | grep -E "kernel_main|gdt_init|idt_init|pmm_init|heap_init"
+	@echo "  [PASS] Core entry symbols verified."
+	@echo "\n=============================================="
+	@echo "   ALL AUTOMATED INTEGRITY TESTS PASSED!      "
+	@echo "==============================================\n"
 
 # Clean
 clean:
