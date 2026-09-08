@@ -46,8 +46,8 @@ void menubar_draw(const char* active_app_name) {
     gfx_draw_string_transparent(mx + 198, 4, "Help", 0x00D1D1D6);
 
     // 5. Right-side Status Extras
-    icon_draw_wifi(sw - 235, 8, COLOR_WHITE);
-    icon_draw_battery(sw - 215, 6, COLOR_WHITE);
+    icon_draw_wifi(sw - 286, 8, COLOR_WHITE);
+    icon_draw_battery(sw - 266, 6, COLOR_WHITE);
 
     // Dynamic Heap / RAM Widget
     heap_stats_t hstats = heap_get_stats();
@@ -57,7 +57,7 @@ void menubar_draw(const char* active_app_name) {
     utoa((uint32_t)(hstats.used_size / 1024), rn, 10);
     strcat(ram_str, rn);
     strcat(ram_str, "K");
-    gfx_draw_string_transparent(sw - 190, 4, ram_str, 0x0030D158);
+    gfx_draw_string_transparent(sw - 238, 4, ram_str, 0x0030D158);
 
     // Live Real-Time Clock
     rtc_time_t t = rtc_get_time();
@@ -79,9 +79,10 @@ void menubar_draw(const char* active_app_name) {
     if (t.minute < 10) strcat(clock_str, "0");
     strcat(clock_str, cn);
 
-    gfx_draw_string_transparent(sw - 128, 4, clock_str, COLOR_WHITE);
-    icon_draw_search(sw - 38, 5, COLOR_WHITE);
-    icon_draw_control_center(sw - 20, 6, COLOR_WHITE);
+    gfx_draw_string_transparent(sw - 148, 4, clock_str, COLOR_WHITE);
+    icon_draw_search(sw - 54, 5, COLOR_WHITE);
+    icon_draw_control_center(sw - 36, 6, COLOR_WHITE);
+    icon_draw_siri(sw - 16, 6);
 
     // 6.  Apple Menu Dropdown
     if (apple_menu_open) {

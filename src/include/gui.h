@@ -4,7 +4,7 @@
 #include "types.h"
 #include "multiboot.h"
 
-#define MAX_WINDOWS 8
+#define MAX_WINDOWS 16
 
 typedef enum {
     TITLEBAR_HIT_NONE = 0,

@@ -19,8 +19,8 @@ pml4_table:
     resb 4096
 pdpt_table:
     resb 4096
-pd_table:
-    resb 4096
+pd_tables:
+    resb 4096 * 4 ; 4 PD tables = 4 * 512 entries = 2048 entries = 4GB
 
 align 16
 stack_bottom:
@@ -51,35 +51,43 @@ _start:
     mov edi, ebx
     mov esi, eax
 
-    ; 1. Clear Page Tables
-    mov ecx, 1024 * 3
+    ; 1. Clear Page Tables (PML4 + PDPT + 4 PDs = 6 pages = 6 * 1024 dwords)
+    mov ecx, 1024 * 6
     mov edx, pml4_table
 .clear_tables:
     mov dword [edx], 0
     add edx, 4
     loop .clear_tables
 
-    ; 2. Set up 4-Level Paging (Identity-map first 1GB with 2MB huge pages)
+    ; 2. Set up 4-Level Paging (Identity-map full 4GB with 2MB huge pages)
     ; Map PML4[0] -> PDPT
     mov eax, pdpt_table
     or eax, 0b11 ; present + writable
     mov [pml4_table], eax
 
-    ; Map PDPT[0] -> PD
-    mov eax, pd_table
+    ; Map PDPT[0..3] -> 4 PD tables
+    mov ecx, 0
+.map_pdpt:
+    mov eax, ecx
+    shl eax, 12 ; ecx * 4096
+    add eax, pd_tables
     or eax, 0b11 ; present + writable
-    mov [pdpt_table], eax
+    mov [pdpt_table + ecx * 8], eax
+    mov dword [pdpt_table + ecx * 8 + 4], 0
+    inc ecx
+    cmp ecx, 4
+    jne .map_pdpt
 
-    ; Map 512 entries in PD (512 * 2MB = 1GB identity map)
+    ; Map 2048 entries in PDs (2048 * 2MB = 4GB identity map)
     mov ecx, 0
 .map_pd:
     mov eax, 0x200000 ; 2MB
-    mul ecx           ; EAX = ecx * 2MB
+    mul ecx           ; EDX:EAX = ecx * 2MB
     or eax, 0b10000011 ; present + writable + huge page (2MB)
-    mov [pd_table + ecx * 8], eax
-    mov dword [pd_table + ecx * 8 + 4], 0
+    mov [pd_tables + ecx * 8], eax
+    mov [pd_tables + ecx * 8 + 4], edx
     inc ecx
-    cmp ecx, 512
+    cmp ecx, 2048
     jne .map_pd
 
     ; 3. Load CR3 with PML4

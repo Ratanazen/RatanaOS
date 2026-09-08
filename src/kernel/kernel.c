@@ -93,7 +93,10 @@ void kernel_main(uint64_t mbi_addr, uint64_t magic) {
     speaker_beep(1000, 30);
     speaker_beep(1500, 30);
 
-    kprintf("\nRatanaOS 64-bit macOS Edition is ready! Type 'gui' or 'fetch'.\n\n");
+    // Launch macOS Sequoia Desktop Environment
+    gui_start();
+
+    kprintf("\nRatanaOS 64-bit macOS Edition ready. Type 'gui' to return to Desktop.\n\n");
 
     shell_init();
     serial_printf("STEP 13: Shell initialized\n");

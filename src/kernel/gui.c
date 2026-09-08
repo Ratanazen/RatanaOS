@@ -33,12 +33,18 @@ static bool calc_clear_on_next = false;
 static uint32_t paint_canvas[CANVAS_W * CANVAS_H];
 static uint32_t paint_cur_color = 0x000A84FF; // macOS Blue
 
-// Forward declarations
+// Forward declarations of window drawing callbacks
 static void draw_finder_content(window_t* win);
+static void draw_launchpad_content(window_t* win);
+static void draw_safari_content(window_t* win);
 static void draw_terminal_content(window_t* win);
 static void draw_sysmon_content(window_t* win);
 static void draw_calc_content(window_t* win);
 static void draw_paint_content(window_t* win);
+static void draw_notes_content(window_t* win);
+static void draw_music_content(window_t* win);
+static void draw_settings_content(window_t* win);
+static void draw_appstore_content(window_t* win);
 static void draw_about_content(window_t* win);
 
 static void handle_calc_click(window_t* win, int rel_x, int rel_y, int btn);
@@ -56,7 +62,7 @@ static window_t* create_window(int id, const char* title, int x, int y, int w, i
     win->height = h;
     win->orig_w = w;
     win->orig_h = h;
-    win->is_open = true;
+    win->is_open = false;
     win->is_minimized = false;
     win->is_active = false;
     win->is_dragging = false;
@@ -89,15 +95,15 @@ static titlebar_hit_t window_hit_test_titlebar(window_t* win, int mx, int my) {
 
     int btn_cy = win->y + 14;
 
-    // 🔴 Red Close Button (x + 14, radius 6)
+    // 🔴 Red Close Button
     int dx = mx - (win->x + 14), dy = my - btn_cy;
     if (dx * dx + dy * dy <= 36) return TITLEBAR_HIT_CLOSE;
 
-    // 🟡 Yellow Minimize Button (x + 32, radius 6)
+    // 🟡 Yellow Minimize Button
     dx = mx - (win->x + 32);
     if (dx * dx + dy * dy <= 36) return TITLEBAR_HIT_MINIMIZE;
 
-    // 🟢 Green Zoom Button (x + 50, radius 6)
+    // 🟢 Green Zoom Button
     dx = mx - (win->x + 50);
     if (dx * dx + dy * dy <= 36) return TITLEBAR_HIT_ZOOM;
 
@@ -118,12 +124,9 @@ static void draw_window(window_t* win) {
     gfx_draw_rounded_rect(win->x + 1, win->y + 1, win->width - 2, TITLEBAR_HEIGHT, 9, 0x002B2B2E);
     gfx_draw_line(win->x, win->y + TITLEBAR_HEIGHT, win->x + win->width - 1, win->y + TITLEBAR_HEIGHT, 0x003A3A3C);
 
-    // 🔴 🟡 🟢 Traffic Lights (12px Diameter, 8px Margin, 8px Spacing)
-    // Red Close
+    // 🔴 🟡 🟢 Traffic Lights (12px Diameter)
     gfx_draw_circle(win->x + 14, win->y + 14, 6, COLOR_MAC_CLOSE);
-    // Yellow Minimize
     gfx_draw_circle(win->x + 32, win->y + 14, 6, COLOR_MAC_MIN);
-    // Green Zoom / Maximize
     gfx_draw_circle(win->x + 50, win->y + 14, 6, COLOR_MAC_ZOOM);
 
     // Centered Window Title Text
@@ -159,27 +162,151 @@ static void draw_finder_content(window_t* win) {
     gfx_draw_string_transparent(cx + 10, cy + 120, "Locations", 0x008E8E93);
     gfx_draw_string_transparent(cx + 14, cy + 140, "[=] RatanaOS HD", 0x000A84FF);
 
-    int rx = cx + sidebar_w + 16;
+    int rx = cx + sidebar_w + 14;
     gfx_draw_rect(cx + sidebar_w + 1, cy, cw - sidebar_w - 1, ch, 0x001C1C1E);
 
-    icon_draw_drive_48(rx, cy + 16);
-    gfx_draw_string_transparent(rx - 8, cy + 56, "RatanaOS HD", COLOR_WHITE);
+    // Row 1 of Applications
+    icon_draw_safari_48(rx, cy + 14);
+    gfx_draw_string_transparent(rx + 2, cy + 54, "Safari", COLOR_WHITE);
 
-    icon_draw_finder_48(rx + 90, cy + 16);
-    gfx_draw_string_transparent(rx + 94, cy + 56, "System", COLOR_WHITE);
+    icon_draw_terminal_48(rx + 80, cy + 14);
+    gfx_draw_string_transparent(rx + 74, cy + 54, "Terminal", COLOR_WHITE);
 
-    icon_draw_terminal_48(rx + 180, cy + 16);
-    gfx_draw_string_transparent(rx + 168, cy + 56, "Applications", COLOR_WHITE);
+    icon_draw_sysmon_48(rx + 160, cy + 14);
+    gfx_draw_string_transparent(rx + 154, cy + 54, "Activity", COLOR_WHITE);
 
-    icon_draw_about_48(rx + 270, cy + 16);
-    gfx_draw_string_transparent(rx + 272, cy + 56, "Library", COLOR_WHITE);
+    icon_draw_calculator_48(rx + 240, cy + 14);
+    gfx_draw_string_transparent(rx + 234, cy + 54, "Calculator", COLOR_WHITE);
+
+    // Row 2 of Applications
+    icon_draw_paint_48(rx, cy + 84);
+    gfx_draw_string_transparent(rx + 6, cy + 124, "Paint", COLOR_WHITE);
+
+    icon_draw_notes_48(rx + 80, cy + 84);
+    gfx_draw_string_transparent(rx + 84, cy + 124, "Notes", COLOR_WHITE);
+
+    icon_draw_music_48(rx + 160, cy + 84);
+    gfx_draw_string_transparent(rx + 164, cy + 124, "Music", COLOR_WHITE);
+
+    icon_draw_settings_48(rx + 240, cy + 84);
+    gfx_draw_string_transparent(rx + 236, cy + 124, "Settings", COLOR_WHITE);
 
     gfx_draw_line(cx + sidebar_w, cy + ch - 24, cx + cw, cy + ch - 24, 0x003A3A3C);
-    gfx_draw_string_transparent(rx, cy + ch - 18, "4 items, 256 MB available on RatanaOS HD", 0x008E8E93);
+    gfx_draw_string_transparent(rx, cy + ch - 18, "8 items, 256 MB available on RatanaOS HD", 0x008E8E93);
 }
 
 // -------------------------------------------------------------
-// App 1: Terminal.app Window
+// App 1: Launchpad Modal Window (520x360)
+// -------------------------------------------------------------
+static void draw_launchpad_content(window_t* win) {
+    int cx = win->x + 2;
+    int cy = win->y + TITLEBAR_HEIGHT + 1;
+    int cw = win->width - 4;
+    int ch = win->height - TITLEBAR_HEIGHT - 3;
+
+    gfx_draw_rect(cx, cy, cw, ch, 0x00141418);
+
+    // Search Bar Pill
+    gfx_draw_rounded_rect(cx + 120, cy + 10, cw - 240, 24, 12, 0x00282830);
+    gfx_draw_rounded_rect_outline(cx + 120, cy + 10, cw - 240, 24, 12, 0x00484854);
+    icon_draw_search(cx + 130, cy + 14, 0x008E8E93);
+    gfx_draw_string_transparent(cx + 150, cy + 14, "Search Applications...", 0x008E8E93);
+
+    // 4x3 Grid of App Icons
+    int grid_x = cx + 36;
+    int grid_y = cy + 46;
+    int step_x = 112;
+    int step_y = 80;
+
+    // Row 0
+    icon_draw_finder_48(grid_x + step_x * 0, grid_y + step_y * 0);
+    gfx_draw_string_transparent(grid_x + step_x * 0 + 2, grid_y + step_y * 0 + 52, "Finder", COLOR_WHITE);
+
+    icon_draw_safari_48(grid_x + step_x * 1, grid_y + step_y * 0);
+    gfx_draw_string_transparent(grid_x + step_x * 1 + 2, grid_y + step_y * 0 + 52, "Safari", COLOR_WHITE);
+
+    icon_draw_terminal_48(grid_x + step_x * 2, grid_y + step_y * 0);
+    gfx_draw_string_transparent(grid_x + step_x * 2 - 4, grid_y + step_y * 0 + 52, "Terminal", COLOR_WHITE);
+
+    icon_draw_sysmon_48(grid_x + step_x * 3, grid_y + step_y * 0);
+    gfx_draw_string_transparent(grid_x + step_x * 3 - 6, grid_y + step_y * 0 + 52, "Activity", COLOR_WHITE);
+
+    // Row 1
+    icon_draw_calculator_48(grid_x + step_x * 0, grid_y + step_y * 1);
+    gfx_draw_string_transparent(grid_x + step_x * 0 - 6, grid_y + step_y * 1 + 52, "Calculator", COLOR_WHITE);
+
+    icon_draw_paint_48(grid_x + step_x * 1, grid_y + step_y * 1);
+    gfx_draw_string_transparent(grid_x + step_x * 1 + 6, grid_y + step_y * 1 + 52, "Paint", COLOR_WHITE);
+
+    icon_draw_notes_48(grid_x + step_x * 2, grid_y + step_y * 1);
+    gfx_draw_string_transparent(grid_x + step_x * 2 + 6, grid_y + step_y * 1 + 52, "Notes", COLOR_WHITE);
+
+    icon_draw_music_48(grid_x + step_x * 3, grid_y + step_y * 1);
+    gfx_draw_string_transparent(grid_x + step_x * 3 + 6, grid_y + step_y * 1 + 52, "Music", COLOR_WHITE);
+
+    // Row 2
+    icon_draw_settings_48(grid_x + step_x * 0, grid_y + step_y * 2);
+    gfx_draw_string_transparent(grid_x + step_x * 0 - 2, grid_y + step_y * 2 + 52, "Settings", COLOR_WHITE);
+
+    icon_draw_appstore_48(grid_x + step_x * 1, grid_y + step_y * 2);
+    gfx_draw_string_transparent(grid_x + step_x * 1 - 4, grid_y + step_y * 2 + 52, "App Store", COLOR_WHITE);
+
+    icon_draw_about_48(grid_x + step_x * 2, grid_y + step_y * 2);
+    gfx_draw_string_transparent(grid_x + step_x * 2 + 2, grid_y + step_y * 2 + 52, "About", COLOR_WHITE);
+
+    icon_draw_folder_48(grid_x + step_x * 3, grid_y + step_y * 2);
+    gfx_draw_string_transparent(grid_x + step_x * 3 + 2, grid_y + step_y * 2 + 52, "Folder", COLOR_WHITE);
+}
+
+// -------------------------------------------------------------
+// App 2: Safari Browser Window (520x340)
+// -------------------------------------------------------------
+static void draw_safari_content(window_t* win) {
+    int cx = win->x + 2;
+    int cy = win->y + TITLEBAR_HEIGHT + 1;
+    int cw = win->width - 4;
+    int ch = win->height - TITLEBAR_HEIGHT - 3;
+
+    gfx_draw_rect(cx, cy, cw, ch, 0x001A1A1E);
+
+    // Safari Toolbar (Navigation & Unified Smart Search Bar)
+    gfx_draw_rect(cx, cy, cw, 34, 0x00242428);
+    gfx_draw_line(cx, cy + 34, cx + cw, cy + 34, 0x003A3A3C);
+
+    gfx_draw_string_transparent(cx + 10, cy + 9, "<  >", 0x008E8E93);
+
+    // Unified URL Pill
+    int url_w = cw - 120;
+    gfx_draw_rounded_rect(cx + 60, cy + 5, url_w, 24, 12, 0x0018181C);
+    gfx_draw_rounded_rect_outline(cx + 60, cy + 5, url_w, 24, 12, 0x003A3A3C);
+    gfx_draw_string_transparent(cx + 74, cy + 9, "[*] https://apple.com/macos/sequoia", COLOR_WHITE);
+
+    // Start Page Content
+    gfx_draw_string_transparent(cx + 20, cy + 50, "Favorites", 0x008E8E93);
+
+    // Favorite Cards
+    static const char* fav_titles[4] = {"Apple", "RatanaOS Wiki", "GitHub", "Developer"};
+    for (int i = 0; i < 4; i++) {
+        int fx = cx + 20 + i * 118;
+        int fy = cy + 74;
+        gfx_draw_rounded_rect(fx, fy, 104, 70, 8, 0x00282830);
+        gfx_draw_rounded_rect_outline(fx, fy, 104, 70, 8, 0x003E3E48);
+        icon_draw_apple_logo(fx + 44, fy + 16, (i == 0) ? COLOR_WHITE : (i == 1 ? 0x000A84FF : 0x0030D158));
+        gfx_draw_string_transparent(fx + 12, fy + 48, fav_titles[i], COLOR_WHITE);
+    }
+
+    // Hero Privacy Banner
+    int bx = cx + 20;
+    int by = cy + 164;
+    gfx_draw_rounded_rect(bx, by, cw - 40, 84, 8, 0x00202026);
+    gfx_draw_rounded_rect_outline(bx, by, cw - 40, 84, 8, 0x003A3A44);
+    gfx_draw_string_transparent(bx + 16, by + 12, "Safari Privacy Report", 0x000A84FF);
+    gfx_draw_string_transparent(bx + 16, by + 34, "RatanaOS Native 64-bit Engine active.", COLOR_WHITE);
+    gfx_draw_string_transparent(bx + 16, by + 54, "100% Secure Isolated Kernel Sandbox.", 0x0030D158);
+}
+
+// -------------------------------------------------------------
+// App 3: Terminal.app Window
 // -------------------------------------------------------------
 static void draw_terminal_content(window_t* win) {
     int cx = win->x + 2;
@@ -212,7 +339,7 @@ static void draw_terminal_content(window_t* win) {
 }
 
 // -------------------------------------------------------------
-// App 2: Activity Monitor.app Window
+// App 4: Activity Monitor.app Window
 // -------------------------------------------------------------
 static void draw_sysmon_content(window_t* win) {
     int cx = win->x + 8;
@@ -263,7 +390,7 @@ static void draw_sysmon_content(window_t* win) {
 }
 
 // -------------------------------------------------------------
-// App 3: Calculator.app Window
+// App 5: Calculator.app Window
 // -------------------------------------------------------------
 static const char* calc_buttons[4][4] = {
     {"C", "+/-", "%", "/"},
@@ -367,7 +494,7 @@ static void handle_calc_click(window_t* win, int rel_x, int rel_y, int btn) {
 }
 
 // -------------------------------------------------------------
-// App 4: Paint Studio.app Window
+// App 6: Paint Studio.app Window
 // -------------------------------------------------------------
 static const uint32_t paint_colors[8] = {
     0x00FFFFFF, 0x00FF453A, 0x0030D158, 0x000A84FF,
@@ -429,7 +556,167 @@ static void handle_paint_click(window_t* win, int rel_x, int rel_y, int btn) {
 }
 
 // -------------------------------------------------------------
-// §4. About This Mac Dialog Window (480x320)
+// App 7: Notes.app Window (460x280)
+// -------------------------------------------------------------
+static void draw_notes_content(window_t* win) {
+    int cx = win->x + 2;
+    int cy = win->y + TITLEBAR_HEIGHT + 1;
+    int cw = win->width - 4;
+    int ch = win->height - TITLEBAR_HEIGHT - 3;
+
+    int sidebar_w = 140;
+    gfx_draw_rect(cx, cy, sidebar_w, ch, 0x00242428);
+    gfx_draw_line(cx + sidebar_w, cy, cx + sidebar_w, cy + ch, 0x003A3A3C);
+
+    gfx_draw_string_transparent(cx + 10, cy + 10, "All iCloud Notes", 0x00FFD60A);
+    gfx_draw_rounded_rect(cx + 6, cy + 30, sidebar_w - 12, 36, 4, 0x003A3A44);
+    gfx_draw_string_transparent(cx + 12, cy + 34, "RatanaOS Plan", COLOR_WHITE);
+    gfx_draw_string_transparent(cx + 12, cy + 50, "macOS Icon Clone...", 0x008E8E93);
+
+    gfx_draw_string_transparent(cx + 12, cy + 76, "64-bit Architecture", COLOR_WHITE);
+    gfx_draw_string_transparent(cx + 12, cy + 92, "Long Mode Kernel...", 0x008E8E93);
+
+    // Right legal notepad pane
+    int rx = cx + sidebar_w + 1;
+    int rw = cw - sidebar_w - 1;
+    gfx_draw_rect(rx, cy, rw, ch, 0x001E1E22);
+
+    gfx_draw_string_transparent(rx + 16, cy + 16, "RatanaOS 64-bit & macOS Sequoia Edition", 0x00FFD60A);
+    gfx_draw_line(rx + 16, cy + 36, rx + rw - 16, cy + 36, 0x003A3A3C);
+
+    gfx_draw_string_transparent(rx + 16, cy + 48, "- x86_64 Long Mode Kernel identity-mapped", COLOR_WHITE);
+    gfx_draw_string_transparent(rx + 16, cy + 68, "- 16-byte 64-bit Interrupt Descriptor Table", COLOR_WHITE);
+    gfx_draw_string_transparent(rx + 16, cy + 88, "- High-Definition Vector macOS Icon Suite", COLOR_WHITE);
+    gfx_draw_string_transparent(rx + 16, cy + 108, "- Translucent Alpha-Blended Floating Dock", COLOR_WHITE);
+    gfx_draw_string_transparent(rx + 16, cy + 128, "- 256MB RAM / 16MB Dynamic Heap Allocator", COLOR_WHITE);
+}
+
+// -------------------------------------------------------------
+// App 8: Music.app Window (440x260)
+// -------------------------------------------------------------
+static void draw_music_content(window_t* win) {
+    int cx = win->x + 2;
+    int cy = win->y + TITLEBAR_HEIGHT + 1;
+    int cw = win->width - 4;
+    int ch = win->height - TITLEBAR_HEIGHT - 3;
+
+    gfx_draw_rect(cx, cy, cw, ch, 0x0018181C);
+
+    // Album Art Card
+    int art_x = cx + 20;
+    int art_y = cy + 24;
+    icon_draw_music_48(art_x, art_y);
+    gfx_draw_rounded_rect(art_x, art_y, 72, 72, 8, 0x00FA2D48);
+    gfx_draw_string_transparent(art_x + 18, art_y + 26, "♫", COLOR_WHITE);
+
+    // Track Info
+    int tx = art_x + 88;
+    gfx_draw_string_transparent(tx, cy + 24, "Sequoia Symphony (64-bit Suite)", COLOR_WHITE);
+    gfx_draw_string_transparent(tx, cy + 46, "RatanaOS Orchestra - Studio Master", 0x00FA2D48);
+    gfx_draw_string_transparent(tx, cy + 68, "Lossless Audio * 24-bit / 192 kHz", 0x008E8E93);
+
+    // Playback Timeline Scrubber
+    int scrob_y = cy + 116;
+    gfx_draw_rounded_rect(cx + 20, scrob_y, cw - 40, 6, 3, 0x003A3A40);
+    gfx_draw_rounded_rect(cx + 20, scrob_y, (cw - 40) * 3 / 5, 6, 3, 0x00FA2D48); // 60% progress
+    gfx_draw_circle(cx + 20 + (cw - 40) * 3 / 5, scrob_y + 3, 5, COLOR_WHITE);
+
+    gfx_draw_string_transparent(cx + 20, scrob_y + 12, "02:14", 0x008E8E93);
+    gfx_draw_string_transparent(cx + cw - 60, scrob_y + 12, "-01:42", 0x008E8E93);
+
+    // Controls: Previous, Play/Pause, Next
+    int btn_cy = scrob_y + 40;
+    gfx_draw_string_transparent(cx + cw / 2 - 48, btn_cy, "|<<", COLOR_WHITE);
+    gfx_draw_circle(cx + cw / 2, btn_cy + 8, 16, 0x00FA2D48);
+    gfx_draw_string_transparent(cx + cw / 2 - 4, btn_cy, "||", COLOR_WHITE);
+    gfx_draw_string_transparent(cx + cw / 2 + 36, btn_cy, ">>|", COLOR_WHITE);
+}
+
+// -------------------------------------------------------------
+// App 9: System Settings.app Window (480x300)
+// -------------------------------------------------------------
+static void draw_settings_content(window_t* win) {
+    int cx = win->x + 2;
+    int cy = win->y + TITLEBAR_HEIGHT + 1;
+    int cw = win->width - 4;
+    int ch = win->height - TITLEBAR_HEIGHT - 3;
+
+    int sidebar_w = 130;
+    gfx_draw_rect(cx, cy, sidebar_w, ch, 0x00242428);
+    gfx_draw_line(cx + sidebar_w, cy, cx + sidebar_w, cy + ch, 0x003A3A3C);
+
+    gfx_draw_string_transparent(cx + 10, cy + 10, "Settings", 0x008E8E93);
+    gfx_draw_string_transparent(cx + 14, cy + 30, "[*] Wi-Fi", COLOR_WHITE);
+    gfx_draw_string_transparent(cx + 14, cy + 50, "[*] Bluetooth", COLOR_WHITE);
+    gfx_draw_string_transparent(cx + 14, cy + 70, "[*] Displays", COLOR_WHITE);
+    gfx_draw_rounded_rect(cx + 6, cy + 90, sidebar_w - 12, 22, 4, 0x000A84FF);
+    gfx_draw_string_transparent(cx + 14, cy + 94, "> General", COLOR_WHITE);
+    gfx_draw_string_transparent(cx + 14, cy + 120, "[*] Wallpaper", COLOR_WHITE);
+
+    int rx = cx + sidebar_w + 16;
+    gfx_draw_rect(cx + sidebar_w + 1, cy, cw - sidebar_w - 1, ch, 0x001C1C1E);
+
+    gfx_draw_string_transparent(rx, cy + 14, "General Settings", COLOR_WHITE);
+    gfx_draw_line(rx, cy + 34, cx + cw - 16, cy + 34, 0x003A3A3C);
+
+    gfx_draw_string_transparent(rx, cy + 46, "Compositor 60 FPS Engine:", COLOR_WHITE);
+    gfx_draw_rounded_rect(rx + 230, cy + 44, 36, 18, 9, 0x0030D158);
+    gfx_draw_circle(rx + 256, cy + 53, 7, COLOR_WHITE);
+
+    gfx_draw_string_transparent(rx, cy + 74, "High-Res Vector Icon Suite:", COLOR_WHITE);
+    gfx_draw_rounded_rect(rx + 230, cy + 72, 36, 18, 9, 0x0030D158);
+    gfx_draw_circle(rx + 256, cy + 81, 7, COLOR_WHITE);
+
+    gfx_draw_string_transparent(rx, cy + 102, "Dark Mode Aqua Theme:", COLOR_WHITE);
+    gfx_draw_rounded_rect(rx + 230, cy + 100, 36, 18, 9, 0x0030D158);
+    gfx_draw_circle(rx + 256, cy + 109, 7, COLOR_WHITE);
+
+    gfx_draw_string_transparent(rx, cy + 130, "Virtual Machine Acceleration:", COLOR_WHITE);
+    gfx_draw_rounded_rect(rx + 230, cy + 128, 36, 18, 9, 0x0030D158);
+    gfx_draw_circle(rx + 256, cy + 137, 7, COLOR_WHITE);
+}
+
+// -------------------------------------------------------------
+// App 10: App Store.app Window (480x280)
+// -------------------------------------------------------------
+static void draw_appstore_content(window_t* win) {
+    int cx = win->x + 2;
+    int cy = win->y + TITLEBAR_HEIGHT + 1;
+    int cw = win->width - 4;
+    int ch = win->height - TITLEBAR_HEIGHT - 3;
+
+    gfx_draw_rect(cx, cy, cw, ch, 0x00141418);
+
+    gfx_draw_string_transparent(cx + 16, cy + 12, "Featured Applications for RatanaOS", COLOR_WHITE);
+
+    // 2 App Store Cards
+    int card_w = (cw - 48) / 2;
+    // Card 1: Xcode
+    int c1_x = cx + 16;
+    int cy_pos = cy + 36;
+    gfx_draw_rounded_rect(c1_x, cy_pos, card_w, 160, 8, 0x00202028);
+    gfx_draw_rounded_rect_outline(c1_x, cy_pos, card_w, 160, 8, 0x003A3A44);
+    icon_draw_terminal_48(c1_x + 14, cy_pos + 14);
+    gfx_draw_string_transparent(c1_x + 72, cy_pos + 16, "Xcode Pro", COLOR_WHITE);
+    gfx_draw_string_transparent(c1_x + 72, cy_pos + 36, "Developer Tools", 0x008E8E93);
+    gfx_draw_string_transparent(c1_x + 14, cy_pos + 76, "Native 64-bit IDE & C Compiler", COLOR_WHITE);
+    gfx_draw_rounded_rect(c1_x + 14, cy_pos + 116, 72, 24, 12, 0x000A84FF);
+    gfx_draw_string_transparent(c1_x + 26, cy_pos + 120, "GET", COLOR_WHITE);
+
+    // Card 2: Logic Pro
+    int c2_x = c1_x + card_w + 16;
+    gfx_draw_rounded_rect(c2_x, cy_pos, card_w, 160, 8, 0x00202028);
+    gfx_draw_rounded_rect_outline(c2_x, cy_pos, card_w, 160, 8, 0x003A3A44);
+    icon_draw_music_48(c2_x + 14, cy_pos + 14);
+    gfx_draw_string_transparent(c2_x + 72, cy_pos + 16, "Logic Pro", COLOR_WHITE);
+    gfx_draw_string_transparent(c2_x + 72, cy_pos + 36, "Music Production", 0x008E8E93);
+    gfx_draw_string_transparent(c2_x + 14, cy_pos + 76, "Multi-track Audio Studio", COLOR_WHITE);
+    gfx_draw_rounded_rect(c2_x + 14, cy_pos + 116, 92, 24, 12, 0x0030D158);
+    gfx_draw_string_transparent(c2_x + 20, cy_pos + 120, "INSTALLED", COLOR_WHITE);
+}
+
+// -------------------------------------------------------------
+// App 11: About This Mac Dialog Window (480x320)
 // -------------------------------------------------------------
 static void draw_about_content(window_t* win) {
     int cx = win->x + 24;
@@ -492,9 +779,18 @@ static void draw_macos_desktop(void) {
     // 1. Wallpaper Precomputed Gradient
     gfx_draw_wallpaper();
 
-    // 2. Desktop Drive Icon (RatanaOS HD) at Top-Right
+    // 2. Desktop Icons on Right Side
+    // 2a. Drive Icon (RatanaOS HD)
     icon_draw_drive_48(sw - 74, 40);
     gfx_draw_string_transparent(sw - 88, 92, "RatanaOS HD", COLOR_WHITE);
+
+    // 2b. Applications Folder
+    icon_draw_folder_48(sw - 74, 130);
+    gfx_draw_string_transparent(sw - 94, 182, "Applications", COLOR_WHITE);
+
+    // 2c. Documents Folder
+    icon_draw_folder_48(sw - 74, 220);
+    gfx_draw_string_transparent(sw - 86, 272, "Documents", COLOR_WHITE);
 
     // 3. Render Windows in Z-Order
     for (int i = 0; i < window_count; i++) {
@@ -512,9 +808,9 @@ static void draw_macos_desktop(void) {
     menubar_draw(active_name);
 
     // 5. Render macOS Floating Bottom Dock
-    bool open_states[6];
-    bool active_states[6];
-    for (int i = 0; i < 6 && i < window_count; i++) {
+    bool open_states[12];
+    bool active_states[12];
+    for (int i = 0; i < 12 && i < window_count; i++) {
         open_states[i] = windows[i].is_open;
         active_states[i] = windows[i].is_active;
     }
@@ -551,15 +847,15 @@ static void process_gui_events(void) {
             prev_left_click = left_click;
             return;
         } else if (m_hit == MENUBAR_HIT_ITEM_ABOUT) {
-            windows[5].is_open = true;
-            windows[5].is_minimized = false;
-            focus_window(5);
+            windows[11].is_open = true;
+            windows[11].is_minimized = false;
+            focus_window(11);
             prev_left_click = left_click;
             return;
         } else if (m_hit == MENUBAR_HIT_ITEM_SETTINGS) {
-            windows[2].is_open = true;
-            windows[2].is_minimized = false;
-            focus_window(2);
+            windows[9].is_open = true;
+            windows[9].is_minimized = false;
+            focus_window(9);
             prev_left_click = left_click;
             return;
         } else if (m_hit == MENUBAR_HIT_ITEM_EXIT_CLI) {
@@ -572,7 +868,7 @@ static void process_gui_events(void) {
         // 2. Floating Dock Hit Testing
         int dock_idx = dock_hit_test(mx, my);
         if (dock_idx >= 0) {
-            if (dock_idx >= 0 && dock_idx < 6 && dock_idx < window_count) {
+            if (dock_idx >= 0 && dock_idx < 12 && dock_idx < window_count) {
                 if (!windows[dock_idx].is_open) {
                     windows[dock_idx].is_open = true;
                     windows[dock_idx].is_minimized = false;
@@ -585,18 +881,35 @@ static void process_gui_events(void) {
                 } else {
                     focus_window(dock_idx);
                 }
-            } else if (dock_idx == 6) { // Trash Icon
+            } else if (dock_idx == 12) { // Trash Icon
                 memset(paint_canvas, 0, sizeof(paint_canvas));
             }
             prev_left_click = left_click;
             return;
         }
 
-        // 3. Desktop Drive Icon Double-Click (RatanaOS HD)
+        // 3. Desktop Icons Click Testing
+        // 3a. RatanaOS HD
         if (mx >= sw - 88 && mx <= sw - 20 && my >= 40 && my <= 110) {
             windows[0].is_open = true; // Finder
             windows[0].is_minimized = false;
             focus_window(0);
+            prev_left_click = left_click;
+            return;
+        }
+        // 3b. Applications Folder
+        if (mx >= sw - 94 && mx <= sw - 20 && my >= 130 && my <= 200) {
+            windows[1].is_open = true; // Launchpad
+            windows[1].is_minimized = false;
+            focus_window(1);
+            prev_left_click = left_click;
+            return;
+        }
+        // 3c. Documents Folder
+        if (mx >= sw - 88 && mx <= sw - 20 && my >= 220 && my <= 290) {
+            windows[7].is_open = true; // Notes
+            windows[7].is_minimized = false;
+            focus_window(7);
             prev_left_click = left_click;
             return;
         }
@@ -640,7 +953,7 @@ static void process_gui_events(void) {
     if (left_click) {
         for (int i = window_count - 1; i >= 0; i--) {
             window_t* win = &windows[i];
-            if (win->is_open && !win->is_minimized && win->id == 4) { // Paint Studio
+            if (win->is_open && !win->is_minimized && win->id == 6) { // Paint Studio (id=6)
                 if (mx >= win->x + 8 && mx < win->x + 8 + CANVAS_W &&
                     my >= win->y + TITLEBAR_HEIGHT + 38 && my < win->y + TITLEBAR_HEIGHT + 38 + CANVAS_H) {
                     if (win->handle_click) {
@@ -669,16 +982,24 @@ void gui_init(multiboot_info_t* mbi) {
     window_count = 0;
     memset(paint_canvas, 0, sizeof(paint_canvas));
 
-    // Register 6 macOS Desktop Applications
+    // Register all 12 macOS Desktop Applications
     create_window(0, "Finder", 40, 48, 480, 260, draw_finder_content, NULL);
-    create_window(1, "Terminal", 540, 48, 460, 260, draw_terminal_content, NULL);
-    create_window(2, "Activity Monitor", 540, 320, 460, 280, draw_sysmon_content, NULL);
-    create_window(3, "Calculator", 40, 320, 240, 280, draw_calc_content, handle_calc_click);
-    create_window(4, "Paint Studio", 300, 320, 360, 280, draw_paint_content, handle_paint_click);
-    create_window(5, "About This Mac", 272, 160, 480, 320, draw_about_content, NULL);
+    create_window(1, "Launchpad", 240, 100, 540, 360, draw_launchpad_content, NULL);
+    create_window(2, "Safari", 220, 60, 560, 360, draw_safari_content, NULL);
+    create_window(3, "Terminal", 540, 48, 460, 260, draw_terminal_content, NULL);
+    create_window(4, "Activity Monitor", 540, 320, 460, 280, draw_sysmon_content, NULL);
+    create_window(5, "Calculator", 40, 320, 240, 280, draw_calc_content, handle_calc_click);
+    create_window(6, "Paint Studio", 300, 320, 360, 280, draw_paint_content, handle_paint_click);
+    create_window(7, "Notes", 260, 120, 480, 280, draw_notes_content, NULL);
+    create_window(8, "Music", 280, 140, 460, 260, draw_music_content, NULL);
+    create_window(9, "System Settings", 250, 100, 500, 320, draw_settings_content, NULL);
+    create_window(10, "App Store", 260, 110, 500, 300, draw_appstore_content, NULL);
+    create_window(11, "About This Mac", 272, 160, 480, 320, draw_about_content, NULL);
 
-    // Initial focus on About This Mac dialog
-    focus_window(5);
+    // Initial desktop state: Open Finder and About This Mac
+    windows[0].is_open = true;
+    windows[11].is_open = true;
+    focus_window(11);
 }
 
 void gui_start(void) {
@@ -712,3 +1033,4 @@ void gui_exit(void) {
 bool gui_is_running(void) {
     return gui_running;
 }
+

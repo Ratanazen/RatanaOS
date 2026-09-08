@@ -3,10 +3,10 @@
 
 #include "types.h"
 
-#define DOCK_NUM_ITEMS 7
+#define DOCK_NUM_ITEMS 13
 #define DOCK_ICON_SIZE 48
-#define DOCK_PADDING 12
-#define DOCK_SPACING 8
+#define DOCK_PADDING 10
+#define DOCK_SPACING 6
 #define DOCK_RADIUS 16
 
 typedef struct {
