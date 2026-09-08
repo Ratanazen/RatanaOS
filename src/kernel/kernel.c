@@ -17,6 +17,7 @@
 #include "../include/cpuid.h"
 #include "../include/gui.h"
 #include "../include/shell.h"
+#include "../include/packages.h"
 
 static multiboot_info_t* global_mbi = NULL;
 
@@ -75,6 +76,7 @@ void kernel_main(uint64_t mbi_addr, uint64_t magic) {
 
     cpuid_init();
     pci_init();
+    packages_init();
     serial_printf("STEP 9: CPUID & PCI initialized\n");
     print_status("64-bit CPUID feature detector & PCI Bus scanner ready");
 

@@ -50,6 +50,7 @@ static void draw_music_content(window_t* win);
 static void draw_settings_content(window_t* win);
 static void draw_appstore_content(window_t* win);
 static void draw_about_content(window_t* win);
+static void draw_telegram_content(window_t* win);
 
 static void handle_calc_click(window_t* win, int rel_x, int rel_y, int btn);
 static void handle_paint_click(window_t* win, int rel_x, int rel_y, int btn);
@@ -913,6 +914,32 @@ static void draw_about_content(window_t* win) {
     ui_button_draw(tx, cy + 170, 140, 26, "System Report...", UI_BUTTON_SECONDARY, UI_STATE_NORMAL);
 }
 
+// Built-in Telegram demo. It is a local UI sample, not a network client.
+static void draw_telegram_content(window_t* win) {
+    const ui_theme_t* theme = theme_get_current();
+    int cx = win->x + 2;
+    int cy = win->y + TITLEBAR_HEIGHT + 1;
+    int cw = win->width - 4;
+    int ch = win->height - TITLEBAR_HEIGHT - 3;
+    int sidebar_w = 130;
+
+    gfx_draw_rect(cx, cy, sidebar_w, ch, theme->sidebar_bg);
+    font_draw_text(cx + 14, cy + 14, "Telegram", theme->text_primary, FONT_SIZE_LARGE);
+    font_draw_text(cx + 14, cy + 48, "Saved Messages", theme->accent, FONT_SIZE_REGULAR);
+    font_draw_text(cx + 14, cy + 72, "RatanaOS Team", theme->text_primary, FONT_SIZE_REGULAR);
+    gfx_draw_rect(cx + sidebar_w, cy, cw - sidebar_w, ch, theme->panel_bg);
+
+    int px = cx + sidebar_w + 18;
+    font_draw_text(px, cy + 16, "Saved Messages", theme->text_primary, FONT_SIZE_LARGE);
+    font_draw_text(px, cy + 42, "Telegram Demo — local-only preview", theme->text_secondary, FONT_SIZE_SMALL);
+    gfx_draw_rounded_rect(px, cy + 76, cw - sidebar_w - 36, 44, 10, theme->control_bg);
+    font_draw_text(px + 12, cy + 88, "Welcome to Telegram on RatanaOS.", theme->text_primary, FONT_SIZE_REGULAR);
+    gfx_draw_rounded_rect(px + 64, cy + 132, cw - sidebar_w - 100, 44, 10, theme->accent);
+    font_draw_text(px + 76, cy + 144, "This is a built-in demo app.", theme->text_on_accent, FONT_SIZE_REGULAR);
+    gfx_draw_rounded_rect(px, cy + ch - 42, cw - sidebar_w - 36, 28, 10, theme->control_bg);
+    font_draw_text(px + 10, cy + ch - 34, "Network messaging is not available yet", theme->text_disabled, FONT_SIZE_REGULAR);
+}
+
 // -------------------------------------------------------------
 // §5. macOS Desktop Compositor & Event Handling
 // -------------------------------------------------------------
@@ -1118,6 +1145,7 @@ void gui_init(multiboot_info_t* mbi) {
     create_window(9, "System Settings", 250, 80, 520, 350, draw_settings_content, handle_settings_click);
     create_window(10, "App Store", 260, 110, 500, 300, draw_appstore_content, NULL);
     create_window(11, "About This Mac", 272, 160, 480, 320, draw_about_content, NULL);
+    create_window(12, "Telegram Demo", 300, 130, 500, 320, draw_telegram_content, NULL);
 
     // Initial desktop state: Open Finder and System Settings
     window_t* finder = window_by_id(0);
@@ -1179,4 +1207,12 @@ void gui_exit(void) {
 
 bool gui_is_running(void) {
     return gui_running;
+}
+
+bool gui_launch_app(const char* app_id) {
+    if (app_id && strcmp(app_id, "telegram") == 0 && window_by_id(12)) {
+        show_window(12);
+        return true;
+    }
+    return false;
 }

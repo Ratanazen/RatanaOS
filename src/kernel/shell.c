@@ -18,6 +18,7 @@
 #include "../include/font.h"
 #include "../include/dock.h"
 #include "../include/settings.h"
+#include "../include/packages.h"
 
 static char command_buffer[SHELL_BUFFER_SIZE];
 static size_t command_len = 0;
@@ -58,6 +59,8 @@ static void cmd_help(void) {
     kprintf("  dock <size|mag>   - Configure Dock (size <40..64>, spacing <2..16>, mag <on/off>)\n");
     kprintf("  icons <theme>     - Switch macOS icon theme (whitesur, mactahoe, vector, next)\n");
     kprintf("  settings <cmd>    - Settings manager (appearance, status, save, load, reset)\n");
+    kprintf("  pkg <cmd>         - Built-in packages (list, install, remove, run)\n");
+    kprintf("  pacman / apt      - Aliases for pkg; supports Telegram Demo only\n");
     kprintf("  matrix            - Animated digital rain screensaver\n");
     kprintf("  snake             - Play interactive Snake arcade game\n");
     kprintf("  color <fg> [bg]   - Set terminal colors (0-15)\n");
@@ -363,6 +366,47 @@ static void cmd_settings(char* args) {
     }
 }
 
+static void cmd_package(char* args) {
+    while (*args == ' ') args++;
+    if (strcmp(args, "list") == 0 || *args == '\0') {
+        packages_list();
+    } else if (strncmp(args, "install ", 8) == 0) {
+        const char* name = args + 8;
+        if (packages_install(name)) kprintf("Installed %s for this boot session.\n", name);
+        else kprintf("Package '%s' is not in the built-in catalog.\n", name);
+    } else if (strncmp(args, "remove ", 7) == 0) {
+        const char* name = args + 7;
+        if (packages_remove(name)) kprintf("Removed %s from this boot session.\n", name);
+        else kprintf("Package '%s' is not in the built-in catalog.\n", name);
+    } else if (strncmp(args, "run ", 4) == 0) {
+        const char* name = args + 4;
+        if (!packages_is_installed(name)) {
+            kprintf("Install '%s' first: pkg install %s\n", name, name);
+        } else if (gui_launch_app(name)) {
+            gui_start();
+        } else {
+            kprintf("Package '%s' has no GUI launcher.\n", name);
+        }
+    } else {
+        kprintf("Usage: pkg <list | install telegram | remove telegram | run telegram>\n");
+    }
+}
+
+static void cmd_package_alias(char* manager, char* args) {
+    while (*args == ' ') args++;
+    if (strcmp(manager, "pacman") == 0 && strncmp(args, "-S ", 3) == 0) {
+        char command[64] = "install ";
+        strncat(command, args + 3, sizeof(command) - strlen(command) - 1);
+        cmd_package(command);
+    } else if (strcmp(manager, "apt") == 0 && strncmp(args, "install ", 8) == 0) {
+        cmd_package(args);
+    } else if (strcmp(args, "list") == 0) {
+        cmd_package(args);
+    } else {
+        kprintf("%s is a RatanaOS pkg alias. Try '%s list' or '%s install telegram'.\n", manager, manager, manager);
+    }
+}
+
 static void cmd_calc(char* args) {
     while (*args == ' ') args++;
     if (*args == '\0') {
@@ -480,6 +524,12 @@ void shell_execute(char* command) {
         cmd_icons(command + 5);
     } else if (strncmp(command, "settings", 8) == 0 && (command[8] == ' ' || command[8] == '\0')) {
         cmd_settings(command + 8);
+    } else if (strncmp(command, "pkg", 3) == 0 && (command[3] == ' ' || command[3] == '\0')) {
+        cmd_package(command + 3);
+    } else if (strncmp(command, "pacman", 6) == 0 && (command[6] == ' ' || command[6] == '\0')) {
+        cmd_package_alias("pacman", command + 6);
+    } else if (strncmp(command, "apt", 3) == 0 && (command[3] == ' ' || command[3] == '\0')) {
+        cmd_package_alias("apt", command + 3);
     } else if (strcmp(command, "matrix") == 0) {
         matrix_run();
     } else if (strcmp(command, "snake") == 0) {

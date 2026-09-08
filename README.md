@@ -322,6 +322,10 @@ and [`docs/SETTINGS.md`](docs/SETTINGS.md). The icon suites remain independent
 from UI themes; settings storage is currently volatile memory, not disk
 persistence.
 
+The built-in app catalog and Telegram Demo commands are documented in
+[`docs/PACKAGES.md`](docs/PACKAGES.md). They are a local, boot-session-only
+package-manager foundation—not a network package repository.
+
 ---
 
 ## Author & License

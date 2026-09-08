@@ -38,5 +38,6 @@ void gui_init(multiboot_info_t* mbi);
 void gui_start(void);
 void gui_exit(void);
 bool gui_is_running(void);
+bool gui_launch_app(const char* app_id);
 
 #endif // GUI_H

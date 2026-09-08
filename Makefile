@@ -22,6 +22,7 @@ C_OBJS = $(BUILD_DIR)/kernel.o \
          $(BUILD_DIR)/pmm.o \
          $(BUILD_DIR)/heap.o \
          $(BUILD_DIR)/cpuid.o \
+         $(BUILD_DIR)/packages.o \
          $(BUILD_DIR)/shell.o \
          $(BUILD_DIR)/theme.o \
          $(BUILD_DIR)/font.o \
@@ -93,6 +94,9 @@ $(BUILD_DIR)/heap.o: $(SRC_DIR)/kernel/heap.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/cpuid.o: $(SRC_DIR)/kernel/cpuid.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/packages.o: $(SRC_DIR)/kernel/packages.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/shell.o: $(SRC_DIR)/kernel/shell.c
