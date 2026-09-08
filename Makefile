@@ -154,11 +154,14 @@ $(TARGET32): $(TARGET)
 
 # Create Bootable ISO (requires xorriso)
 iso: $(TARGET)
-	@which xorriso >/dev/null 2>&1 || (echo "Notice: xorriso is not installed. Run 'sudo pacman -S xorriso' to build ISOs."; exit 1)
-	@mkdir -p iso/boot
+	@mkdir -p iso/boot/grub
 	@cp $(TARGET) iso/boot/ratanaos.bin
-	grub-mkrescue -o $(ISO_TARGET) iso
-	@echo "\n>>> Successfully built Bootable ISO: $(ISO_TARGET) <<<\n"
+	@if which xorriso >/dev/null 2>&1; then \
+		grub-mkrescue -o $(ISO_TARGET) iso; \
+		echo "\n>>> Successfully built Bootable ISO: $(ISO_TARGET) <<<\n"; \
+	else \
+		echo "Notice: xorriso is not installed. To generate $(ISO_TARGET), install xorriso with 'sudo pacman -S xorriso'."; \
+	fi
 
 # Run in QEMU 64-bit with direct kernel boot & COM1 serial redirect to stdio
 run: $(TARGET32)
@@ -166,7 +169,11 @@ run: $(TARGET32)
 
 # Run ISO in QEMU
 run-iso: iso
-	qemu-system-x86_64 -cdrom $(ISO_TARGET) -serial stdio -vga std
+	@if [ -f $(ISO_TARGET) ]; then \
+		qemu-system-x86_64 -cdrom $(ISO_TARGET) -serial stdio -vga std; \
+	else \
+		echo "ISO not found. Run 'sudo pacman -S xorriso' and 'make iso'."; \
+	fi
 
 # Run in QEMU Curses Mode (in terminal)
 run-curses: $(TARGET32)

@@ -15,6 +15,13 @@ static int max_bounds_y = 768;
 static bool left_button = false;
 static bool right_button = false;
 
+static void mouse_drain_buffer(void) {
+    int timeout = 10000;
+    while ((inb(0x64) & 1) && timeout-- > 0) {
+        inb(0x60);
+    }
+}
+
 static void mouse_wait(uint8_t a_type) {
     uint32_t time_out = 100000;
     if (a_type == 0) {
@@ -97,6 +104,9 @@ void mouse_init(void) {
     left_button = false;
     right_button = false;
 
+    // Drain any stale bytes from 8042 controller
+    mouse_drain_buffer();
+
     // Enable auxiliary mouse device
     mouse_wait(1);
     outb(0x64, 0xA8);
@@ -170,7 +180,7 @@ void mouse_draw_cursor(int x, int y) {
         for (int col = 0; col < 12; col++) {
             char p = cursor_bitmap[row][col];
             if (p == 'X') {
-                gfx_draw_pixel(x + col, y + row, COLOR_BLACK);      // Black outline
+                gfx_draw_pixel(x + col, y + row, COLOR_BLACK); // Black outline
             } else if (p == '.') {
                 gfx_draw_pixel(x + col, y + row, COLOR_WHITE); // White fill
             }

@@ -38,7 +38,7 @@ void shell_init(void) {
 
 static void cmd_help(void) {
     kprintf("\nRatanaOS 64-bit (x86_64) Built-in Commands:\n");
-    kprintf("  gui               - Launch Full-Feature 64-bit GUI Desktop\n");
+    kprintf("  gui               - Launch Full-Feature 64-bit macOS GUI Desktop\n");
     kprintf("  fetch             - System overview & 64-bit ASCII architecture\n");
     kprintf("  date / time       - Query hardware CMOS Real-Time Clock (2026)\n");
     kprintf("  mem / free        - 64-bit Physical Memory & Dynamic Heap stats\n");
@@ -54,7 +54,8 @@ static void cmd_help(void) {
     kprintf("  echo <text>       - Print text to console\n");
     kprintf("  uptime            - Display system uptime and PIT timer ticks\n");
     kprintf("  about             - System and developer details\n");
-    kprintf("  reboot            - Pulse CPU reset line\n");
+    kprintf("  reboot            - Pulse CPU reset line to reboot\n");
+    kprintf("  shutdown / poweroff - Power down Virtual Machine / ACPI hardware\n");
     kprintf("  halt              - Halt processor execution\n");
 }
 
@@ -72,7 +73,7 @@ static void cmd_fetch(void) {
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK));
     kprintf("OS:        ");
     vga_set_color(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
-    kprintf("RatanaOS 64-bit (x86_64 Edition)\n");
+    kprintf("RatanaOS 64-bit (macOS Sequoia Edition)\n");
 
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK));
     kprintf("      /  \\       ");
@@ -116,7 +117,7 @@ static void cmd_fetch(void) {
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_GREEN, VGA_COLOR_BLACK));
     kprintf("Desktop:   ");
     vga_set_color(vga_entry_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK));
-    kprintf("RatanaWM 64-bit (VBE Linear Framebuffer)\n");
+    kprintf("macOS Sequoia Aqua (VBE 1024x768x32 Framebuffer)\n");
 
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK));
     kprintf("                 ");
@@ -293,12 +294,32 @@ static void cmd_reboot(void) {
     __asm__ volatile ("cli; hlt");
 }
 
+static void cmd_shutdown(void) {
+    kprintf("\nShutting down system...\n");
+
+    // 1. QEMU / Bochs older ACPI power off
+    outw(0xB004, 0x2000);
+
+    // 2. QEMU modern ACPI power off
+    outw(0x604, 0x2000);
+
+    // 3. VirtualBox power off
+    outw(0x4004, 0x3400);
+
+    // 4. Cloud / ACPI DSDT power off
+    outw(0x600, 0x34);
+
+    // 5. Fallback halt
+    kprintf("System halted. You may safely turn off your machine.\n");
+    __asm__ volatile ("cli; hlt");
+}
+
 void shell_execute(char* command) {
     while (*command == ' ') command++;
     if (*command == '\0') return;
 
     if (strcmp(command, "gui") == 0 || strcmp(command, "startx") == 0 || strcmp(command, "desktop") == 0) {
-        kprintf("Starting RatanaOS 64-bit GUI Desktop Environment...\n");
+        kprintf("Starting RatanaOS 64-bit macOS Desktop Environment...\n");
         gui_start();
         kprintf("\nReturned to RatanaOS CLI.\n");
     } else if (strcmp(command, "help") == 0) {
@@ -337,9 +358,11 @@ void shell_execute(char* command) {
     } else if (strcmp(command, "about") == 0) {
         kprintf("\nRatanaOS 64-bit (x86_64 Long Mode) Operating System\n");
         kprintf("Author: Ratanazen\n");
-        kprintf("Architecture: 64-bit Long Mode, 4-Level Paging, GDT64, IDT64, VBE 64-bit Desktop\n");
+        kprintf("Architecture: 64-bit Long Mode, 4-Level Paging, GDT64, IDT64, macOS Sequoia GUI Desktop\n");
     } else if (strcmp(command, "reboot") == 0) {
         cmd_reboot();
+    } else if (strcmp(command, "shutdown") == 0 || strcmp(command, "poweroff") == 0) {
+        cmd_shutdown();
     } else if (strcmp(command, "halt") == 0) {
         kprintf("Halting system.\n");
         __asm__ volatile ("cli; hlt");
