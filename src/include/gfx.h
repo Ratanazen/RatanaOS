@@ -45,6 +45,10 @@ int  gfx_get_width(void);
 int  gfx_get_height(void);
 uint32_t* gfx_get_backbuffer(void);
 
+// Clipping Region Management
+void gfx_set_clip(int x, int y, int w, int h);
+void gfx_reset_clip(void);
+
 // Drawing primitives
 void gfx_clear(uint32_t color);
 void gfx_draw_pixel(int x, int y, uint32_t color);
@@ -59,9 +63,11 @@ void gfx_draw_rounded_rect(int x, int y, int w, int h, int r, uint32_t color);
 void gfx_draw_rounded_rect_alpha(int x, int y, int w, int h, int r, uint32_t color, uint8_t alpha);
 void gfx_draw_rounded_rect_outline(int x, int y, int w, int h, int r, uint32_t color);
 
+void gfx_draw_shadow(int x, int y, int w, int h, int r, int shadow_size, uint8_t alpha);
 void gfx_draw_circle(int cx, int cy, int radius, uint32_t color);
 void gfx_draw_line(int x0, int y0, int x1, int y1, uint32_t color);
 void gfx_draw_gradient_v(int x, int y, int w, int h, uint32_t c1, uint32_t c2);
+void gfx_draw_gradient_h(int x, int y, int w, int h, uint32_t c1, uint32_t c2);
 
 // Text & Wallpaper
 void gfx_draw_char(int x, int y, char c, uint32_t fg, uint32_t bg);
@@ -69,6 +75,7 @@ void gfx_draw_string(int x, int y, const char* str, uint32_t fg, uint32_t bg);
 void gfx_draw_string_transparent(int x, int y, const char* str, uint32_t fg);
 
 void gfx_init_wallpaper(void);
+void gfx_generate_wallpaper(uint32_t c_top, uint32_t c_mid, uint32_t c_bot);
 void gfx_draw_wallpaper(void);
 void gfx_swap_buffers(void);
 

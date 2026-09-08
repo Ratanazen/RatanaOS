@@ -20,4 +20,11 @@ void dock_init(void);
 void dock_draw(const bool* window_open_states, const bool* window_active_states, int count);
 int  dock_hit_test(int mx, int my);
 
+void dock_set_icon_size(int size);
+int  dock_get_icon_size(void);
+void dock_set_spacing(int spacing);
+int  dock_get_spacing(void);
+void dock_set_magnification(bool enabled);
+bool dock_get_magnification(void);
+
 #endif // DOCK_H

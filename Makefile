@@ -23,6 +23,10 @@ C_OBJS = $(BUILD_DIR)/kernel.o \
          $(BUILD_DIR)/heap.o \
          $(BUILD_DIR)/cpuid.o \
          $(BUILD_DIR)/shell.o \
+         $(BUILD_DIR)/theme.o \
+         $(BUILD_DIR)/font.o \
+         $(BUILD_DIR)/ui_controls.o \
+         $(BUILD_DIR)/settings.o \
          $(BUILD_DIR)/matrix.o \
          $(BUILD_DIR)/snake.o \
          $(BUILD_DIR)/vga.o \
@@ -92,6 +96,18 @@ $(BUILD_DIR)/cpuid.o: $(SRC_DIR)/kernel/cpuid.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/shell.o: $(SRC_DIR)/kernel/shell.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/theme.o: $(SRC_DIR)/kernel/theme.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/font.o: $(SRC_DIR)/kernel/font.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/ui_controls.o: $(SRC_DIR)/kernel/ui_controls.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/settings.o: $(SRC_DIR)/kernel/settings.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/matrix.o: $(SRC_DIR)/kernel/matrix.c

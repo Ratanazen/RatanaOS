@@ -20,6 +20,34 @@
 
 static gfx_context_t ctx;
 
+static struct {
+    int x0, y0, x1, y1;
+    bool enabled;
+} clip_rect = {0, 0, 1024, 768, false};
+
+void gfx_set_clip(int x, int y, int w, int h) {
+    if (x < 0) { w += x; x = 0; }
+    if (y < 0) { h += y; y = 0; }
+    if (x + w > (int)ctx.width) w = (int)ctx.width - x;
+    if (y + h > (int)ctx.height) h = (int)ctx.height - y;
+    if (w < 0) w = 0;
+    if (h < 0) h = 0;
+
+    clip_rect.x0 = x;
+    clip_rect.y0 = y;
+    clip_rect.x1 = x + w;
+    clip_rect.y1 = y + h;
+    clip_rect.enabled = true;
+}
+
+void gfx_reset_clip(void) {
+    clip_rect.x0 = 0;
+    clip_rect.y0 = 0;
+    clip_rect.x1 = (int)ctx.width;
+    clip_rect.y1 = (int)ctx.height;
+    clip_rect.enabled = false;
+}
+
 static inline void bga_write(uint16_t index, uint16_t data) {
     outw(VBE_DISPI_IOPORT_INDEX, index);
     outw(VBE_DISPI_IOPORT_DATA, data);
@@ -76,17 +104,13 @@ bool gfx_init(multiboot_info_t* mbi) {
     ctx.wallpaper_buffer = (uint32_t*)kmalloc(fb_size);
     gfx_init_wallpaper();
 
+    gfx_reset_clip();
     ctx.active = true;
     return true;
 }
 
-void gfx_init_wallpaper(void) {
+void gfx_generate_wallpaper(uint32_t c_top, uint32_t c_mid, uint32_t c_bot) {
     if (!ctx.wallpaper_buffer) return;
-
-    // macOS Sequoia Multi-tone Gradient: #1C1C2E -> #2E2E48 -> #141420
-    uint32_t c_top = 0x001C1C2E;
-    uint32_t c_mid = 0x002E2E48;
-    uint32_t c_bot = 0x00141420;
 
     int mid_y = (int)ctx.height / 2;
 
@@ -116,6 +140,11 @@ void gfx_init_wallpaper(void) {
     }
 }
 
+void gfx_init_wallpaper(void) {
+    // Default macOS Sequoia Multi-tone Gradient: #1C1C2E -> #2E2E48 -> #141420
+    gfx_generate_wallpaper(0x001C1C2E, 0x002E2E48, 0x00141420);
+}
+
 void gfx_draw_wallpaper(void) {
     if (ctx.wallpaper_buffer && ctx.backbuffer) {
         size_t total_pixels = (size_t)ctx.width * ctx.height;
@@ -139,11 +168,17 @@ void gfx_clear(uint32_t color) {
 }
 
 void gfx_draw_pixel(int x, int y, uint32_t color) {
+    if (clip_rect.enabled) {
+        if (x < clip_rect.x0 || x >= clip_rect.x1 || y < clip_rect.y0 || y >= clip_rect.y1) return;
+    }
     if (x < 0 || (uint32_t)x >= ctx.width || y < 0 || (uint32_t)y >= ctx.height || !ctx.backbuffer) return;
     ctx.backbuffer[y * ctx.width + x] = color;
 }
 
 void gfx_draw_pixel_alpha(int x, int y, uint32_t color, uint8_t alpha) {
+    if (clip_rect.enabled) {
+        if (x < clip_rect.x0 || x >= clip_rect.x1 || y < clip_rect.y0 || y >= clip_rect.y1) return;
+    }
     if (x < 0 || (uint32_t)x >= ctx.width || y < 0 || (uint32_t)y >= ctx.height || !ctx.backbuffer) return;
     if (alpha == 255) {
         ctx.backbuffer[y * ctx.width + x] = color;
@@ -285,6 +320,37 @@ void gfx_draw_circle(int xc, int yc, int r, uint32_t color) {
                 gfx_draw_pixel(xc + x, yc + y, color);
             }
         }
+    }
+}
+
+void gfx_draw_shadow(int x, int y, int w, int h, int r, int shadow_size, uint8_t alpha) {
+    if (shadow_size <= 0 || alpha == 0) return;
+    int layers = shadow_size;
+    if (layers > 10) layers = 10;
+    for (int i = layers; i >= 1; i--) {
+        int off_y = (i * 3) / 4 + 2;
+        int sx = x - i;
+        int sy = y - i + off_y;
+        int sw = w + i * 2;
+        int sh = h + i * 2;
+        int sr = r + i;
+        uint8_t layer_alpha = (uint8_t)((alpha * (layers - i + 1)) / (layers * layers + 1));
+        if (layer_alpha > 0) {
+            gfx_draw_rounded_rect_alpha(sx, sy, sw, sh, sr, 0x00000000, layer_alpha);
+        }
+    }
+}
+
+void gfx_draw_gradient_h(int x, int y, int w, int h, uint32_t left_color, uint32_t right_color) {
+    uint8_t r1 = (left_color >> 16) & 0xFF, g1 = (left_color >> 8) & 0xFF, b1 = left_color & 0xFF;
+    uint8_t r2 = (right_color >> 16) & 0xFF, g2 = (right_color >> 8) & 0xFF, b2 = right_color & 0xFF;
+
+    for (int cx = 0; cx < w; cx++) {
+        uint8_t r = (uint8_t)(r1 + ((r2 - r1) * cx) / (w > 1 ? (w - 1) : 1));
+        uint8_t g = (uint8_t)(g1 + ((g2 - g1) * cx) / (w > 1 ? (w - 1) : 1));
+        uint8_t b = (uint8_t)(b1 + ((b2 - b1) * cx) / (w > 1 ? (w - 1) : 1));
+        uint32_t col = (r << 16) | (g << 8) | b;
+        gfx_draw_rect(x + cx, y, 1, h, col);
     }
 }
 

@@ -10,6 +10,8 @@ static volatile int buffer_head = 0;
 static volatile int buffer_tail = 0;
 
 static bool shift_pressed = false;
+static bool ctrl_pressed = false;
+static bool alt_pressed = false;
 static bool caps_lock = false;
 static bool extended_scancode = false;
 
@@ -97,12 +99,26 @@ static void keyboard_callback(registers_t* regs) {
         uint8_t released_key = scancode & 0x7F;
         if (released_key == 0x2A || released_key == 0x36) {
             shift_pressed = false;
+        } else if (released_key == 0x1D) {
+            ctrl_pressed = false;
+        } else if (released_key == 0x38) {
+            alt_pressed = false;
         }
         extended_scancode = false;
     } else {
         // Key press
         if (scancode == 0x2A || scancode == 0x36) {
             shift_pressed = true;
+            extended_scancode = false;
+            return;
+        }
+        if (scancode == 0x1D) {
+            ctrl_pressed = true;
+            extended_scancode = false;
+            return;
+        }
+        if (scancode == 0x38) {
+            alt_pressed = true;
             extended_scancode = false;
             return;
         }
@@ -147,6 +163,8 @@ void keyboard_init(void) {
     buffer_head = 0;
     buffer_tail = 0;
     shift_pressed = false;
+    ctrl_pressed = false;
+    alt_pressed = false;
     caps_lock = false;
     extended_scancode = false;
     register_interrupt_handler(IRQ1, keyboard_callback);
@@ -163,4 +181,16 @@ char keyboard_getchar(void) {
     char c = key_buffer[buffer_tail];
     buffer_tail = (buffer_tail + 1) % KEYBOARD_BUFFER_SIZE;
     return c;
+}
+
+bool keyboard_is_ctrl_pressed(void) {
+    return ctrl_pressed;
+}
+
+bool keyboard_is_alt_pressed(void) {
+    return alt_pressed;
+}
+
+bool keyboard_is_shift_pressed(void) {
+    return shift_pressed;
 }
