@@ -3,8 +3,7 @@
 
 MBALIGN     equ  1 << 0             ; align loaded modules on page boundaries
 MEMINFO     equ  1 << 1             ; provide memory map
-VIDINFO     equ  1 << 2             ; request video mode information
-FLAGS       equ  MBALIGN | MEMINFO | VIDINFO
+FLAGS       equ  MBALIGN | MEMINFO  ; compatible with direct QEMU & GRUB
 MAGIC       equ  0x1BADB002         ; 'magic number' lets bootloader find the header
 CHECKSUM    equ -(MAGIC + FLAGS)    ; checksum of above
 
@@ -13,11 +12,6 @@ align 4
     dd MAGIC
     dd FLAGS
     dd CHECKSUM
-    ; Video mode request fields (since VIDINFO is set)
-    dd 0    ; mode_type (0 = linear graphics framebuffer)
-    dd 1024 ; width (1024 pixels)
-    dd 768  ; height (768 pixels)
-    dd 32   ; depth (32-bit color: ARGB)
 
 section .bss
 align 4096
@@ -38,28 +32,34 @@ align 16
 gdt64:
     dq 0 ; Null descriptor (0x00)
 .code: equ $ - gdt64
-    ; 64-bit Code Segment: Present, Ring 0, Executable, Read/Write, 64-bit Long Mode (L=1, D=0)
-    dq (1 << 43) | (1 << 44) | (1 << 47) | (1 << 53) ; 0x00AF9A000000FFFF (0x08)
+    dq 0x00209A0000000000 ; 64-bit Code Segment (0x08)
 .data: equ $ - gdt64
-    ; 64-bit Data Segment: Present, Ring 0, Read/Write
-    dq (1 << 41) | (1 << 44) | (1 << 47)             ; 0x00AF92000000FFFF (0x10)
+    dq 0x0000920000000000 ; 64-bit Data Segment (0x10)
 gdt64_ptr:
     dw $ - gdt64 - 1
-    dq gdt64
+    dd gdt64
 
 section .text
 global _start
 extern kernel_main
 
 _start:
-    ; Set up initial 32-bit stack
-    mov esp, stack_top
+    cli
+    cld
 
     ; Save Multiboot info pointer (EBX) and magic (EAX)
     mov edi, ebx
     mov esi, eax
 
-    ; 1. Set up 4-Level Paging (Identity-map first 1GB with 2MB huge pages)
+    ; 1. Clear Page Tables
+    mov ecx, 1024 * 3
+    mov edx, pml4_table
+.clear_tables:
+    mov dword [edx], 0
+    add edx, 4
+    loop .clear_tables
+
+    ; 2. Set up 4-Level Paging (Identity-map first 1GB with 2MB huge pages)
     ; Map PML4[0] -> PDPT
     mov eax, pdpt_table
     or eax, 0b11 ; present + writable
@@ -70,9 +70,9 @@ _start:
     or eax, 0b11 ; present + writable
     mov [pdpt_table], eax
 
-    ; Map 512 entries in PD_table (512 * 2MB = 1GB)
+    ; Map 512 entries in PD (512 * 2MB = 1GB identity map)
     mov ecx, 0
-.map_pd_table:
+.map_pd:
     mov eax, 0x200000 ; 2MB
     mul ecx           ; EAX = ecx * 2MB
     or eax, 0b10000011 ; present + writable + huge page (2MB)
@@ -80,57 +80,54 @@ _start:
     mov dword [pd_table + ecx * 8 + 4], 0
     inc ecx
     cmp ecx, 512
-    jne .map_pd_table
+    jne .map_pd
 
-    ; 2. Load CR3 with PML4 address
+    ; 3. Load CR3 with PML4
     mov eax, pml4_table
     mov cr3, eax
 
-    ; 3. Enable PAE (Physical Address Extension) in CR4 (bit 5)
+    ; 4. Enable PAE in CR4 (bit 5) & OSFXSR (bit 9) & OSXMMEXCPT (bit 10)
     mov eax, cr4
-    or eax, 1 << 5
+    or eax, (1 << 5) | (1 << 9) | (1 << 10)
     mov cr4, eax
 
-    ; 4. Set Long Mode Enable (LME) bit in EFER MSR (0xC0000080 bit 8)
+    ; 5. Set Long Mode Enable (LME) in EFER MSR (0xC0000080 bit 8)
     mov ecx, 0xC0000080
     rdmsr
     or eax, 1 << 8
     wrmsr
 
-    ; 5. Enable Paging & Protected Mode in CR0 (bit 31 & bit 0)
+    ; 6. Enable Paging (bit 31), Protected Mode (bit 0), Monitor Coprocessor (bit 1), clear EM (bit 2)
     mov eax, cr0
-    or eax, (1 << 31) | (1 << 0)
+    and eax, ~(1 << 2) ; Clear EM
+    or eax, (1 << 31) | (1 << 0) | (1 << 1)
     mov cr0, eax
 
-    ; 6. Load 64-bit GDT
+    ; 7. Load 64-bit GDT
     lgdt [gdt64_ptr]
 
-    ; 7. Far jump into 64-bit Long Mode code segment (0x08)
-    jmp gdt64.code:long_mode_entry
+    ; 8. Far jump into 64-bit code segment (0x08)
+    jmp 0x08:long_mode_entry
 
 [bits 64]
 long_mode_entry:
-    ; Reload data segment registers with 64-bit data segment selector (0x10)
-    mov ax, gdt64.data
+    mov ax, 0x10
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
     mov ss, ax
 
-    ; Set up native 64-bit RSP
+    ; Align 64-bit stack to 16 bytes
     mov rsp, stack_top
+    and rsp, -16
 
-    ; SysV x86_64 calling convention:
-    ; RDI = 1st argument (Multiboot info address)
-    ; RSI = 2nd argument (Multiboot magic)
+    ; SysV ABI: RDI = 1st arg (multiboot info address), RSI = 2nd arg (magic)
     mov rdi, rdi
     mov rsi, rsi
 
-    ; Call 64-bit C Kernel Main
     call kernel_main
 
-    ; Halt if kernel returns
     cli
 .hang:
     hlt

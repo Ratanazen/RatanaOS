@@ -2,7 +2,7 @@ CC = gcc
 AS = nasm
 LD = ld
 
-CFLAGS = -m64 -ffreestanding -O2 -Wall -Wextra -fno-pie -fno-stack-protector -fno-builtin -mno-red-zone -mcmodel=small -nostdlib -nodefaultlibs
+CFLAGS = -m64 -mgeneral-regs-only -ffreestanding -O2 -Wall -Wextra -fno-pie -fno-stack-protector -fno-builtin -mno-red-zone -mcmodel=small -nostdlib -nodefaultlibs
 ASFLAGS = -f elf64
 LDFLAGS = -m elf_x86_64 -T src/boot/linker.ld -nostdlib
 
@@ -33,6 +33,8 @@ C_OBJS = $(BUILD_DIR)/kernel.o \
          $(BUILD_DIR)/pci.o \
          $(BUILD_DIR)/gfx.o \
          $(BUILD_DIR)/icons.o \
+         $(BUILD_DIR)/menubar.o \
+         $(BUILD_DIR)/dock.o \
          $(BUILD_DIR)/mouse.o \
          $(BUILD_DIR)/gui.o \
          $(BUILD_DIR)/string.o \
@@ -40,11 +42,12 @@ C_OBJS = $(BUILD_DIR)/kernel.o \
 
 OBJS = $(ASM_OBJS) $(C_OBJS)
 TARGET = $(BUILD_DIR)/ratanaos.bin
+TARGET32 = $(BUILD_DIR)/ratanaos32.bin
 ISO_TARGET = $(BUILD_DIR)/ratanaos.iso
 
 .PHONY: all clean run run-iso iso test test-qemu dirs
 
-all: dirs $(TARGET)
+all: dirs $(TARGET) $(TARGET32)
 
 dirs:
 	@mkdir -p $(BUILD_DIR)
@@ -96,6 +99,12 @@ $(BUILD_DIR)/matrix.o: $(SRC_DIR)/kernel/matrix.c
 $(BUILD_DIR)/snake.o: $(SRC_DIR)/kernel/snake.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(BUILD_DIR)/menubar.o: $(SRC_DIR)/kernel/menubar.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/dock.o: $(SRC_DIR)/kernel/dock.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 $(BUILD_DIR)/gui.o: $(SRC_DIR)/kernel/gui.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
@@ -139,6 +148,10 @@ $(TARGET): $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJS)
 	@echo "\n>>> Successfully built RatanaOS 64-bit macOS Edition: $(TARGET) <<<\n"
 
+# Create ELF32 container for direct QEMU -kernel loader
+$(TARGET32): $(TARGET)
+	objcopy -I elf64-x86-64 -O elf32-i386 $(TARGET) $@
+
 # Create Bootable ISO (requires xorriso)
 iso: $(TARGET)
 	@which xorriso >/dev/null 2>&1 || (echo "Notice: xorriso is not installed. Run 'sudo pacman -S xorriso' to build ISOs."; exit 1)
@@ -148,16 +161,16 @@ iso: $(TARGET)
 	@echo "\n>>> Successfully built Bootable ISO: $(ISO_TARGET) <<<\n"
 
 # Run in QEMU 64-bit with direct kernel boot & COM1 serial redirect to stdio
-run: $(TARGET)
-	qemu-system-x86_64 -kernel $(TARGET) -serial stdio -vga std
+run: $(TARGET32)
+	qemu-system-x86_64 -kernel $(TARGET32) -serial stdio -vga std
 
 # Run ISO in QEMU
 run-iso: iso
 	qemu-system-x86_64 -cdrom $(ISO_TARGET) -serial stdio -vga std
 
 # Run in QEMU Curses Mode (in terminal)
-run-curses: $(TARGET)
-	qemu-system-x86_64 -kernel $(TARGET) -display curses
+run-curses: $(TARGET32)
+	qemu-system-x86_64 -kernel $(TARGET32) -display curses
 
 # Run automated tests
 test: all
@@ -165,13 +178,13 @@ test: all
 	@echo "     RATANAOS 64-BIT MACOS TEST SUITE         "
 	@echo "=============================================="
 	@echo "\n[TEST 1] Multiboot Header Verification..."
-	@grub-file --is-x86-multiboot $(TARGET) && echo "  [PASS] Multiboot header is valid and compliant." || (echo "  [FAIL] Invalid Multiboot header."; exit 1)
+	@grub-file --is-x86-multiboot $(TARGET32) && echo "  [PASS] Multiboot header is valid and compliant." || (echo "  [FAIL] Invalid Multiboot header."; exit 1)
 	@echo "\n[TEST 2] 64-bit ELF Layout & Section Alignment..."
 	@readelf -h $(TARGET) | grep -E "Class|Machine|Entry point address"
 	@readelf -S $(TARGET) | grep -E "\.text|\.rodata|\.data|\.bss"
 	@echo "  [PASS] Native ELF 64-bit x86-64 executable layout validated."
 	@echo "\n[TEST 3] 64-bit Kernel & macOS GUI Symbols..."
-	@nm $(TARGET) | grep -E "kernel_main|gdt_init|idt_init|gui_init|icon_draw_finder|icon_draw_apple"
+	@nm $(TARGET) | grep -E "kernel_main|gdt_init|idt_init|menubar_init|dock_init|gui_init|icon_draw_finder_48"
 	@echo "  [PASS] 64-bit macOS GUI & icon symbols verified."
 	@echo "\n=============================================="
 	@echo "   ALL 64-BIT MACOS TESTS PASSED!             "

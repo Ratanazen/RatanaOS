@@ -35,71 +35,69 @@ void kernel_main(uint64_t mbi_addr, uint64_t magic) {
     (void)magic;
     global_mbi = (multiboot_info_t*)(uintptr_t)mbi_addr;
 
-    // 1. Initialize Serial COM1 port (early debug log)
     serial_init();
-    serial_printf("=== RatanaOS 64-bit Long Mode Initializing ===\n");
+    serial_printf("STEP 1: Serial initialized\n");
 
-    // 2. Initialize VGA text display driver
     vga_init();
+    serial_printf("STEP 2: VGA initialized\n");
+
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK));
     kprintf("================================================================================\n");
     kprintf("            Welcome to RatanaOS 2026 (Native 64-bit x86_64 Long Mode)           \n");
     kprintf("================================================================================\n\n");
     vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK));
 
-    // 3. Initialize 64-bit GDT
     gdt_init();
+    serial_printf("STEP 3: GDT initialized\n");
     print_status("64-bit Long Mode Global Descriptor Table (GDT) initialized");
 
-    // 4. Initialize 64-bit 16-byte IDT & CPU Exception Handlers
     idt_init();
     isr_init();
+    serial_printf("STEP 4: IDT initialized\n");
     print_status("64-bit Interrupt Descriptor Table (IDT & ISRs, iretq) loaded");
 
-    // 5. Remap 8259 Dual PIC
     pic_remap(0x20, 0x28);
+    serial_printf("STEP 5: PIC remapped\n");
     print_status("Dual 8259 PIC remapped (IRQs 0-15 -> vectors 32-47)");
 
-    // 6. Initialize PIT Timer (100 Hz)
     timer_init(100);
+    serial_printf("STEP 6: Timer initialized\n");
     print_status("Programmable Interval Timer (PIT) calibrated at 100 Hz");
 
-    // 7. Initialize 64-bit PMM (256MB) & 64-bit Kernel Heap (16MB)
     pmm_init(256 * 1024 * 1024);
-    heap_init(0x00400000, 16 * 1024 * 1024); // 16MB Dynamic Heap in 64-bit space
+    heap_init(0x00400000, 16 * 1024 * 1024);
+    serial_printf("STEP 7: PMM & Heap initialized\n");
     print_status("64-bit PMM (256MB bitmap) & Dynamic Heap (16MB) active");
 
-    // 8. Initialize CMOS Real-Time Clock
     rtc_init();
+    serial_printf("STEP 8: RTC initialized\n");
     print_status("CMOS Real-Time Clock (RTC) synchronized (2026)");
 
-    // 9. Initialize CPUID & PCI Bus
     cpuid_init();
     pci_init();
+    serial_printf("STEP 9: CPUID & PCI initialized\n");
     print_status("64-bit CPUID feature detector & PCI Bus scanner ready");
 
-    // 10. Initialize PS/2 Keyboard Driver
     keyboard_init();
+    serial_printf("STEP 10: Keyboard initialized\n");
     print_status("PS/2 Keyboard driver active");
 
-    // 11. Initialize 64-bit GUI Subsystem & Mouse Driver
     gui_init(global_mbi);
-    print_status("64-bit VBE Linear Framebuffer & PS/2 Mouse Driver (IRQ12) ready");
+    serial_printf("STEP 11: GUI initialized\n");
+    print_status("64-bit macOS Framebuffer & PS/2 Mouse Driver ready");
 
-    // 12. Enable Hardware Interrupts
     __asm__ volatile ("sti");
+    serial_printf("STEP 12: STI enabled\n");
     print_status("Hardware interrupts enabled in Long Mode (STI)");
 
-    // Boot chime
     speaker_beep(1000, 30);
     speaker_beep(1500, 30);
 
-    kprintf("\nRatanaOS 64-bit is ready! Type 'gui' to launch Desktop, or 'fetch'.\n\n");
+    kprintf("\nRatanaOS 64-bit macOS Edition is ready! Type 'gui' or 'fetch'.\n\n");
 
-    // 13. Launch 64-bit Interactive Shell
     shell_init();
+    serial_printf("STEP 13: Shell initialized\n");
 
-    // Main Kernel Idle Loop
     while (1) {
         if (keyboard_has_key()) {
             char c = keyboard_getchar();

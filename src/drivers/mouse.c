@@ -172,7 +172,7 @@ void mouse_draw_cursor(int x, int y) {
             if (p == 'X') {
                 gfx_draw_pixel(x + col, y + row, COLOR_BLACK);      // Black outline
             } else if (p == '.') {
-                gfx_draw_pixel(x + col, y + row, COLOR_TEXT_WHITE); // White fill
+                gfx_draw_pixel(x + col, y + row, COLOR_WHITE); // White fill
             }
         }
     }

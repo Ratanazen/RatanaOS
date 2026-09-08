@@ -7,10 +7,8 @@ static gdt_ptr_t gdt_ptr;
 
 void gdt_init(void) {
     gdt_entries[0] = 0; // Null descriptor
-    // 64-bit Kernel Code Segment (0x08): Present, Ring 0, Code, Exec/Read, Long Mode (L=1)
-    gdt_entries[1] = 0x00AF9A000000FFFFULL;
-    // 64-bit Kernel Data Segment (0x10): Present, Ring 0, Data, Read/Write
-    gdt_entries[2] = 0x00AF92000000FFFFULL;
+    gdt_entries[1] = 0x00209A0000000000ULL; // 64-bit Code (0x08)
+    gdt_entries[2] = 0x0000920000000000ULL; // 64-bit Data (0x10)
 
     gdt_ptr.limit = sizeof(gdt_entries) - 1;
     gdt_ptr.base  = (uint64_t)&gdt_entries;
