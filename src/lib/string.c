@@ -62,6 +62,18 @@ char* strcat(char* dest, const char* src) {
     return orig;
 }
 
+char* strncat(char* dest, const char* src, size_t n) {
+    if (!dest || !src || n == 0) return dest;
+    char* orig = dest;
+    while (*dest)
+        dest++;
+    while (n-- && *src) {
+        *dest++ = *src++;
+    }
+    *dest = '\0';
+    return orig;
+}
+
 char* strchr(const char* s, int c) {
     if (!s) return NULL;
     while (*s) {

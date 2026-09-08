@@ -32,6 +32,7 @@ C_OBJS = $(BUILD_DIR)/kernel.o \
          $(BUILD_DIR)/speaker.o \
          $(BUILD_DIR)/pci.o \
          $(BUILD_DIR)/gfx.o \
+         $(BUILD_DIR)/icons.o \
          $(BUILD_DIR)/mouse.o \
          $(BUILD_DIR)/gui.o \
          $(BUILD_DIR)/string.o \
@@ -120,6 +121,9 @@ $(BUILD_DIR)/pci.o: $(SRC_DIR)/drivers/pci.c
 $(BUILD_DIR)/gfx.o: $(SRC_DIR)/drivers/gfx.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(BUILD_DIR)/icons.o: $(SRC_DIR)/drivers/icons.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 $(BUILD_DIR)/mouse.o: $(SRC_DIR)/drivers/mouse.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
@@ -133,7 +137,7 @@ $(BUILD_DIR)/stdio.o: $(SRC_DIR)/lib/stdio.c
 # Link 64-bit Kernel Binary
 $(TARGET): $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJS)
-	@echo "\n>>> Successfully built RatanaOS 64-bit (x86_64) Kernel: $(TARGET) <<<\n"
+	@echo "\n>>> Successfully built RatanaOS 64-bit macOS Edition: $(TARGET) <<<\n"
 
 # Create Bootable ISO (requires xorriso)
 iso: $(TARGET)
@@ -158,7 +162,7 @@ run-curses: $(TARGET)
 # Run automated tests
 test: all
 	@echo "\n=============================================="
-	@echo "     RATANAOS 64-BIT SYSTEM TEST SUITE        "
+	@echo "     RATANAOS 64-BIT MACOS TEST SUITE         "
 	@echo "=============================================="
 	@echo "\n[TEST 1] Multiboot Header Verification..."
 	@grub-file --is-x86-multiboot $(TARGET) && echo "  [PASS] Multiboot header is valid and compliant." || (echo "  [FAIL] Invalid Multiboot header."; exit 1)
@@ -166,11 +170,11 @@ test: all
 	@readelf -h $(TARGET) | grep -E "Class|Machine|Entry point address"
 	@readelf -S $(TARGET) | grep -E "\.text|\.rodata|\.data|\.bss"
 	@echo "  [PASS] Native ELF 64-bit x86-64 executable layout validated."
-	@echo "\n[TEST 3] 64-bit Kernel Symbols..."
-	@nm $(TARGET) | grep -E "kernel_main|gdt_init|idt_init|pmm_init|heap_init|gui_init"
-	@echo "  [PASS] 64-bit core symbols verified."
+	@echo "\n[TEST 3] 64-bit Kernel & macOS GUI Symbols..."
+	@nm $(TARGET) | grep -E "kernel_main|gdt_init|idt_init|gui_init|icon_draw_finder|icon_draw_apple"
+	@echo "  [PASS] 64-bit macOS GUI & icon symbols verified."
 	@echo "\n=============================================="
-	@echo "   ALL 64-BIT AUTOMATED TESTS PASSED!         "
+	@echo "   ALL 64-BIT MACOS TESTS PASSED!             "
 	@echo "==============================================\n"
 
 # Clean

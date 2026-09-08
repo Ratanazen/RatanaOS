@@ -1,84 +1,101 @@
-# RatanaOS (64-bit x86_64 Long Mode Edition)
+# RatanaOS 64-bit (macOS Desktop Edition)
 
-![Year](https://img.shields.io/badge/Edition-64--bit_Long_Mode-blueviolet)
+![Year](https://img.shields.io/badge/Edition-macOS_Desktop_Sequoia-blueviolet)
 ![Architecture](https://img.shields.io/badge/Architecture-x86__64_%7C_AMD64-blue)
 ![Graphics](https://img.shields.io/badge/GUI-VBE_32--bit_Framebuffer-brightgreen)
 ![Language](https://img.shields.io/badge/Language-C23_%2F_NASM_64-orange)
 ![Build](https://img.shields.io/badge/Build-Passing-brightgreen)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-**RatanaOS 64-bit** is a high-performance operating system kernel operating natively in **64-bit x86_64 Long Mode**. It features a 4-level paging memory manager (PML4), 64-bit GDT/IDT, 64-bit dynamic heap allocator, hardware PS/2 mouse & keyboard drivers, and a full **Linux-like Graphical User Interface (GUI) Desktop Environment**.
+**RatanaOS 64-bit (macOS Edition)** is a native **64-bit x86_64 Long Mode operating system** featuring an authentic **macOS Sequoia-style graphical desktop environment**, top Menu Bar with  Apple menu, bottom floating translucent Dock with colorful rich icons, traffic light window controls (🔴 🟡 🟢), and a complete **About This Mac** system report.
 
 ---
 
-## 64-bit Kernel Architecture
+## macOS GUI Desktop Architecture
 
 ```
-                      +------------------------------------------+
-                      |        RatanaOS 64-bit (x86_64)          |
-                      |       (CLI Shell & RatanaWM GUI)         |
-                      +--------------------+---------------------+
-                                           |
-+------------------------------------------v------------------------------------------+
-|                                64-bit Kernel Core                                   |
-|   +---------------------+  +----------------------+  +--------------------------+   |
-|   | 64-bit GDT & TSS    |  | 64-bit 16-byte IDT   |  | 64-bit PMM & 16MB Heap   |   |
-|   | (Null, KCode, KData)|  | (ISRs & IRQs, iretq) |  | (64-bit Virtual Space)   |   |
-|   +---------------------+  +----------------------+  +--------------------------+   |
-+------------------------------------------+------------------------------------------+
-                                           |
-+------------------------------------------v------------------------------------------+
-|                           x86_64 Long Mode Transition                               |
-|   1. Verify CPUID Long Mode Support (EFER / MSR 0xC0000080)                         |
-|   2. Build 4-Level Paging Hierarchy: PML4 -> PDPT -> PD (2MB Large Pages)           |
-|   3. Enable PAE (CR4 bit 5) -> Enable LME in EFER MSR -> Enable Paging (CR0 bit 31)  |
-|   4. 64-bit Far Jump to Code Segment 0x08 -> Entry into Native 64-bit Long Mode     |
-+-------------------------------------------------------------------------------------+
++-----------------------------------------------------------------------------------------+
+| []  Finder  File  Edit  View  Go  Window  Help             [WiFi] [RAM: 24KB] [10:35 PM] | <- Top Menu Bar
++-----------------------------------------------------------------------------------------+
+|                                                                                         |
+|  [📁 RatanaOS HD]                                                                       |
+|                                                                                         |
+|      +-------------------------------------------------------------------+              |
+|      | (•)(•)(•)                   About This Mac                        |              |
+|      | +---------------------------------------------------------------+ |              |
+|      | |       RatanaOS Sequoia (2026 64-bit Edition)                 | |              |
+|      | |        Version 15.4 (Build 2026.09)                           | |              |
+|      | |        Model:   MacBook Pro (x86_64 Long Mode)                | |              |
+|      | |        Chip:    x86_64 Processor                              | |              |
+|      | |        Memory:  256 MB Unified (16 MB Dynamic Heap)           | |              |
+|      | |        Graphics: VBE 32-bit Linear Framebuffer (1024x768)     | |              |
+|      | +---------------------------------------------------------------+ |              |
+|      +-------------------------------------------------------------------+              |
+|                                                                                         |
+|                                                                                         |
+|             +-------------------------------------------------------------+             |
+|             |  [Finder] [Terminal] [SysMon] [Calc] [Paint] [About] [Trash]| <- macOS Dock
+|             +-------------------------------------------------------------+             |
++-----------------------------------------------------------------------------------------+
 ```
 
 ---
 
-## Subsystems & Features
+## Key macOS Subsystems & Features
 
-### 1. 64-bit Memory & CPU Management
-- **4-Level Paging**: PML4, PDPT, and Page Directory identity-mapping the first 1GB with 2MB huge pages.
-- **Physical Memory Manager (PMM)**: 256MB Physical Memory Bitmap frame allocator.
-- **Dynamic Kernel Heap**: 16MB 64-bit heap (`kmalloc`, `kcalloc`, `krealloc`, `kfree`) with 16-byte alignment.
-- **64-bit GDT & IDT**: 16-byte IDT gate descriptors, 64-bit ISR/IRQ stubs with register preservation and `iretq`.
+### 1. Top Menu Bar (24px)
+- ** Apple Menu**: Dropdown with *About This Mac*, *System Settings*, *Force Quit*, and *Exit to CLI*.
+- **Active App Title & Standard Menus**: `File`, `Edit`, `View`, `Window`, `Help`.
+- **Menu Extras (Status Icons)**:
+  - 📶 Wi-Fi status symbol.
+  - 🔋 Battery indicator.
+  - 🧠 Live RAM & Heap monitor (`KB`).
+  - 🕒 CMOS Real-Time Clock (`MM/DD HH:MM`).
+  - 🔍 Spotlight Search & Control Center emblems.
 
-### 2. Full 64-bit GUI Desktop Environment (`RatanaWM`)
-- High-resolution `1024x768x32` linear framebuffer graphics engine with double buffering (`60 FPS`).
-- Hardware PS/2 mouse driver (IRQ12) with screen boundary clipping and cursor rendering.
-- Movable windows with active focus management, titlebars, and **Close [X]** / **Minimize [_]** controls.
-- Bottom Taskbar with **Start Menu**, active window tabs, **RTC 2026 Clock**, and **RAM Usage Widget**.
-- Built-in Applications: **Terminal Console**, **System Monitor**, **GUI Calculator**, **Paint Canvas**, and **About RatanaOS**.
+### 2. Floating Bottom Dock (Translucent Glass)
+- Rounded glass pill container with rich 32x32 vector/bitmap application icons:
+  1. **Finder**: 2-tone blue/cyan smiling face icon.
+  2. **Terminal.app**: Dark icon with `>_` green prompt.
+  3. **Activity Monitor.app**: Activity pulse wave & CPU monitor.
+  4. **Calculator.app**: Orange grid icon with math operators (`+`, `-`, `*`, `=`).
+  5. **Paint Studio.app**: Artist palette with color swatches and brush.
+  6. **About This Mac**:  Apple emblem icon.
+  7. **Trash**: Metal mesh wastebasket icon (clicking clears drawing canvas).
+- **Active App Indicators**: Glowing dot below open windows.
 
-### 3. Hardware Drivers & Shell Utilities
-- **CMOS RTC**: Accurate hardware clock reporting Year 2026 timestamps (`date` / `time`).
-- **Drivers**: Serial COM1 (`0x3F8`), PC Speaker synthesizer (`beep`), PCI bus enumerator (`pci`), and CPUID inspector (`cpuid`).
-- **Arcade & Visuals**: Matrix digital rain animation (`matrix`) and playable Snake game (`snake`).
+### 3. macOS Window Styling & Traffic Lights
+- 🔴 **Red Button** (`0x00FF5F56`): Close window.
+- 🟡 **Yellow Button** (`0x00FFBD2E`): Minimize to Dock.
+- 🟢 **Green Button** (`0x0027C93F`): Zoom / Expand window.
+- Centered typography and dark-mode window shadows.
+
+### 4. "About This Mac" Experience
+- Authentic Apple-style system specifications card:
+  - Big  Logo emblem.
+  - Model: `MacBook Pro (x86_64 Long Mode)`.
+  - Chip: Processor brand extracted via 64-bit CPUID.
+  - Memory: `256 MB Unified Memory (16 MB Dynamic Heap)`.
+  - Startup Disk: `RatanaOS HD (1GB)`.
+  - Graphics: `VBE 32-bit Linear Framebuffer 1024x768`.
+  - Serial: `C02RTN2026X86`.
 
 ---
 
 ## Quickstart & Testing
 
-### 1. Build 64-bit Kernel
+### 1. Build Kernel
 ```bash
 make clean && make
 ```
 
-### 2. Run Automated 64-bit Test Suite
+### 2. Run Automated Test Suite
 ```bash
 make test
 ```
 
-### 3. Run in QEMU
+### 3. Launch in QEMU
 ```bash
 make run
 ```
-*Tip: Once the system boots, type `gui` in the shell to launch the desktop environment, or press `ESC` inside the GUI to return to CLI.*
-
-### 4. Run in Terminal (Curses Mode)
-```bash
-make run-curses
-```
+*Tip: In the shell prompt, type `gui` to launch the macOS desktop. Use your mouse to interact with windows, click the Apple menu, launch Dock apps, and press `ESC` or choose `Exit to CLI` to return to the shell.*
