@@ -24,6 +24,7 @@
 - [Directory Structure](#directory-structure)
 - [Getting Started & Build Instructions](#getting-started--build-instructions)
 - [Automated Testing](#automated-testing)
+- [GUI Engineering Notes](#gui-engineering-notes)
 - [Author & License](#author--license)
 
 ---
@@ -309,6 +310,17 @@ Test Results:
    ALL 64-BIT MACOS TESTS PASSED!             
 ==============================================
 ```
+
+---
+
+## GUI Engineering Notes
+
+The current GUI work is documented in [`docs/GUI_ARCHITECTURE.md`](docs/GUI_ARCHITECTURE.md),
+[`docs/THEME_ENGINE.md`](docs/THEME_ENGINE.md), [`docs/FONT_SYSTEM.md`](docs/FONT_SYSTEM.md),
+[`docs/UI_SCALE.md`](docs/UI_SCALE.md), [`docs/WINDOW_SYSTEM.md`](docs/WINDOW_SYSTEM.md),
+and [`docs/SETTINGS.md`](docs/SETTINGS.md). The icon suites remain independent
+from UI themes; settings storage is currently volatile memory, not disk
+persistence.
 
 ---
 

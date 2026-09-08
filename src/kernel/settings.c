@@ -64,8 +64,7 @@ void settings_apply(void) {
 void settings_save(void) {
     active_settings.checksum = calculate_checksum(&active_settings);
     saved_settings = active_settings;
-    // In-memory backing buffer; ready for NVRAM / ATA disk block write in future
-    kprintf("Settings saved successfully.\n");
+    kprintf("Settings saved to the volatile in-memory backend.\n");
 }
 
 void settings_load(void) {
@@ -73,7 +72,7 @@ void settings_load(void) {
         saved_settings.checksum == calculate_checksum(&saved_settings)) {
         active_settings = saved_settings;
         settings_apply();
-        kprintf("Settings loaded from persistent store.\n");
+        kprintf("Settings loaded from the volatile in-memory backend.\n");
     } else {
         settings_reset_defaults();
         settings_apply();
@@ -92,5 +91,18 @@ void settings_print(void) {
     kprintf("Window Radius:      %d px\n", active_settings.window_radius);
     kprintf("Transparency:       %s\n", active_settings.transparency ? "Enabled" : "Disabled");
     kprintf("Window Shadows:     %s\n", active_settings.shadows ? "Enabled" : "Disabled");
+    kprintf("Storage Backend:    %s\n", settings_get_backend_name());
     kprintf("--------------------------------------\n\n");
+}
+
+settings_backend_t settings_get_backend(void) {
+    return SETTINGS_BACKEND_VOLATILE;
+}
+
+const char* settings_get_backend_name(void) {
+    return "Volatile memory (not persistent across reboot)";
+}
+
+bool settings_is_persistent(void) {
+    return false;
 }

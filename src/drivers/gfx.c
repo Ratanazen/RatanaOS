@@ -25,18 +25,53 @@ static struct {
     bool enabled;
 } clip_rect = {0, 0, 1024, 768, false};
 
-void gfx_set_clip(int x, int y, int w, int h) {
-    if (x < 0) { w += x; x = 0; }
-    if (y < 0) { h += y; y = 0; }
-    if (x + w > (int)ctx.width) w = (int)ctx.width - x;
-    if (y + h > (int)ctx.height) h = (int)ctx.height - y;
-    if (w < 0) w = 0;
-    if (h < 0) h = 0;
+/* The backbuffer is tightly packed; the hardware frontbuffer may not be. */
+static bool gfx_valid(void) {
+    return ctx.backbuffer && ctx.width > 0 && ctx.height > 0;
+}
 
-    clip_rect.x0 = x;
-    clip_rect.y0 = y;
-    clip_rect.x1 = x + w;
-    clip_rect.y1 = y + h;
+static bool gfx_clip_rect(int x, int y, int w, int h,
+                          int* x0, int* y0, int* x1, int* y1) {
+    if (!gfx_valid() || w <= 0 || h <= 0) return false;
+
+    int64_t right = (int64_t)x + (int64_t)w;
+    int64_t bottom = (int64_t)y + (int64_t)h;
+    int64_t left = x;
+    int64_t top = y;
+    int64_t max_x = ctx.width;
+    int64_t max_y = ctx.height;
+
+    if (clip_rect.enabled) {
+        if (left < clip_rect.x0) left = clip_rect.x0;
+        if (top < clip_rect.y0) top = clip_rect.y0;
+        if (right > clip_rect.x1) right = clip_rect.x1;
+        if (bottom > clip_rect.y1) bottom = clip_rect.y1;
+    }
+    if (left < 0) left = 0;
+    if (top < 0) top = 0;
+    if (right > max_x) right = max_x;
+    if (bottom > max_y) bottom = max_y;
+    if (left >= right || top >= bottom) return false;
+
+    *x0 = (int)left;
+    *y0 = (int)top;
+    *x1 = (int)right;
+    *y1 = (int)bottom;
+    return true;
+}
+
+void gfx_set_clip(int x, int y, int w, int h) {
+    int x0, y0, x1, y1;
+    if (!gfx_clip_rect(x, y, w, h, &x0, &y0, &x1, &y1)) {
+        clip_rect.x0 = clip_rect.y0 = clip_rect.x1 = clip_rect.y1 = 0;
+        clip_rect.enabled = true;
+        return;
+    }
+
+    clip_rect.x0 = x0;
+    clip_rect.y0 = y0;
+    clip_rect.x1 = x1;
+    clip_rect.y1 = y1;
     clip_rect.enabled = true;
 }
 
@@ -90,6 +125,13 @@ bool gfx_init(multiboot_info_t* mbi) {
         ctx.pitch = 1024 * 4;
         ctx.bpp = 32;
         ctx.frontbuffer = (uint32_t*)(uintptr_t)find_vga_pci_bar0();
+    }
+
+    if (ctx.width == 0 || ctx.height == 0 || ctx.bpp != 32 ||
+        ctx.pitch < ctx.width * 4U ||
+        (size_t)ctx.width > (SIZE_MAX / 4U) / (size_t)ctx.height) {
+        ctx.active = false;
+        return false;
     }
 
     size_t fb_size = (size_t)ctx.width * ctx.height * 4;
@@ -160,7 +202,7 @@ int gfx_get_height(void) { return (int)ctx.height; }
 uint32_t* gfx_get_backbuffer(void) { return ctx.backbuffer; }
 
 void gfx_clear(uint32_t color) {
-    if (!ctx.backbuffer) return;
+    if (!gfx_valid()) return;
     size_t total_pixels = (size_t)ctx.width * ctx.height;
     for (size_t i = 0; i < total_pixels; i++) {
         ctx.backbuffer[i] = color;
@@ -203,12 +245,8 @@ uint32_t gfx_get_pixel(int x, int y) {
 }
 
 void gfx_draw_rect(int x, int y, int w, int h, uint32_t color) {
-    if (x >= (int)ctx.width || y >= (int)ctx.height || x + w <= 0 || y + h <= 0) return;
-
-    int x0 = x < 0 ? 0 : x;
-    int y0 = y < 0 ? 0 : y;
-    int x1 = (x + w > (int)ctx.width) ? (int)ctx.width : x + w;
-    int y1 = (y + h > (int)ctx.height) ? (int)ctx.height : y + h;
+    int x0, y0, x1, y1;
+    if (!gfx_clip_rect(x, y, w, h, &x0, &y0, &x1, &y1)) return;
 
     for (int cy = y0; cy < y1; cy++) {
         uint32_t* row = &ctx.backbuffer[cy * ctx.width + x0];
@@ -220,12 +258,8 @@ void gfx_draw_rect(int x, int y, int w, int h, uint32_t color) {
 }
 
 void gfx_draw_rect_alpha(int x, int y, int w, int h, uint32_t color, uint8_t alpha) {
-    if (x >= (int)ctx.width || y >= (int)ctx.height || x + w <= 0 || y + h <= 0) return;
-
-    int x0 = x < 0 ? 0 : x;
-    int y0 = y < 0 ? 0 : y;
-    int x1 = (x + w > (int)ctx.width) ? (int)ctx.width : x + w;
-    int y1 = (y + h > (int)ctx.height) ? (int)ctx.height : y + h;
+    int x0, y0, x1, y1;
+    if (alpha == 0 || !gfx_clip_rect(x, y, w, h, &x0, &y0, &x1, &y1)) return;
 
     for (int cy = y0; cy < y1; cy++) {
         for (int cx = x0; cx < x1; cx++) {
@@ -235,6 +269,7 @@ void gfx_draw_rect_alpha(int x, int y, int w, int h, uint32_t color, uint8_t alp
 }
 
 void gfx_draw_rect_outline(int x, int y, int w, int h, uint32_t color) {
+    if (w <= 0 || h <= 0) return;
     gfx_draw_line(x, y, x + w - 1, y, color);
     gfx_draw_line(x, y + h - 1, x + w - 1, y + h - 1, color);
     gfx_draw_line(x, y, x, y + h - 1, color);
@@ -242,10 +277,13 @@ void gfx_draw_rect_outline(int x, int y, int w, int h, uint32_t color) {
 }
 
 void gfx_draw_rounded_rect(int x, int y, int w, int h, int r, uint32_t color) {
+    if (w <= 0 || h <= 0) return;
     if (r <= 0) {
         gfx_draw_rect(x, y, w, h, color);
         return;
     }
+    int max_radius = (w < h ? w : h) / 2;
+    if (r > max_radius) r = max_radius;
     // Main inner crosses
     gfx_draw_rect(x + r, y, w - 2 * r, h, color);
     gfx_draw_rect(x, y + r, r, h - 2 * r, color);
@@ -259,6 +297,13 @@ void gfx_draw_rounded_rect(int x, int y, int w, int h, int r, uint32_t color) {
 }
 
 void gfx_draw_rounded_rect_alpha(int x, int y, int w, int h, int r, uint32_t color, uint8_t alpha) {
+    if (w <= 0 || h <= 0 || alpha == 0) return;
+    if (r <= 0) {
+        gfx_draw_rect_alpha(x, y, w, h, color, alpha);
+        return;
+    }
+    int max_radius = (w < h ? w : h) / 2;
+    if (r > max_radius) r = max_radius;
     for (int cy = y; cy < y + h; cy++) {
         for (int cx = x; cx < x + w; cx++) {
             // Check if inside corner cutouts
@@ -285,6 +330,13 @@ void gfx_draw_rounded_rect_alpha(int x, int y, int w, int h, int r, uint32_t col
 }
 
 void gfx_draw_rounded_rect_outline(int x, int y, int w, int h, int r, uint32_t color) {
+    if (w <= 0 || h <= 0) return;
+    if (r <= 0) {
+        gfx_draw_rect_outline(x, y, w, h, color);
+        return;
+    }
+    int max_radius = (w < h ? w : h) / 2;
+    if (r > max_radius) r = max_radius;
     gfx_draw_line(x + r, y, x + w - r - 1, y, color);
     gfx_draw_line(x + r, y + h - 1, x + w - r - 1, y + h - 1, color);
     gfx_draw_line(x, y + r, x, y + h - r - 1, color);
@@ -314,6 +366,7 @@ void gfx_draw_line(int x0, int y0, int x1, int y1, uint32_t color) {
 }
 
 void gfx_draw_circle(int xc, int yc, int r, uint32_t color) {
+    if (r < 0) return;
     for (int y = -r; y <= r; y++) {
         for (int x = -r; x <= r; x++) {
             if (x * x + y * y <= r * r) {
@@ -342,6 +395,7 @@ void gfx_draw_shadow(int x, int y, int w, int h, int r, int shadow_size, uint8_t
 }
 
 void gfx_draw_gradient_h(int x, int y, int w, int h, uint32_t left_color, uint32_t right_color) {
+    if (w <= 0 || h <= 0) return;
     uint8_t r1 = (left_color >> 16) & 0xFF, g1 = (left_color >> 8) & 0xFF, b1 = left_color & 0xFF;
     uint8_t r2 = (right_color >> 16) & 0xFF, g2 = (right_color >> 8) & 0xFF, b2 = right_color & 0xFF;
 
@@ -355,6 +409,7 @@ void gfx_draw_gradient_h(int x, int y, int w, int h, uint32_t left_color, uint32
 }
 
 void gfx_draw_gradient_v(int x, int y, int w, int h, uint32_t top_color, uint32_t bottom_color) {
+    if (w <= 0 || h <= 0) return;
     uint8_t r1 = (top_color >> 16) & 0xFF, g1 = (top_color >> 8) & 0xFF, b1 = top_color & 0xFF;
     uint8_t r2 = (bottom_color >> 16) & 0xFF, g2 = (bottom_color >> 8) & 0xFF, b2 = bottom_color & 0xFF;
 
@@ -406,6 +461,11 @@ void gfx_swap_buffers(void) {
     if (!ctx.backbuffer || !ctx.frontbuffer || ctx.backbuffer == ctx.frontbuffer) {
         return;
     }
-    size_t total_pixels = (size_t)ctx.width * ctx.height;
-    memcpy(ctx.frontbuffer, ctx.backbuffer, total_pixels * 4);
+    uint8_t* destination = (uint8_t*)ctx.frontbuffer;
+    const uint8_t* source = (const uint8_t*)ctx.backbuffer;
+    size_t row_bytes = (size_t)ctx.width * 4U;
+    for (uint32_t y = 0; y < ctx.height; y++) {
+        memcpy(destination + (size_t)y * ctx.pitch,
+               source + (size_t)y * row_bytes, row_bytes);
+    }
 }

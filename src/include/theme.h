@@ -123,4 +123,13 @@ void ui_scale_decrease(void);
 int  ui_scale_val(int val);
 const char* ui_scale_get_label(void);
 
+/* Stable GUI-facing aliases. Icon selection deliberately remains separate. */
+void ui_theme_set(ui_theme_preset_t preset);
+const ui_theme_t* ui_theme_get(void);
+void ui_theme_next(void);
+const char* ui_theme_get_name(void);
+void ui_scale_up(void);
+void ui_scale_down(void);
+int ui_scale_value(void);
+
 #endif // THEME_H

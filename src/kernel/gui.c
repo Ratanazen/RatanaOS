@@ -55,6 +55,13 @@ static void handle_calc_click(window_t* win, int rel_x, int rel_y, int btn);
 static void handle_paint_click(window_t* win, int rel_x, int rel_y, int btn);
 static void handle_settings_click(window_t* win, int rel_x, int rel_y, int btn);
 
+static window_t* window_by_id(int id) {
+    for (int i = 0; i < window_count; i++) {
+        if (windows[i].id == id) return &windows[i];
+    }
+    return NULL;
+}
+
 static window_t* create_window(int id, const char* title, int x, int y, int w, int h,
                               void (*draw)(window_t*), void (*click)(window_t*, int, int, int)) {
     if (window_count >= MAX_WINDOWS) return NULL;
@@ -88,6 +95,23 @@ static void focus_window(int idx) {
         windows[window_count - 1] = temp;
         windows[window_count - 1].is_active = true;
     }
+}
+
+static void focus_window_by_id(int id) {
+    for (int i = 0; i < window_count; i++) {
+        if (windows[i].id == id) {
+            focus_window(i);
+            return;
+        }
+    }
+}
+
+static void show_window(int id) {
+    window_t* win = window_by_id(id);
+    if (!win) return;
+    win->is_open = true;
+    win->is_minimized = false;
+    focus_window_by_id(id);
 }
 
 // -------------------------------------------------------------
@@ -931,9 +955,10 @@ static void draw_macos_desktop(void) {
     // 5. Render Floating Bottom Dock
     bool open_states[12];
     bool active_states[12];
-    for (int i = 0; i < 12 && i < window_count; i++) {
-        open_states[i] = windows[i].is_open;
-        active_states[i] = windows[i].is_active;
+    for (int i = 0; i < 12; i++) {
+        window_t* dock_window = window_by_id(i);
+        open_states[i] = dock_window && dock_window->is_open;
+        active_states[i] = dock_window && dock_window->is_active;
     }
     dock_draw(open_states, active_states, window_count);
 }
@@ -968,15 +993,11 @@ static void process_gui_events(void) {
             prev_left_click = left_click;
             return;
         } else if (m_hit == MENUBAR_HIT_ITEM_ABOUT) {
-            windows[11].is_open = true;
-            windows[11].is_minimized = false;
-            focus_window(11);
+            show_window(11);
             prev_left_click = left_click;
             return;
         } else if (m_hit == MENUBAR_HIT_ITEM_SETTINGS) {
-            windows[9].is_open = true;
-            windows[9].is_minimized = false;
-            focus_window(9);
+            show_window(9);
             prev_left_click = left_click;
             return;
         } else if (m_hit == MENUBAR_HIT_ITEM_EXIT_CLI) {
@@ -990,17 +1011,17 @@ static void process_gui_events(void) {
         int dock_idx = dock_hit_test(mx, my);
         if (dock_idx >= 0) {
             if (dock_idx >= 0 && dock_idx < 12 && dock_idx < window_count) {
-                if (!windows[dock_idx].is_open) {
-                    windows[dock_idx].is_open = true;
-                    windows[dock_idx].is_minimized = false;
-                    focus_window(dock_idx);
-                } else if (windows[dock_idx].is_minimized) {
-                    windows[dock_idx].is_minimized = false;
-                    focus_window(dock_idx);
-                } else if (windows[dock_idx].is_active) {
-                    windows[dock_idx].is_minimized = true;
-                } else {
-                    focus_window(dock_idx);
+                window_t* dock_window = window_by_id(dock_idx);
+                if (dock_window) {
+                    if (!dock_window->is_open) {
+                        show_window(dock_idx);
+                    } else if (dock_window->is_minimized) {
+                        show_window(dock_idx);
+                    } else if (dock_window->is_active) {
+                        dock_window->is_minimized = true;
+                    } else {
+                        focus_window_by_id(dock_idx);
+                    }
                 }
             } else if (dock_idx == 12) { // Trash Icon
                 memset(paint_canvas, 0, sizeof(paint_canvas));
@@ -1012,25 +1033,19 @@ static void process_gui_events(void) {
         // 3. Desktop Icons Click Testing
         // 3a. RatanaOS HD
         if (mx >= sw - 88 && mx <= sw - 20 && my >= 40 && my <= 110) {
-            windows[0].is_open = true; // Finder
-            windows[0].is_minimized = false;
-            focus_window(0);
+            show_window(0); // Finder
             prev_left_click = left_click;
             return;
         }
         // 3b. Applications Folder
         if (mx >= sw - 94 && mx <= sw - 20 && my >= 130 && my <= 200) {
-            windows[1].is_open = true; // Launchpad
-            windows[1].is_minimized = false;
-            focus_window(1);
+            show_window(1); // Launchpad
             prev_left_click = left_click;
             return;
         }
         // 3c. Documents Folder
         if (mx >= sw - 88 && mx <= sw - 20 && my >= 220 && my <= 290) {
-            windows[7].is_open = true; // Notes
-            windows[7].is_minimized = false;
-            focus_window(7);
+            show_window(7); // Notes
             prev_left_click = left_click;
             return;
         }
@@ -1041,7 +1056,10 @@ static void process_gui_events(void) {
             if (!win->is_open || win->is_minimized) continue;
 
             if (mx >= win->x && mx < win->x + win->width && my >= win->y && my < win->y + win->height) {
+                int window_id = win->id;
                 focus_window(i);
+                win = window_by_id(window_id);
+                if (!win) break;
 
                 if (my < win->y + TITLEBAR_HEIGHT) {
                     titlebar_hit_t t_hit = window_hit_test_titlebar(win, mx, my);
@@ -1102,9 +1120,11 @@ void gui_init(multiboot_info_t* mbi) {
     create_window(11, "About This Mac", 272, 160, 480, 320, draw_about_content, NULL);
 
     // Initial desktop state: Open Finder and System Settings
-    windows[0].is_open = true;
-    windows[9].is_open = true;
-    focus_window(9);
+    window_t* finder = window_by_id(0);
+    window_t* settings = window_by_id(9);
+    if (finder) finder->is_open = true;
+    if (settings) settings->is_open = true;
+    focus_window_by_id(9);
 }
 
 void gui_start(void) {
@@ -1116,6 +1136,18 @@ void gui_start(void) {
             if (k == 27) { // ESC -> Exit to CLI
                 gui_exit();
                 break;
+            } else if (keyboard_is_ctrl_pressed() && keyboard_is_alt_pressed() && (k == 't' || k == 'T')) {
+                icon_theme_next();
+            } else if (keyboard_is_ctrl_pressed() && keyboard_is_alt_pressed() && (k == 'd' || k == 'D')) {
+                theme_toggle_dark();
+            } else if (keyboard_is_ctrl_pressed() && keyboard_is_alt_pressed() && (k == '+' || k == '=')) {
+                ui_scale_up();
+                dock_init();
+            } else if (keyboard_is_ctrl_pressed() && keyboard_is_alt_pressed() && (k == '-' || k == '_')) {
+                ui_scale_down();
+                dock_init();
+            } else if (keyboard_is_ctrl_pressed() && keyboard_is_alt_pressed() && (k == 's' || k == 'S')) {
+                show_window(9);
             } else if (k == 't' || k == 'T') {
                 icon_theme_next();
             } else if (k == 'd' || k == 'D') {

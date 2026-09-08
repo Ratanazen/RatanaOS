@@ -8,6 +8,10 @@
 
 #define SETTINGS_MAGIC 0x52415441 // 'RATA'
 
+typedef enum {
+    SETTINGS_BACKEND_VOLATILE = 0
+} settings_backend_t;
+
 typedef struct {
     uint32_t magic;
     uint32_t version;
@@ -36,5 +40,8 @@ void settings_save(void);
 void settings_load(void);
 void settings_reset_defaults(void);
 void settings_print(void);
+settings_backend_t settings_get_backend(void);
+const char* settings_get_backend_name(void);
+bool settings_is_persistent(void);
 
 #endif // SETTINGS_H

@@ -4,6 +4,7 @@
 #include "../include/string.h"
 
 static font_size_t active_font_size = FONT_SIZE_REGULAR;
+static font_role_t active_font_role = FONT_ROLE_UI;
 
 static const char* font_size_names[FONT_SIZE_COUNT] = {
     "Small (12px)",
@@ -14,6 +15,7 @@ static const char* font_size_names[FONT_SIZE_COUNT] = {
 
 void font_init(void) {
     active_font_size = FONT_SIZE_REGULAR;
+    active_font_role = FONT_ROLE_UI;
 }
 
 void font_set_active_size(font_size_t size) {
@@ -31,6 +33,35 @@ const char* font_get_size_name(font_size_t size) {
         return font_size_names[size];
     }
     return "Unknown";
+}
+
+void font_set(font_role_t role) {
+    if (role < 0 || role >= FONT_ROLE_COUNT) return;
+    active_font_role = role;
+    if (role == FONT_ROLE_TITLE) active_font_size = FONT_SIZE_TITLE;
+    else if (role == FONT_ROLE_CAPTION) active_font_size = FONT_SIZE_SMALL;
+    else active_font_size = FONT_SIZE_REGULAR;
+}
+
+font_role_t font_get(void) {
+    return active_font_role;
+}
+
+void font_set_size(font_size_t size) {
+    font_set_active_size(size);
+}
+
+font_size_t font_get_size(void) {
+    return font_get_active_size();
+}
+
+bool font_set_size_px(int pixels) {
+    if (pixels <= 0) return false;
+    if (pixels <= 12) active_font_size = FONT_SIZE_SMALL;
+    else if (pixels <= 16) active_font_size = FONT_SIZE_REGULAR;
+    else if (pixels <= 24) active_font_size = FONT_SIZE_LARGE;
+    else active_font_size = FONT_SIZE_TITLE;
+    return true;
 }
 
 int font_get_char_width(font_size_t size) {
@@ -61,6 +92,10 @@ int font_measure_text_width(const char* str, font_size_t size) {
 
 int font_measure_text_height(font_size_t size) {
     return font_get_char_height(size);
+}
+
+int font_measure_text(const char* str, font_size_t size) {
+    return font_measure_text_width(str, size);
 }
 
 void font_draw_char(int x, int y, char c, uint32_t fg, uint32_t bg, font_size_t size) {

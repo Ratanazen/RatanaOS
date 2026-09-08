@@ -393,3 +393,31 @@ const char* ui_scale_get_label(void) {
     strcat(scale_label_buf, "%");
     return scale_label_buf;
 }
+
+void ui_theme_set(ui_theme_preset_t preset) {
+    theme_set_preset(preset);
+}
+
+const ui_theme_t* ui_theme_get(void) {
+    return theme_get_current();
+}
+
+void ui_theme_next(void) {
+    theme_next();
+}
+
+const char* ui_theme_get_name(void) {
+    return theme_get_preset_name(theme_get_preset());
+}
+
+void ui_scale_up(void) {
+    ui_scale_increase();
+}
+
+void ui_scale_down(void) {
+    ui_scale_decrease();
+}
+
+int ui_scale_value(void) {
+    return ui_scale_get();
+}
