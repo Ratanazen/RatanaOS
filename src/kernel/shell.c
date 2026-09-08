@@ -13,6 +13,7 @@
 #include "../include/matrix.h"
 #include "../include/snake.h"
 #include "../include/gui.h"
+#include "../include/icons.h"
 
 static char command_buffer[SHELL_BUFFER_SIZE];
 static size_t command_len = 0;
@@ -47,6 +48,7 @@ static void cmd_help(void) {
     kprintf("  calc <a> <op> <b> - Arithmetic calculator (+, -, *, /, %%)\n");
     kprintf("  beep [freq] [ms]  - Play tone through PC speaker (default 440Hz 200ms)\n");
     kprintf("  theme <name>      - Apply theme (arch, cyber2026, matrix, ocean, amber)\n");
+    kprintf("  icons [theme]     - Switch macOS icon theme (whitesur, mactahoe, vector)\n");
     kprintf("  matrix            - Animated digital rain screensaver\n");
     kprintf("  snake             - Play interactive Snake arcade game\n");
     kprintf("  color <fg> [bg]   - Set terminal colors (0-15)\n");
@@ -181,8 +183,34 @@ static void cmd_beep(char* args) {
     speaker_beep(freq, duration);
 }
 
+static void cmd_icons(char* args) {
+    while (*args == ' ') args++;
+    if (strcmp(args, "whitesur") == 0) {
+        icon_set_theme(ICON_THEME_WHITESUR);
+        kprintf("Active macOS Icon Theme: %s\n", icon_get_theme_name());
+    } else if (strcmp(args, "mactahoe") == 0) {
+        icon_set_theme(ICON_THEME_MACTAHOE);
+        kprintf("Active macOS Icon Theme: %s\n", icon_get_theme_name());
+    } else if (strcmp(args, "vector") == 0) {
+        icon_set_theme(ICON_THEME_VECTOR);
+        kprintf("Active macOS Icon Theme: %s\n", icon_get_theme_name());
+    } else if (strcmp(args, "next") == 0) {
+        icon_theme_next();
+        kprintf("Switched to Icon Theme: %s\n", icon_get_theme_name());
+    } else if (*args == '\0') {
+        kprintf("Current Icon Theme: %s\n", icon_get_theme_name());
+        kprintf("Available Themes: whitesur, mactahoe, vector, next\n");
+    } else {
+        kprintf("Unknown icon theme '%s'. Usage: icons <whitesur | mactahoe | vector | next>\n", args);
+    }
+}
+
 static void cmd_theme(char* args) {
     while (*args == ' ') args++;
+    if (strncmp(args, "icons", 5) == 0 && (args[5] == ' ' || args[5] == '\0')) {
+        cmd_icons(args + 5);
+        return;
+    }
     if (strcmp(args, "arch") == 0) {
         vga_set_color(vga_entry_color(VGA_COLOR_LIGHT_CYAN, VGA_COLOR_BLACK));
         kprintf("Applied 'Arch' theme.\n");
@@ -200,7 +228,7 @@ static void cmd_theme(char* args) {
         vga_set_color(vga_entry_color(VGA_COLOR_BROWN, VGA_COLOR_BLACK));
         kprintf("Applied 'Amber CRT' theme.\n");
     } else {
-        kprintf("Usage: theme <arch | cyber2026 | matrix | ocean | amber>\n");
+        kprintf("Usage: theme <arch | cyber2026 | matrix | ocean | amber | icons [theme]>\n");
     }
 }
 
@@ -340,6 +368,8 @@ void shell_execute(char* command) {
         cmd_beep(command + 4);
     } else if (strncmp(command, "theme", 5) == 0 && (command[5] == ' ' || command[5] == '\0')) {
         cmd_theme(command + 5);
+    } else if (strncmp(command, "icons", 5) == 0 && (command[5] == ' ' || command[5] == '\0')) {
+        cmd_icons(command + 5);
     } else if (strcmp(command, "matrix") == 0) {
         matrix_run();
     } else if (strcmp(command, "snake") == 0) {

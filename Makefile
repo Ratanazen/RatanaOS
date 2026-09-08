@@ -33,6 +33,7 @@ C_OBJS = $(BUILD_DIR)/kernel.o \
          $(BUILD_DIR)/pci.o \
          $(BUILD_DIR)/gfx.o \
          $(BUILD_DIR)/icons.o \
+         $(BUILD_DIR)/icons_assets.o \
          $(BUILD_DIR)/menubar.o \
          $(BUILD_DIR)/dock.o \
          $(BUILD_DIR)/mouse.o \
@@ -45,7 +46,7 @@ TARGET = $(BUILD_DIR)/ratanaos.bin
 TARGET32 = $(BUILD_DIR)/ratanaos32.bin
 ISO_TARGET = $(BUILD_DIR)/ratanaos.iso
 
-.PHONY: all clean run run-iso iso test test-qemu dirs
+.PHONY: all clean run run-iso iso test test-qemu dirs bake-icons
 
 all: dirs $(TARGET) $(TARGET32)
 
@@ -133,6 +134,9 @@ $(BUILD_DIR)/gfx.o: $(SRC_DIR)/drivers/gfx.c
 $(BUILD_DIR)/icons.o: $(SRC_DIR)/drivers/icons.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(BUILD_DIR)/icons_assets.o: $(SRC_DIR)/drivers/icons_assets.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 $(BUILD_DIR)/mouse.o: $(SRC_DIR)/drivers/mouse.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
@@ -196,6 +200,9 @@ test: all
 	@echo "\n=============================================="
 	@echo "   ALL 64-BIT MACOS TESTS PASSED!             "
 	@echo "==============================================\n"
+
+bake-icons:
+	python3 tools/bake_icons.py
 
 # Clean
 clean:

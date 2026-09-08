@@ -2,6 +2,16 @@
 #define ICONS_H
 
 #include "types.h"
+#include "icons_assets.h"
+
+// Theme Management API
+void icon_set_theme(icon_theme_id_t theme);
+icon_theme_id_t icon_get_theme(void);
+void icon_theme_next(void);
+const char* icon_get_theme_name(void);
+
+// 32-bit ARGB Icon Blitter with 8-bit Alpha Channel
+void gfx_draw_icon_rgba(int x, int y, int w, int h, const uint32_t* pixels);
 
 // 48x48 macOS Sonoma/Sequoia Dock Icons
 void icon_draw_finder_48(int x, int y);

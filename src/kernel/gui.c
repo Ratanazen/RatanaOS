@@ -49,6 +49,7 @@ static void draw_about_content(window_t* win);
 
 static void handle_calc_click(window_t* win, int rel_x, int rel_y, int btn);
 static void handle_paint_click(window_t* win, int rel_x, int rel_y, int btn);
+static void handle_settings_click(window_t* win, int rel_x, int rel_y, int btn);
 
 static window_t* create_window(int id, const char* title, int x, int y, int w, int h,
                               void (*draw)(window_t*), void (*click)(window_t*, int, int, int)) {
@@ -633,7 +634,7 @@ static void draw_music_content(window_t* win) {
 }
 
 // -------------------------------------------------------------
-// App 9: System Settings.app Window (480x300)
+// App 9: System Settings.app Window (500x320)
 // -------------------------------------------------------------
 static void draw_settings_content(window_t* win) {
     int cx = win->x + 2;
@@ -650,30 +651,62 @@ static void draw_settings_content(window_t* win) {
     gfx_draw_string_transparent(cx + 14, cy + 50, "[*] Bluetooth", COLOR_WHITE);
     gfx_draw_string_transparent(cx + 14, cy + 70, "[*] Displays", COLOR_WHITE);
     gfx_draw_rounded_rect(cx + 6, cy + 90, sidebar_w - 12, 22, 4, 0x000A84FF);
-    gfx_draw_string_transparent(cx + 14, cy + 94, "> General", COLOR_WHITE);
+    gfx_draw_string_transparent(cx + 14, cy + 94, "> Appearance", COLOR_WHITE);
     gfx_draw_string_transparent(cx + 14, cy + 120, "[*] Wallpaper", COLOR_WHITE);
 
     int rx = cx + sidebar_w + 16;
     gfx_draw_rect(cx + sidebar_w + 1, cy, cw - sidebar_w - 1, ch, 0x001C1C1E);
 
-    gfx_draw_string_transparent(rx, cy + 14, "General Settings", COLOR_WHITE);
-    gfx_draw_line(rx, cy + 34, cx + cw - 16, cy + 34, 0x003A3A3C);
+    gfx_draw_string_transparent(rx, cy + 14, "Appearance & Icon Themes", COLOR_WHITE);
+    gfx_draw_line(rx, cy + 30, cx + cw - 16, cy + 30, 0x003A3A3C);
 
-    gfx_draw_string_transparent(rx, cy + 46, "Compositor 60 FPS Engine:", COLOR_WHITE);
-    gfx_draw_rounded_rect(rx + 230, cy + 44, 36, 18, 9, 0x0030D158);
-    gfx_draw_circle(rx + 256, cy + 53, 7, COLOR_WHITE);
+    gfx_draw_string_transparent(rx, cy + 40, "Active Icon Theme:", COLOR_WHITE);
 
-    gfx_draw_string_transparent(rx, cy + 74, "High-Res Vector Icon Suite:", COLOR_WHITE);
-    gfx_draw_rounded_rect(rx + 230, cy + 72, 36, 18, 9, 0x0030D158);
-    gfx_draw_circle(rx + 256, cy + 81, 7, COLOR_WHITE);
+    // Theme badge & switcher button
+    const char* theme_name = icon_get_theme_name();
+    gfx_draw_rounded_rect(rx, cy + 56, 180, 26, 6, 0x002C2C2E);
+    gfx_draw_rounded_rect_outline(rx, cy + 56, 180, 26, 6, 0x003A3A3C);
+    gfx_draw_string_transparent(rx + 10, cy + 62, theme_name, 0x000A84FF);
 
-    gfx_draw_string_transparent(rx, cy + 102, "Dark Mode Aqua Theme:", COLOR_WHITE);
-    gfx_draw_rounded_rect(rx + 230, cy + 100, 36, 18, 9, 0x0030D158);
-    gfx_draw_circle(rx + 256, cy + 109, 7, COLOR_WHITE);
+    // Next Theme Button
+    gfx_draw_rounded_rect(rx + 190, cy + 56, 120, 26, 6, 0x000A84FF);
+    gfx_draw_string_transparent(rx + 202, cy + 62, "Switch Theme", COLOR_WHITE);
 
-    gfx_draw_string_transparent(rx, cy + 130, "Virtual Machine Acceleration:", COLOR_WHITE);
-    gfx_draw_rounded_rect(rx + 230, cy + 128, 36, 18, 9, 0x0030D158);
-    gfx_draw_circle(rx + 256, cy + 137, 7, COLOR_WHITE);
+    // Live Icon Preview Row
+    gfx_draw_string_transparent(rx, cy + 94, "Theme Preview (48x48 Dock Icons):", 0x008E8E93);
+    icon_draw_finder_48(rx + 8, cy + 112);
+    icon_draw_safari_48(rx + 68, cy + 112);
+    icon_draw_terminal_48(rx + 128, cy + 112);
+    icon_draw_settings_48(rx + 188, cy + 112);
+    icon_draw_trash_48(rx + 248, cy + 112);
+
+    gfx_draw_line(rx, cy + 172, cx + cw - 16, cy + 172, 0x003A3A3C);
+
+    gfx_draw_string_transparent(rx, cy + 184, "32-bit ARGB Alpha Blending:", COLOR_WHITE);
+    gfx_draw_rounded_rect(rx + 240, cy + 182, 36, 18, 9, 0x0030D158);
+    gfx_draw_circle(rx + 266, cy + 191, 7, COLOR_WHITE);
+
+    gfx_draw_string_transparent(rx, cy + 212, "Dark Mode Aqua Theme:", COLOR_WHITE);
+    gfx_draw_rounded_rect(rx + 240, cy + 210, 36, 18, 9, 0x0030D158);
+    gfx_draw_circle(rx + 266, cy + 219, 7, COLOR_WHITE);
+
+    gfx_draw_string_transparent(rx, cy + 240, "Compositor 60 FPS Engine:", COLOR_WHITE);
+    gfx_draw_rounded_rect(rx + 240, cy + 238, 36, 18, 9, 0x0030D158);
+    gfx_draw_circle(rx + 266, cy + 247, 7, COLOR_WHITE);
+}
+
+static void handle_settings_click(window_t* win, int rel_x, int rel_y, int btn) {
+    (void)win;
+    (void)btn;
+    int sidebar_w = 130;
+    int rx = 2 + sidebar_w + 16;
+    int cy = TITLEBAR_HEIGHT + 1;
+
+    // Check if clicked the "Switch Theme" button (rx + 190, cy + 56, w 120, h 26) or the badge (rx, cy + 56, w 180, h 26)
+    if (rel_x >= rx && rel_x <= rx + 310 &&
+        rel_y >= cy + 56 && rel_y <= cy + 56 + 26) {
+        icon_theme_next();
+    }
 }
 
 // -------------------------------------------------------------
@@ -992,14 +1025,14 @@ void gui_init(multiboot_info_t* mbi) {
     create_window(6, "Paint Studio", 300, 320, 360, 280, draw_paint_content, handle_paint_click);
     create_window(7, "Notes", 260, 120, 480, 280, draw_notes_content, NULL);
     create_window(8, "Music", 280, 140, 460, 260, draw_music_content, NULL);
-    create_window(9, "System Settings", 250, 100, 500, 320, draw_settings_content, NULL);
+    create_window(9, "System Settings", 250, 100, 500, 320, draw_settings_content, handle_settings_click);
     create_window(10, "App Store", 260, 110, 500, 300, draw_appstore_content, NULL);
     create_window(11, "About This Mac", 272, 160, 480, 320, draw_about_content, NULL);
 
-    // Initial desktop state: Open Finder and About This Mac
+    // Initial desktop state: Open Finder and System Settings
     windows[0].is_open = true;
-    windows[11].is_open = true;
-    focus_window(11);
+    windows[9].is_open = true;
+    focus_window(9);
 }
 
 void gui_start(void) {
@@ -1011,6 +1044,8 @@ void gui_start(void) {
             if (k == 27) { // ESC
                 gui_exit();
                 break;
+            } else if (k == 't' || k == 'T') {
+                icon_theme_next();
             }
         }
 
