@@ -293,6 +293,30 @@ static registers_t* syscall_handler_int80(registers_t* regs) {
             break;
         }
 
+        case 158: { // Linux x86_64 sys_arch_prctl(code, addr)
+            int code = (int)regs->rdi;
+            uint64_t addr = regs->rsi;
+            if (code == 0x1002) { // ARCH_SET_FS
+                uint32_t low = (uint32_t)addr;
+                uint32_t high = (uint32_t)(addr >> 32);
+                __asm__ volatile ("wrmsr" : : "c"(0xC0000100), "a"(low), "d"(high));
+                regs->rax = 0;
+            } else if (code == 0x1001) { // ARCH_SET_GS
+                uint32_t low = (uint32_t)addr;
+                uint32_t high = (uint32_t)(addr >> 32);
+                __asm__ volatile ("wrmsr" : : "c"(0xC0000101), "a"(low), "d"(high));
+                regs->rax = 0;
+            } else {
+                regs->rax = (uint64_t)-1;
+            }
+            break;
+        }
+
+        case 231: { // Linux x86_64 sys_exit_group(code)
+            process_exit();
+            break;
+        }
+
         default:
             serial_printf("SYSCALL: Unsupported syscall %d\n", syscall_num);
             regs->rax = (uint64_t)-1;

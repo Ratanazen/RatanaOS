@@ -23,9 +23,19 @@ process_t* elf_load_and_run(vfs_node_t* file, const char* name) {
     process_t* proc = process_create((void*)header->entry, true);
     if (!proc) return NULL;
 
+    uint8_t abi = file->data[7];
+    bool is_linux = (abi == 0 || abi == 3); // SYSV / Linux
+    if (is_linux) {
+        serial_printf("ELF: Linux x86_64 binary header detected for %s (ABI %u)\n", file->name, abi);
+    }
+
     elf64_program_header_t* ph = (elf64_program_header_t*)(file->data + header->program_header_pos);
 
     for (int i = 0; i < header->program_header_entries; i++) {
+        if (ph[i].type == 3) { // PT_INTERP
+            char* interp_path = (char*)(file->data + ph[i].offset);
+            serial_printf("ELF: Dynamic interpreter requested: %s\n", interp_path);
+        }
         if (ph[i].type == 1) { // PT_LOAD
             uint64_t vaddr = ph[i].virtual_addr;
             uint64_t mem_size = ph[i].memory_size;

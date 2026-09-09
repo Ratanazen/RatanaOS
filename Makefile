@@ -57,6 +57,8 @@ C_OBJS = $(BUILD_DIR)/kernel.o \
          $(BUILD_DIR)/gui.o \
          $(BUILD_DIR)/panic.o \
          $(BUILD_DIR)/printk.o \
+         $(BUILD_DIR)/debianfs.o \
+         $(BUILD_DIR)/debian_data.o \
          $(BUILD_DIR)/string.o \
          $(BUILD_DIR)/stdio.o
 
@@ -152,6 +154,15 @@ $(BUILD_DIR)/panic.o: $(SRC_DIR)/kernel/panic.c
 $(BUILD_DIR)/printk.o: $(SRC_DIR)/kernel/printk.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(SRC_DIR)/kernel/fs/debian_data.c:
+	python3 tools/bake_debian_rootfs.py debian-rootfs build/debian.img src/kernel/fs/debian_data.c
+
+$(BUILD_DIR)/debian_data.o: $(SRC_DIR)/kernel/fs/debian_data.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/debianfs.o: $(SRC_DIR)/kernel/fs/debianfs.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 # 64-bit Driver C Objects
 $(BUILD_DIR)/vga.o: $(SRC_DIR)/drivers/vga.c
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -207,12 +218,23 @@ iso: $(TARGET) $(TARGET32)
 	@mkdir -p iso/boot/grub
 	@cp $(TARGET) iso/boot/ratanaos.bin
 	@cp $(TARGET32) iso/boot/ratanaos32.bin
+	@if [ -n "$(DEBIAN_ISO)" ] && [ -f "$(DEBIAN_ISO)" ]; then \
+		echo "Embedding Debian ISO from $(DEBIAN_ISO)..."; \
+		cp $(DEBIAN_ISO) iso/debian.iso; \
+	fi
 	@if which xorriso >/dev/null 2>&1; then \
 		grub-mkrescue -o $(ISO_TARGET) iso; \
 		echo "\n>>> Successfully built Bootable ISO: $(ISO_TARGET) <<<\n"; \
 	else \
 		echo "Notice: xorriso is not installed. To generate $(ISO_TARGET), install xorriso with 'sudo pacman -S xorriso'."; \
 	fi
+
+iso-with-debian:
+	@if [ -z "$(DEBIAN_ISO)" ]; then \
+		echo "Usage: make iso-with-debian DEBIAN_ISO=path/to/debian-netinst.iso"; \
+		exit 1; \
+	fi
+	@$(MAKE) iso DEBIAN_ISO=$(DEBIAN_ISO)
 
 # Run in QEMU 64-bit with direct kernel boot & COM1 serial redirect to stdio
 run: $(TARGET32)

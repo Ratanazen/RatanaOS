@@ -27,6 +27,7 @@
 #include "../include/gui.h"
 #include "../include/shell.h"
 #include "../include/packages.h"
+#include "../include/debianfs.h"
 
 static multiboot_info_t* global_mbi = NULL;
 
@@ -78,6 +79,7 @@ void kernel_main(uint64_t mbi_addr, uint64_t magic) {
     }
 
     initramfs_init();
+    debianfs_init();
     syscall_init();
     
     // Load /sbin/init
