@@ -1,12 +1,12 @@
 [Desktop Entry]
 Type=X-GNOME-Metatheme
 Name=RatanaOS-Dark
-Comment=RatanaOS macOS Sequoia Theme
+Comment=RatanaOS macOS Sequoia 2026 Metatheme
 Encoding=UTF-8
 
 [X-GNOME-Metatheme]
 GtkTheme=RatanaOS-Dark
 MetacityTheme=RatanaOS-Dark
-IconTheme=WhiteSur
+IconTheme=RatanaOS-WhiteSur
 CursorTheme=Adwaita
 ButtonLayout=close,minimize,maximize:

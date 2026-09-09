@@ -1,44 +1,102 @@
-/* RatanaOS macOS Sequoia GTK 3 Theme */
-@define-color bg_color #1E1E1E;
+/* RatanaOS macOS Sequoia 2026 gtk-3.0 Theme */
+@define-color bg_color #1E1E24;
 @define-color fg_color #FFFFFF;
-@define-color accent_color #007AFF;
-@define-color panel_bg rgba(30, 30, 30, 0.85);
+@define-color sidebar_bg #18181D;
+@define-color accent_color #E0386B;
+@define-color panel_bg rgba(24, 24, 28, 0.82);
 
 * {
-    border-radius: 6px;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Ubuntu", sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Cantarell", "Ubuntu", sans-serif;
+    -gtk-secondary-caret-color: @accent_color;
 }
 
 window {
     background-color: @bg_color;
     color: @fg_color;
+    border-radius: 12px;
 }
 
-headerbar {
-    background-color: @bg_color;
-    border-bottom: 1px solid rgba(128, 128, 128, 0.2);
-    min-height: 38px;
+/* macOS Finder Sidebar (Nautilus / Thunar / Dolphin) */
+.sidebar, sidebar, placessidebar, .source-list {
+    background-color: @sidebar_bg;
+    color: @fg_color;
+    border-right: 1px solid rgba(128, 128, 128, 0.15);
 }
 
-.xfce4-panel {
+.sidebar row, placessidebar row {
+    border-radius: 8px;
+    margin: 2px 8px;
+    padding: 6px 10px;
+    transition: background 0.15s ease-in-out;
+}
+
+.sidebar row:selected, placessidebar row:selected {
+    background-color: alpha(@accent_color, 0.22);
+    color: @accent_color;
+    font-weight: 600;
+}
+
+/* Headerbars & Toolbars */
+headerbar, .titlebar {
+    background: @bg_color;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.18);
+    min-height: 42px;
+    padding: 0 12px;
+}
+
+/* macOS Control Center Popups & Sliders */
+.control-center-card, popover.menu, .popup {
+    background-color: rgba(30, 30, 36, 0.88);
+    backdrop-filter: blur(24px);
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+scale trough {
+    background-color: rgba(128, 128, 128, 0.25);
+    border-radius: 10px;
+    min-height: 20px;
+}
+
+scale highlight {
+    background: @accent_color;
+    border-radius: 10px;
+}
+
+scale slider {
+    background: #FFFFFF;
+    border-radius: 50%;
+    min-width: 22px;
+    min-height: 22px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Top 24px Apple Panel */
+.xfce4-panel, #panel {
     background-color: @panel_bg;
     color: @fg_color;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 13px;
+    font-weight: 500;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* Push Buttons */
 button {
-    border-radius: 6px;
-    padding: 4px 10px;
-    background: #2A2A2A;
+    border-radius: 8px;
+    padding: 6px 14px;
+    background: rgba(255, 255, 255, 0.08);
     color: @fg_color;
-    border: 1px solid rgba(128, 128, 128, 0.3);
+    border: 1px solid rgba(128, 128, 128, 0.22);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
 button:hover {
-    background: #383838;
+    background: rgba(255, 255, 255, 0.14);
 }
 
 button.suggested-action {
     background: @accent_color;
-    color: white;
+    color: #FFFFFF;
+    font-weight: 600;
 }
