@@ -4,3 +4,6 @@ build/
 *.o
 *.log
 .vscode/
+disk.img
+hello.txt
+

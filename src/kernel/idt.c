@@ -36,6 +36,7 @@ extern void isr28();
 extern void isr29();
 extern void isr30();
 extern void isr31();
+extern void isr128();
 
 // External 64-bit IRQ handlers
 extern void irq0();
@@ -125,6 +126,7 @@ void idt_init(void) {
     idt_set_gate(45, (uint64_t)irq13, 0x08, 0x8E);
     idt_set_gate(46, (uint64_t)irq14, 0x08, 0x8E);
     idt_set_gate(47, (uint64_t)irq15, 0x08, 0x8E);
+    idt_set_gate(128, (uint64_t)isr128, 0x08, 0xEE);
 
     idt_flush((uint64_t)&idt_ptr);
 }

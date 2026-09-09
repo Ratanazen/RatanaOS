@@ -1,0 +1,32 @@
+#!/bin/bash
+# ============================================================================
+# ratanaos-hardware — RatanaOS Hardware Detection
+# ============================================================================
+
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+BOLD='\033[1m'
+DIM='\033[2m'
+NC='\033[0m'
+
+echo -e "\n${BOLD}${CYAN}  RatanaOS Hardware Information${NC}\n"
+
+echo -e "${BOLD}  ── CPU ──${NC}"
+lscpu 2>/dev/null | grep -E "Model name|Architecture|CPU\(s\)|Thread|Core|Socket|MHz|Cache" | sed 's/^/  /'
+
+echo -e "\n${BOLD}  ── Memory ──${NC}"
+free -h 2>/dev/null | sed 's/^/  /'
+
+echo -e "\n${BOLD}  ── Storage ──${NC}"
+lsblk -o NAME,SIZE,TYPE,MOUNTPOINT 2>/dev/null | sed 's/^/  /'
+
+echo -e "\n${BOLD}  ── PCI Devices ──${NC}"
+lspci 2>/dev/null | head -15 | sed 's/^/  /'
+
+echo -e "\n${BOLD}  ── USB Devices ──${NC}"
+lsusb 2>/dev/null | head -10 | sed 's/^/  /'
+
+echo -e "\n${BOLD}  ── Network Interfaces ──${NC}"
+ip -br link 2>/dev/null | sed 's/^/  /'
+
+echo ""

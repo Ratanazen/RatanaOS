@@ -2,12 +2,15 @@
 #include "../include/isr.h"
 #include "../include/pic.h"
 #include "../include/io.h"
+#include "../include/process.h"
 
 static volatile uint32_t timer_ticks = 0;
 
-static void timer_callback(registers_t* regs) {
-    (void)regs;
+static registers_t* timer_callback(registers_t* regs) {
     timer_ticks++;
+    // Yield to the scheduler
+    return (registers_t*)scheduler_tick((trap_frame_t*)regs);
+    return regs;
 }
 
 void timer_init(uint32_t frequency) {

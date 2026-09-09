@@ -1,0 +1,33 @@
+#!/bin/bash
+# ratanaos-config — System configuration tool
+set -euo pipefail
+
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+echo -e "\n${BOLD}${CYAN}  RatanaOS Configuration${NC}\n"
+
+case "${1:-show}" in
+    show)
+        echo -e "  ${CYAN}Hostname:${NC}    $(hostname)"
+        echo -e "  ${CYAN}Timezone:${NC}    $(timedatectl show --property=Timezone --value 2>/dev/null || cat /etc/timezone 2>/dev/null)"
+        echo -e "  ${CYAN}Locale:${NC}      ${LANG:-C}"
+        echo -e "  ${CYAN}DNS:${NC}         $(grep nameserver /etc/resolv.conf 2>/dev/null | head -1 | awk '{print $2}')"
+        echo -e "  ${CYAN}Shell:${NC}       ${SHELL}"
+        echo -e "  ${CYAN}Editor:${NC}      ${EDITOR:-nano}"
+        echo ""
+        ;;
+    hostname)
+        sudo hostnamectl set-hostname "${2:?Usage: ratanaos-config hostname <name>}"
+        echo -e "${GREEN}[✓] Hostname set to: $2${NC}"
+        ;;
+    timezone)
+        sudo timedatectl set-timezone "${2:?Usage: ratanaos-config timezone <zone>}"
+        echo -e "${GREEN}[✓] Timezone set to: $2${NC}"
+        ;;
+    *)
+        echo "Usage: ratanaos-config <show|hostname|timezone> [value]"
+        ;;
+esac

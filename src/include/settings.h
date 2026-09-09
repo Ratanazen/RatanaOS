@@ -26,6 +26,10 @@ typedef struct {
     int                dock_spacing;
     bool               dock_magnification;
 
+    bool               show_desktop_icons;
+    int                desktop_icon_size;
+    bool               show_icon_labels;
+
     int                window_radius;
     bool               transparency;
     bool               shadows;

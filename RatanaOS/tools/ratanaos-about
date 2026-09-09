@@ -1,0 +1,39 @@
+#!/bin/bash
+# ratanaos-about — About RatanaOS
+CYAN='\033[0;36m'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BOLD='\033[1m'
+DIM='\033[2m'
+NC='\033[0m'
+
+echo ""
+echo -e "${RED}  ██████╗  █████╗ ████████╗ █████╗ ███╗   ██╗ █████╗  ██████╗ ███████╗${NC}"
+echo -e "${RED}  ██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗████╗  ██║██╔══██╗██╔═══██╗██╔════╝${NC}"
+echo -e "${RED}  ██████╔╝███████║   ██║   ███████║██╔██╗ ██║███████║██║   ██║███████╗${NC}"
+echo -e "${RED}  ██╔══██╗██╔══██║   ██║   ██╔══██║██║╚██╗██║██╔══██║██║   ██║╚════██║${NC}"
+echo -e "${RED}  ██║  ██║██║  ██║   ██║   ██║  ██║██║ ╚████║██║  ██║╚██████╔╝███████║${NC}"
+echo -e "${RED}  ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝${NC}"
+echo ""
+echo -e "  ${BOLD}RatanaOS — Security & Server Operating System${NC}"
+echo -e "  ${DIM}Based on Debian GNU/Linux${NC}"
+echo ""
+echo -e "  ${CYAN}Version:${NC}      ${RATANAOS_VERSION:-1.0.0} (${RATANAOS_CODENAME:-Angkor})"
+echo -e "  ${CYAN}Edition:${NC}      Security & Server"
+echo -e "  ${CYAN}Architecture:${NC} $(uname -m)"
+echo -e "  ${CYAN}Kernel:${NC}       $(uname -r)"
+echo -e "  ${CYAN}Built on:${NC}     Debian $(cat /etc/debian_version 2>/dev/null || echo 'Bookworm')"
+echo ""
+echo -e "  ${BOLD}Built-in Security Arsenal:${NC}"
+echo -e "  ${GREEN}•${NC} ratanaos-scan      Network scanner & port analysis"
+echo -e "  ${GREEN}•${NC} ratanaos-exploit    Exploit framework & payload generator"
+echo -e "  ${GREEN}•${NC} ratanaos-recon      OSINT & reconnaissance"
+echo -e "  ${GREEN}•${NC} ratanaos-harden     Server hardening & audit"
+echo -e "  ${GREEN}•${NC} ratanaos-forensics  Digital forensics toolkit"
+echo -e "  ${GREEN}•${NC} ratanaos-crypto     Cryptography & steganography"
+echo -e "  ${GREEN}•${NC} ratanaos-network    Network analysis & monitoring"
+echo -e "  ${GREEN}•${NC} ratapkg             Package manager with arsenal"
+echo ""
+echo -e "  ${CYAN}Website:${NC}  https://ratanaos.org"
+echo -e "  ${CYAN}License:${NC}  GPL-3.0"
+echo ""

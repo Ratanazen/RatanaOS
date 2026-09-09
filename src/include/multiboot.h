@@ -39,4 +39,11 @@ struct multiboot_info {
 } __attribute__((packed));
 typedef struct multiboot_info multiboot_info_t;
 
+struct multiboot_mmap_entry {
+    uint32_t size;
+    uint64_t addr;
+    uint64_t len;
+    uint32_t type;
+} __attribute__((packed));
+typedef struct multiboot_mmap_entry multiboot_memory_map_t;
 #endif // MULTIBOOT_H

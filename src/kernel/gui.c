@@ -11,7 +11,7 @@
 #include "../include/keyboard.h"
 #include "../include/rtc.h"
 #include "../include/heap.h"
-#include "../include/pmm.h"
+#include "../include/physical.h"
 #include "../include/cpuid.h"
 #include "../include/timer.h"
 #include "../include/string.h"
@@ -669,6 +669,8 @@ static void draw_music_content(window_t* win) {
 // -------------------------------------------------------------
 // App 9: System Settings.app Window (520x350) - Appearance & UI Engine
 // -------------------------------------------------------------
+static int settings_active_tab = 0;
+
 static void draw_settings_content(window_t* win) {
     const ui_theme_t* theme = theme_get_current();
     int cx = win->x + 2;
@@ -684,72 +686,156 @@ static void draw_settings_content(window_t* win) {
         "Wallpaper",
         "General"
     };
-    ui_sidebar_draw(cx, cy, sidebar_w, ch, "Settings", sb_items, 5, 0, -1);
+    ui_sidebar_draw(cx, cy, sidebar_w, ch, "Settings", sb_items, 5, settings_active_tab, -1);
 
     int rx = cx + sidebar_w + 14;
     int rw = cw - sidebar_w - 18;
     gfx_draw_rect(cx + sidebar_w + 1, cy, cw - sidebar_w - 1, ch, theme->panel_bg);
 
-    // Header
-    ui_label_draw_header(rx, cy + 10, "Appearance & UI System");
-    gfx_draw_line(rx, cy + 28, cx + cw - 16, cy + 28, theme->border);
+    if (settings_active_tab == 2) {
+        // Tab 2: Full Dock & Icons Configuration
+        ui_label_draw_header(rx, cy + 10, "Dock & Icons Configuration");
+        gfx_draw_line(rx, cy + 28, cx + cw - 16, cy + 28, theme->border);
 
-    // Section 1: Theme Presets (Segmented Buttons)
-    font_draw_text(rx, cy + 34, "Theme Preset:", theme->text_secondary, FONT_SIZE_SMALL);
-    const char* theme_btns[] = {"Dark", "Light", "macOS Dark", "macOS Light", "Auto"};
-    int cur_preset_idx = (int)theme_get_preset();
-    ui_segmented_draw(rx, cy + 48, rw - 16, 22, theme_btns, 5, cur_preset_idx, -1);
+        // Section 1: Icon Theme Suite
+        font_draw_text(rx, cy + 34, "Active Icon Theme:", theme->text_secondary, FONT_SIZE_SMALL);
+        const char* icon_theme_btns[] = {"WhiteSur", "MacTahoe", "Vector (Retro)"};
+        int cur_ith = (int)icon_get_theme();
+        ui_segmented_draw(rx, cy + 48, rw - 16, 22, icon_theme_btns, 3, cur_ith, -1);
 
-    // Section 2: Accent Color Palette
-    font_draw_text(rx, cy + 76, "Accent Color:", theme->text_secondary, FONT_SIZE_SMALL);
-    ui_accent_color_t cur_acc = theme_get_accent();
-    for (int i = 0; i < ACCENT_COUNT; i++) {
-        int ax = rx + i * 26 + 4;
-        int ay = cy + 96;
-        uint32_t col = theme_get_accent_color((ui_accent_color_t)i);
-        gfx_draw_circle(ax, ay, 8, col);
-        if (cur_acc == (ui_accent_color_t)i) {
-            gfx_draw_circle(ax, ay, 10, theme->text_primary);
+        // Section 2: Dock Icon Size & Spacing
+        font_draw_text(rx, cy + 76, "Dock Icon Size:", theme->text_secondary, FONT_SIZE_SMALL);
+        const char* dsize_btns[] = {"32 px", "40 px", "48 px", "56 px", "64 px"};
+        int cur_ds = dock_get_icon_size();
+        int ds_idx = (cur_ds <= 32) ? 0 : (cur_ds <= 40) ? 1 : (cur_ds <= 48) ? 2 : (cur_ds <= 56) ? 3 : 4;
+        ui_segmented_draw(rx, cy + 90, 180, 20, dsize_btns, 5, ds_idx, -1);
+
+        font_draw_text(rx + 195, cy + 76, "Dock Spacing:", theme->text_secondary, FONT_SIZE_SMALL);
+        const char* sp_btns[] = {"4 px", "6 px", "8 px", "12 px"};
+        int cur_sp = dock_get_spacing();
+        int sp_idx = (cur_sp <= 4) ? 0 : (cur_sp <= 6) ? 1 : (cur_sp <= 8) ? 2 : 3;
+        ui_segmented_draw(rx + 195, cy + 90, rw - 211, 20, sp_btns, 4, sp_idx, -1);
+
+        // Section 3: Desktop Icons & Toggles
+        settings_t* s = settings_get();
+        font_draw_text(rx, cy + 118, "Desktop Icons:", theme->text_primary, FONT_SIZE_REGULAR);
+        ui_toggle_draw(rx + 95, cy + 116, s->show_desktop_icons, false);
+
+        font_draw_text(rx + 145, cy + 118, "Desktop Size:", theme->text_secondary, FONT_SIZE_SMALL);
+        const char* dt_sizes[] = {"32 px", "48 px", "64 px"};
+        int dt_idx = (s->desktop_icon_size <= 32) ? 0 : (s->desktop_icon_size <= 48) ? 1 : 2;
+        ui_segmented_draw(rx + 225, cy + 116, rw - 241, 20, dt_sizes, 3, dt_idx, -1);
+
+        font_draw_text(rx, cy + 144, "Icon Labels:", theme->text_primary, FONT_SIZE_REGULAR);
+        ui_toggle_draw(rx + 95, cy + 142, s->show_icon_labels, false);
+
+        font_draw_text(rx + 145, cy + 144, "Dock Magnify:", theme->text_primary, FONT_SIZE_REGULAR);
+        ui_toggle_draw(rx + 240, cy + 142, dock_get_magnification(), false);
+
+        // Section 4: Scaled Live Icon Suite Preview
+        font_draw_text(rx, cy + 172, "Live Icon Suite Preview (Scaled Blitter):", theme->text_secondary, FONT_SIZE_SMALL);
+        int prev_y = cy + 190;
+        int psize = (cur_ds > 48) ? 48 : (cur_ds < 36) ? 36 : cur_ds;
+        int step_px = psize + 8;
+        icon_draw_scaled(ICON_ID_FINDER, rx + 4 + step_px * 0, prev_y, psize);
+        icon_draw_scaled(ICON_ID_SAFARI, rx + 4 + step_px * 1, prev_y, psize);
+        icon_draw_scaled(ICON_ID_TERMINAL, rx + 4 + step_px * 2, prev_y, psize);
+        icon_draw_scaled(ICON_ID_SETTINGS, rx + 4 + step_px * 3, prev_y, psize);
+        icon_draw_scaled(ICON_ID_DRIVE, rx + 4 + step_px * 4, prev_y, psize);
+        icon_draw_scaled(ICON_ID_TRASH, rx + 4 + step_px * 5, prev_y, psize);
+    } else if (settings_active_tab == 1) {
+        // Tab 1: Displays
+        ui_label_draw_header(rx, cy + 10, "Displays & Resolution");
+        gfx_draw_line(rx, cy + 28, cx + cw - 16, cy + 28, theme->border);
+
+        font_draw_text(rx, cy + 38, "Resolution:  1024 x 768 @ 60 Hz", theme->text_primary, FONT_SIZE_REGULAR);
+        font_draw_text(rx, cy + 58, "Color Space: 32-bit ARGB TrueColor", theme->text_secondary, FONT_SIZE_REGULAR);
+        font_draw_text(rx, cy + 78, "Graphics:    BGA / VESA VBE Double Buffer", theme->text_secondary, FONT_SIZE_REGULAR);
+
+        font_draw_text(rx, cy + 112, "UI Scaling Factor:", theme->text_secondary, FONT_SIZE_SMALL);
+        const char* scale_btns[] = {"80%", "100%", "125%", "150%"};
+        int cur_sc = ui_scale_get();
+        int sc_idx = (cur_sc == 80) ? 0 : (cur_sc == 100) ? 1 : (cur_sc == 125) ? 2 : (cur_sc == 150) ? 3 : 1;
+        ui_segmented_draw(rx, cy + 126, 160, 20, scale_btns, 4, sc_idx, -1);
+    } else if (settings_active_tab == 3) {
+        // Tab 3: Wallpaper
+        ui_label_draw_header(rx, cy + 10, "Wallpaper & Desktop Background");
+        gfx_draw_line(rx, cy + 28, cx + cw - 16, cy + 28, theme->border);
+
+        font_draw_text(rx, cy + 38, "Preset: macOS Sonoma / Sequoia Dynamic Aurora", theme->text_primary, FONT_SIZE_REGULAR);
+        font_draw_text(rx, cy + 58, "Shader: Real-time Multi-tone Radial Gradient", theme->text_secondary, FONT_SIZE_REGULAR);
+        font_draw_text(rx, cy + 78, "Mode:   Automatic Dark / Light synchronization", theme->text_secondary, FONT_SIZE_REGULAR);
+    } else if (settings_active_tab == 4) {
+        // Tab 4: General
+        ui_label_draw_header(rx, cy + 10, "General System Information");
+        gfx_draw_line(rx, cy + 28, cx + cw - 16, cy + 28, theme->border);
+
+        font_draw_text(rx, cy + 38, "RatanaOS macOS Desktop Edition 64-bit", theme->text_primary, FONT_SIZE_REGULAR);
+        font_draw_text(rx, cy + 58, "Kernel Version: 1.0.0-macos-sequoia (x86_64)", theme->text_secondary, FONT_SIZE_REGULAR);
+        font_draw_text(rx, cy + 78, "Memory Backend: Volatile Checksum-Protected", theme->text_secondary, FONT_SIZE_REGULAR);
+        font_draw_text(rx, cy + 98, "Shell Commands: theme, icons, settings, scale, font", theme->text_secondary, FONT_SIZE_REGULAR);
+    } else {
+        // Tab 0: Appearance (Default)
+        ui_label_draw_header(rx, cy + 10, "Appearance & UI System");
+        gfx_draw_line(rx, cy + 28, cx + cw - 16, cy + 28, theme->border);
+
+        // Section 1: Theme Presets (Segmented Buttons)
+        font_draw_text(rx, cy + 34, "Theme Preset:", theme->text_secondary, FONT_SIZE_SMALL);
+        const char* theme_btns[] = {"Dark", "Light", "macOS Dark", "macOS Light", "Auto"};
+        int cur_preset_idx = (int)theme_get_preset();
+        ui_segmented_draw(rx, cy + 48, rw - 16, 22, theme_btns, 5, cur_preset_idx, -1);
+
+        // Section 2: Accent Color Palette
+        font_draw_text(rx, cy + 76, "Accent Color:", theme->text_secondary, FONT_SIZE_SMALL);
+        ui_accent_color_t cur_acc = theme_get_accent();
+        for (int i = 0; i < ACCENT_COUNT; i++) {
+            int ax = rx + i * 26 + 4;
+            int ay = cy + 96;
+            uint32_t col = theme_get_accent_color((ui_accent_color_t)i);
+            gfx_draw_circle(ax, ay, 8, col);
+            if (cur_acc == (ui_accent_color_t)i) {
+                gfx_draw_circle(ax, ay, 10, theme->text_primary);
+            }
         }
+
+        // Section 3: UI Scale & Font Size Selectors
+        font_draw_text(rx, cy + 112, "UI Scaling:", theme->text_secondary, FONT_SIZE_SMALL);
+        const char* scale_btns[] = {"80%", "100%", "125%", "150%"};
+        int cur_sc = ui_scale_get();
+        int sc_idx = (cur_sc == 80) ? 0 : (cur_sc == 100) ? 1 : (cur_sc == 125) ? 2 : (cur_sc == 150) ? 3 : 1;
+        ui_segmented_draw(rx, cy + 126, 160, 20, scale_btns, 4, sc_idx, -1);
+
+        font_draw_text(rx + 180, cy + 112, "Font Size:", theme->text_secondary, FONT_SIZE_SMALL);
+        const char* font_btns[] = {"Small", "Regular", "Large", "Title"};
+        int cur_fs = (int)font_get_active_size();
+        ui_segmented_draw(rx + 180, cy + 126, rw - 196, 20, font_btns, 4, cur_fs, -1);
+
+        // Section 4: Window Effects (Toggles)
+        font_draw_text(rx, cy + 154, "Translucency:", theme->text_primary, FONT_SIZE_REGULAR);
+        ui_toggle_draw(rx + 100, cy + 152, theme->transparency_enabled, false);
+
+        font_draw_text(rx + 160, cy + 154, "Drop Shadows:", theme->text_primary, FONT_SIZE_REGULAR);
+        ui_toggle_draw(rx + 270, cy + 152, theme->shadows_enabled, false);
+
+        // Section 5: Icon Theme Suite with Live Preview
+        font_draw_text(rx, cy + 182, "Icon Theme Suite:", theme->text_secondary, FONT_SIZE_SMALL);
+        const char* icon_theme_name = icon_get_theme_name();
+        gfx_draw_rounded_rect(rx, cy + 196, 170, 24, 4, theme->control_bg);
+        gfx_draw_rounded_rect_outline(rx, cy + 196, 170, 24, 4, theme->control_border);
+        font_draw_text(rx + 8, cy + 201, icon_theme_name, theme->accent, FONT_SIZE_REGULAR);
+
+        ui_button_draw(rx + 180, cy + 196, 110, 24, "Next Theme", UI_BUTTON_PRIMARY, UI_STATE_NORMAL);
+
+        // Live Icon Preview Row
+        int prev_y = cy + 226;
+        icon_draw_finder_48(rx + 4, prev_y);
+        icon_draw_safari_48(rx + 60, prev_y);
+        icon_draw_terminal_48(rx + 116, prev_y);
+        icon_draw_settings_48(rx + 172, prev_y);
+        icon_draw_trash_48(rx + 228, prev_y);
     }
 
-    // Section 3: UI Scale & Font Size Selectors
-    font_draw_text(rx, cy + 112, "UI Scaling:", theme->text_secondary, FONT_SIZE_SMALL);
-    const char* scale_btns[] = {"80%", "100%", "125%", "150%"};
-    int cur_sc = ui_scale_get();
-    int sc_idx = (cur_sc == 80) ? 0 : (cur_sc == 100) ? 1 : (cur_sc == 125) ? 2 : (cur_sc == 150) ? 3 : 1;
-    ui_segmented_draw(rx, cy + 126, 160, 20, scale_btns, 4, sc_idx, -1);
-
-    font_draw_text(rx + 180, cy + 112, "Font Size:", theme->text_secondary, FONT_SIZE_SMALL);
-    const char* font_btns[] = {"Small", "Regular", "Large", "Title"};
-    int cur_fs = (int)font_get_active_size();
-    ui_segmented_draw(rx + 180, cy + 126, rw - 196, 20, font_btns, 4, cur_fs, -1);
-
-    // Section 4: Window Effects (Toggles)
-    font_draw_text(rx, cy + 154, "Translucency:", theme->text_primary, FONT_SIZE_REGULAR);
-    ui_toggle_draw(rx + 100, cy + 152, theme->transparency_enabled, false);
-
-    font_draw_text(rx + 160, cy + 154, "Drop Shadows:", theme->text_primary, FONT_SIZE_REGULAR);
-    ui_toggle_draw(rx + 270, cy + 152, theme->shadows_enabled, false);
-
-    // Section 5: Icon Theme Suite with Live Preview
-    font_draw_text(rx, cy + 182, "Icon Theme Suite:", theme->text_secondary, FONT_SIZE_SMALL);
-    const char* icon_theme_name = icon_get_theme_name();
-    gfx_draw_rounded_rect(rx, cy + 196, 170, 24, 4, theme->control_bg);
-    gfx_draw_rounded_rect_outline(rx, cy + 196, 170, 24, 4, theme->control_border);
-    font_draw_text(rx + 8, cy + 201, icon_theme_name, theme->accent, FONT_SIZE_REGULAR);
-
-    ui_button_draw(rx + 180, cy + 196, 110, 24, "Next Theme", UI_BUTTON_PRIMARY, UI_STATE_NORMAL);
-
-    // Live Icon Preview Row
-    int prev_y = cy + 226;
-    icon_draw_finder_48(rx + 4, prev_y);
-    icon_draw_safari_48(rx + 60, prev_y);
-    icon_draw_terminal_48(rx + 116, prev_y);
-    icon_draw_settings_48(rx + 172, prev_y);
-    icon_draw_trash_48(rx + 228, prev_y);
-
-    // Section 6: Action Buttons at Bottom
+    // Common Action Buttons at Bottom
     gfx_draw_line(rx, cy + ch - 34, cx + cw - 16, cy + ch - 34, theme->border);
     ui_button_draw(rx, cy + ch - 28, 100, 22, "Reset Defaults", UI_BUTTON_SECONDARY, UI_STATE_NORMAL);
     ui_button_draw(rx + 110, cy + ch - 28, 80, 22, "Save Store", UI_BUTTON_SECONDARY, UI_STATE_NORMAL);
@@ -759,73 +845,26 @@ static void draw_settings_content(window_t* win) {
 static void handle_settings_click(window_t* win, int rel_x, int rel_y, int btn) {
     (void)win; (void)btn;
     int sidebar_w = 126;
-    int rx = 2 + sidebar_w + 14;
+    int cx = 2;
     int cy = TITLEBAR_HEIGHT + 1;
+    int ch = win->height - TITLEBAR_HEIGHT - 3;
+    int rx = 2 + sidebar_w + 14;
     int rw = win->width - 4 - sidebar_w - 18;
 
-    // 1. Theme Presets Segmented Bar (rx, cy + 48, rw - 16, 22, count 5)
-    int p_idx = ui_segmented_hit_test(rx, cy + 48, rw - 16, 22, 5, rel_x, rel_y);
-    if (p_idx >= 0 && p_idx < UI_THEME_COUNT) {
-        theme_set_preset((ui_theme_preset_t)p_idx);
+    // 0. Check Sidebar Tab Navigation Clicks
+    int tab_hit = ui_sidebar_hit_test(cx, cy, sidebar_w, ch, 5, rel_x, rel_y);
+    if (tab_hit >= 0 && tab_hit < 5) {
+        settings_active_tab = tab_hit;
         return;
     }
 
-    // 2. Accent Colors (8 Circles) at (rx + i * 26 + 4, cy + 96)
-    for (int i = 0; i < ACCENT_COUNT; i++) {
-        int ax = rx + i * 26 + 4;
-        int ay = cy + 96;
-        int dx = rel_x - ax;
-        int dy = rel_y - ay;
-        if (dx * dx + dy * dy <= 100) {
-            theme_set_accent((ui_accent_color_t)i);
-            return;
-        }
-    }
-
-    // 3. UI Scale (rx, cy + 126, 160, 20, 4)
-    int sc_hit = ui_segmented_hit_test(rx, cy + 126, 160, 20, 4, rel_x, rel_y);
-    if (sc_hit >= 0) {
-        int scales[] = {80, 100, 125, 150};
-        ui_scale_set(scales[sc_hit]);
-        dock_init();
-        return;
-    }
-
-    // 4. Font Size (rx + 180, cy + 126, rw - 196, 20, 4)
-    int fs_hit = ui_segmented_hit_test(rx + 180, cy + 126, rw - 196, 20, 4, rel_x, rel_y);
-    if (fs_hit >= 0) {
-        font_set_active_size((font_size_t)fs_hit);
-        return;
-    }
-
-    // 5. Translucency Toggle (rx + 100, cy + 152)
-    if (ui_toggle_hit_test(rx + 100, cy + 152, rel_x, rel_y)) {
-        const ui_theme_t* t = theme_get_current();
-        theme_set_transparency(!t->transparency_enabled);
-        return;
-    }
-
-    // 6. Shadows Toggle (rx + 270, cy + 152)
-    if (ui_toggle_hit_test(rx + 270, cy + 152, rel_x, rel_y)) {
-        const ui_theme_t* t = theme_get_current();
-        theme_set_shadows(!t->shadows_enabled);
-        return;
-    }
-
-    // 7. Next Theme Button (rx + 180, cy + 196, 110, 24)
-    if (ui_button_hit_test(rx + 180, cy + 196, 110, 24, rel_x, rel_y)) {
-        icon_theme_next();
-        return;
-    }
-
-    // 8. Action Buttons at Bottom
-    int ch = win->height - TITLEBAR_HEIGHT - 3;
+    // Common Bottom Action Buttons (available across all tabs)
     // Reset Defaults (rx, cy + ch - 28, 100, 22)
     if (ui_button_hit_test(rx, cy + ch - 28, 100, 22, rel_x, rel_y)) {
         settings_reset_defaults();
         return;
     }
-    // Save (rx + 110, cy + ch - 28, 80, 22)
+    // Save Store (rx + 110, cy + ch - 28, 80, 22)
     if (ui_button_hit_test(rx + 110, cy + ch - 28, 80, 22, rel_x, rel_y)) {
         settings_save();
         return;
@@ -834,6 +873,130 @@ static void handle_settings_click(window_t* win, int rel_x, int rel_y, int btn) 
     if (ui_button_hit_test(win->width - 94, cy + ch - 28, 70, 22, rel_x, rel_y)) {
         settings_apply();
         return;
+    }
+
+    if (settings_active_tab == 2) {
+        // Tab 2: Dock & Icons Clicks
+        // 1. Icon Theme Segmented Control (rx, cy + 48, rw - 16, 22, count 3)
+        int ith_hit = ui_segmented_hit_test(rx, cy + 48, rw - 16, 22, 3, rel_x, rel_y);
+        if (ith_hit >= 0 && ith_hit < ICON_THEME_COUNT) {
+            icon_set_theme((icon_theme_id_t)ith_hit);
+            settings_get()->icon_theme = (icon_theme_id_t)ith_hit;
+            return;
+        }
+
+        // 2. Dock Icon Size (rx, cy + 90, 180, 20, count 5)
+        int ds_hit = ui_segmented_hit_test(rx, cy + 90, 180, 20, 5, rel_x, rel_y);
+        if (ds_hit >= 0) {
+            int sizes[] = {32, 40, 48, 56, 64};
+            dock_set_icon_size(sizes[ds_hit]);
+            settings_get()->dock_icon_size = sizes[ds_hit];
+            return;
+        }
+
+        // 3. Dock Spacing (rx + 195, cy + 90, rw - 211, 20, count 4)
+        int sp_hit = ui_segmented_hit_test(rx + 195, cy + 90, rw - 211, 20, 4, rel_x, rel_y);
+        if (sp_hit >= 0) {
+            int sps[] = {4, 6, 8, 12};
+            dock_set_spacing(sps[sp_hit]);
+            settings_get()->dock_spacing = sps[sp_hit];
+            return;
+        }
+
+        // 4. Desktop Icons Toggle (rx + 95, cy + 116)
+        if (ui_toggle_hit_test(rx + 95, cy + 116, rel_x, rel_y)) {
+            settings_t* s = settings_get();
+            s->show_desktop_icons = !s->show_desktop_icons;
+            return;
+        }
+
+        // 5. Desktop Size Segmented Control (rx + 225, cy + 116, rw - 241, 20, count 3)
+        int dt_hit = ui_segmented_hit_test(rx + 225, cy + 116, rw - 241, 20, 3, rel_x, rel_y);
+        if (dt_hit >= 0) {
+            int dts[] = {32, 48, 64};
+            settings_get()->desktop_icon_size = dts[dt_hit];
+            return;
+        }
+
+        // 6. Icon Labels Toggle (rx + 95, cy + 142)
+        if (ui_toggle_hit_test(rx + 95, cy + 142, rel_x, rel_y)) {
+            settings_t* s = settings_get();
+            s->show_icon_labels = !s->show_icon_labels;
+            return;
+        }
+
+        // 7. Dock Magnification Toggle (rx + 240, cy + 142)
+        if (ui_toggle_hit_test(rx + 240, cy + 142, rel_x, rel_y)) {
+            bool mag = !dock_get_magnification();
+            dock_set_magnification(mag);
+            settings_get()->dock_magnification = mag;
+            return;
+        }
+    } else if (settings_active_tab == 1) {
+        // Tab 1: Displays UI Scale
+        int sc_hit = ui_segmented_hit_test(rx, cy + 126, 160, 20, 4, rel_x, rel_y);
+        if (sc_hit >= 0) {
+            int scales[] = {80, 100, 125, 150};
+            ui_scale_set(scales[sc_hit]);
+            dock_init();
+            return;
+        }
+    } else if (settings_active_tab == 0) {
+        // Tab 0: Appearance Clicks
+        // 1. Theme Presets Segmented Bar (rx, cy + 48, rw - 16, 22, count 5)
+        int p_idx = ui_segmented_hit_test(rx, cy + 48, rw - 16, 22, 5, rel_x, rel_y);
+        if (p_idx >= 0 && p_idx < UI_THEME_COUNT) {
+            theme_set_preset((ui_theme_preset_t)p_idx);
+            return;
+        }
+
+        // 2. Accent Colors (8 Circles) at (rx + i * 26 + 4, cy + 96)
+        for (int i = 0; i < ACCENT_COUNT; i++) {
+            int ax = rx + i * 26 + 4;
+            int ay = cy + 96;
+            int dx = rel_x - ax;
+            int dy = rel_y - ay;
+            if (dx * dx + dy * dy <= 100) {
+                theme_set_accent((ui_accent_color_t)i);
+                return;
+            }
+        }
+
+        // 3. UI Scale (rx, cy + 126, 160, 20, 4)
+        int sc_hit = ui_segmented_hit_test(rx, cy + 126, 160, 20, 4, rel_x, rel_y);
+        if (sc_hit >= 0) {
+            int scales[] = {80, 100, 125, 150};
+            ui_scale_set(scales[sc_hit]);
+            dock_init();
+            return;
+        }
+
+        // 4. Font Size (rx + 180, cy + 126, rw - 196, 20, 4)
+        int fs_hit = ui_segmented_hit_test(rx + 180, cy + 126, rw - 196, 20, 4, rel_x, rel_y);
+        if (fs_hit >= 0) {
+            font_set_active_size((font_size_t)fs_hit);
+            return;
+        }
+
+        // 5. Translucency Toggle (rx + 100, cy + 152)
+        if (ui_toggle_hit_test(rx + 100, cy + 152, rel_x, rel_y)) {
+            const ui_theme_t* t = theme_get_current();
+            theme_set_transparency(!t->transparency_enabled);
+            return;
+        }
+
+        // 6. Shadows Toggle (rx + 270, cy + 152)
+        if (ui_toggle_hit_test(rx + 270, cy + 152, rel_x, rel_y)) {
+            const ui_theme_t* t = theme_get_current();
+            theme_set_shadows(!t->shadows_enabled);
+            return;
+        }
+
+        // 7. Next Theme Button (rx + 180, cy + 196, 110, 24)
+        if (ui_button_hit_test(rx + 180, cy + 196, 110, 24, rel_x, rel_y)) {
+            icon_theme_next();
+            return;
+        }
     }
 }
 
@@ -951,18 +1114,31 @@ static void draw_macos_desktop(void) {
     gfx_draw_wallpaper();
 
     // 2. Desktop Icons on Right Side
-    uint32_t dt_col = theme->dark_mode ? COLOR_WHITE : 0x001A1A1E;
-    // 2a. Drive Icon (RatanaOS HD)
-    icon_draw_drive_48(sw - 74, 40);
-    font_draw_text(sw - 88, 92, "RatanaOS HD", dt_col, FONT_SIZE_REGULAR);
+    settings_t* s = settings_get();
+    if (s->show_desktop_icons) {
+        uint32_t dt_col = theme->dark_mode ? COLOR_WHITE : 0x001A1A1E;
+        int d_size = (s->desktop_icon_size >= 32 && s->desktop_icon_size <= 64) ? s->desktop_icon_size : 48;
+        int d_x = sw - d_size - 26;
+        int step_y = d_size + (s->show_icon_labels ? 42 : 16);
 
-    // 2b. Applications Folder
-    icon_draw_folder_48(sw - 74, 130);
-    font_draw_text(sw - 94, 182, "Applications", dt_col, FONT_SIZE_REGULAR);
+        // 2a. Drive Icon (RatanaOS HD)
+        icon_draw_scaled(ICON_ID_DRIVE, d_x, 40, d_size);
+        if (s->show_icon_labels) {
+            font_draw_text(sw - 88, 40 + d_size + 4, "RatanaOS HD", dt_col, FONT_SIZE_REGULAR);
+        }
 
-    // 2c. Documents Folder
-    icon_draw_folder_48(sw - 74, 220);
-    font_draw_text(sw - 86, 272, "Documents", dt_col, FONT_SIZE_REGULAR);
+        // 2b. Applications Folder
+        icon_draw_scaled(ICON_ID_FOLDER, d_x, 40 + step_y, d_size);
+        if (s->show_icon_labels) {
+            font_draw_text(sw - 94, 40 + step_y + d_size + 4, "Applications", dt_col, FONT_SIZE_REGULAR);
+        }
+
+        // 2c. Documents Folder
+        icon_draw_scaled(ICON_ID_FOLDER, d_x, 40 + step_y * 2, d_size);
+        if (s->show_icon_labels) {
+            font_draw_text(sw - 86, 40 + step_y * 2 + d_size + 4, "Documents", dt_col, FONT_SIZE_REGULAR);
+        }
+    }
 
     // 3. Render Windows in Z-Order
     for (int i = 0; i < window_count; i++) {

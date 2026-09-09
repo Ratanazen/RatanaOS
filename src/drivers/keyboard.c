@@ -84,14 +84,14 @@ static const char scancodes_shifted[128] = {
     0
 };
 
-static void keyboard_callback(registers_t* regs) {
+static registers_t* keyboard_callback(registers_t* regs) {
     (void)regs;
     uint8_t scancode = inb(0x60);
 
     // Check for extended key prefix
     if (scancode == 0xE0) {
         extended_scancode = true;
-        return;
+        return regs;
     }
 
     if (scancode & 0x80) {
@@ -110,22 +110,22 @@ static void keyboard_callback(registers_t* regs) {
         if (scancode == 0x2A || scancode == 0x36) {
             shift_pressed = true;
             extended_scancode = false;
-            return;
+            return regs;
         }
         if (scancode == 0x1D) {
             ctrl_pressed = true;
             extended_scancode = false;
-            return;
+            return regs;
         }
         if (scancode == 0x38) {
             alt_pressed = true;
             extended_scancode = false;
-            return;
+            return regs;
         }
         if (scancode == 0x3A) {
             caps_lock = !caps_lock;
             extended_scancode = false;
-            return;
+            return regs;
         }
 
         char c = 0;
@@ -157,6 +157,7 @@ static void keyboard_callback(registers_t* regs) {
             }
         }
     }
+    return regs;
 }
 
 void keyboard_init(void) {

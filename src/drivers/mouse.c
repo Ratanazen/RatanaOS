@@ -47,11 +47,11 @@ static uint8_t mouse_read(void) {
     return inb(0x60);
 }
 
-static void mouse_callback(registers_t* regs) {
+static registers_t* mouse_callback(registers_t* regs) {
     (void)regs;
     uint8_t status = inb(0x64);
     if (!(status & 0x20)) {
-        return; // Data from keyboard, not mouse
+        return regs; // Data from keyboard, not mouse
     }
 
     uint8_t mouse_in = inb(0x60);
@@ -95,6 +95,7 @@ static void mouse_callback(registers_t* regs) {
             if (mouse_y >= max_bounds_y) mouse_y = max_bounds_y - 1;
             break;
     }
+    return regs;
 }
 
 void mouse_init(void) {

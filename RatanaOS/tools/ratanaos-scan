@@ -1,0 +1,266 @@
+#!/bin/bash
+# ============================================================================
+# ratanaos-scan — RatanaOS Network Scanner & Reconnaissance Tool
+# ============================================================================
+# Built-in reconnaissance and scanning utility for RatanaOS Security Edition.
+# Wraps nmap, masscan, and custom scanning logic.
+# ============================================================================
+
+set -euo pipefail
+
+VERSION="1.0.0"
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+MAGENTA='\033[0;35m'
+BOLD='\033[1m'
+DIM='\033[2m'
+NC='\033[0m'
+
+RESULTS_DIR="${HOME}/.ratanaos/scans"
+mkdir -p "${RESULTS_DIR}"
+
+banner() {
+    echo -e "${RED}${BOLD}"
+    echo "  ╦═╗╔═╗╔╦╗╔═╗  ╔═╗╔═╗╔═╗╔╗╔"
+    echo "  ╠╦╝╠═╣ ║ ╠═╣  ╚═╗║  ╠═╣║║║"
+    echo "  ╩╚═╩ ╩ ╩ ╩ ╩  ╚═╝╚═╝╩ ╩╝╚╝"
+    echo -e "${NC}${DIM}  RatanaOS Network Scanner v${VERSION}${NC}"
+    echo ""
+}
+
+timestamp() { date +%Y%m%d_%H%M%S; }
+
+# ── Quick Scan (top 100 ports) ──
+cmd_quick() {
+    local target="${1:?Usage: ratanaos-scan quick <target>}"
+    local outfile="${RESULTS_DIR}/quick_$(echo $target | tr '/' '_')_$(timestamp).txt"
+
+    banner
+    echo -e "${CYAN}[*] Quick scan: ${target}${NC}"
+    echo -e "${DIM}    Scanning top 100 ports...${NC}"
+
+    if command -v nmap &>/dev/null; then
+        nmap -T4 --top-ports 100 -sV --open "$target" -oN "$outfile" 2>/dev/null
+    else
+        # Fallback: pure bash port scanner
+        echo -e "${YELLOW}[!] nmap not found. Using built-in scanner.${NC}"
+        echo "# RatanaOS Quick Scan — ${target} — $(date)" > "$outfile"
+        for port in 21 22 23 25 53 80 110 111 135 139 143 443 445 993 995 1433 1521 3306 3389 5432 5900 6379 8080 8443 27017; do
+            (echo >/dev/tcp/${target}/${port}) 2>/dev/null && \
+                echo -e "  ${GREEN}[OPEN]${NC} ${target}:${port}" | tee -a "$outfile"
+        done
+    fi
+
+    echo -e "\n${GREEN}[✓] Results saved: ${outfile}${NC}"
+}
+
+# ── Full Scan (all ports) ──
+cmd_full() {
+    local target="${1:?Usage: ratanaos-scan full <target>}"
+    local outfile="${RESULTS_DIR}/full_$(echo $target | tr '/' '_')_$(timestamp).txt"
+
+    banner
+    echo -e "${CYAN}[*] Full port scan: ${target}${NC}"
+    echo -e "${DIM}    Scanning all 65535 ports (this may take a while)...${NC}"
+
+    if command -v nmap &>/dev/null; then
+        nmap -T4 -p- -sV -sC --open "$target" -oN "$outfile" 2>/dev/null
+    elif command -v masscan &>/dev/null; then
+        masscan "$target" -p1-65535 --rate=1000 -oL "$outfile" 2>/dev/null
+    else
+        echo -e "${YELLOW}[!] nmap/masscan not found. Using built-in scanner.${NC}"
+        echo "# RatanaOS Full Scan — ${target} — $(date)" > "$outfile"
+        for port in $(seq 1 65535); do
+            (echo >/dev/tcp/${target}/${port}) 2>/dev/null && \
+                echo -e "  ${GREEN}[OPEN]${NC} ${target}:${port}" | tee -a "$outfile"
+        done
+    fi
+
+    echo -e "\n${GREEN}[✓] Results saved: ${outfile}${NC}"
+}
+
+# ── Stealth Scan (SYN scan) ──
+cmd_stealth() {
+    local target="${1:?Usage: ratanaos-scan stealth <target>}"
+    local outfile="${RESULTS_DIR}/stealth_$(echo $target | tr '/' '_')_$(timestamp).txt"
+
+    banner
+    echo -e "${MAGENTA}[*] Stealth SYN scan: ${target}${NC}"
+
+    if command -v nmap &>/dev/null; then
+        if [[ $EUID -eq 0 ]]; then
+            nmap -sS -T4 -Pn --top-ports 1000 -sV --open "$target" -oN "$outfile" 2>/dev/null
+        else
+            echo -e "${YELLOW}[!] SYN scan requires root. Falling back to connect scan.${NC}"
+            nmap -sT -T4 -Pn --top-ports 1000 -sV --open "$target" -oN "$outfile" 2>/dev/null
+        fi
+    else
+        echo -e "${RED}[!] nmap required for stealth scan. Install: ratapkg install nmap${NC}"
+        return 1
+    fi
+
+    echo -e "\n${GREEN}[✓] Results saved: ${outfile}${NC}"
+}
+
+# ── Vulnerability Scan ──
+cmd_vuln() {
+    local target="${1:?Usage: ratanaos-scan vuln <target>}"
+    local outfile="${RESULTS_DIR}/vuln_$(echo $target | tr '/' '_')_$(timestamp).txt"
+
+    banner
+    echo -e "${RED}[*] Vulnerability scan: ${target}${NC}"
+    echo -e "${DIM}    Running NSE vuln scripts...${NC}"
+
+    if command -v nmap &>/dev/null; then
+        nmap -T4 --script=vuln --top-ports 100 "$target" -oN "$outfile" 2>/dev/null
+    else
+        echo -e "${RED}[!] nmap required. Install: ratapkg install nmap${NC}"
+        return 1
+    fi
+
+    echo -e "\n${GREEN}[✓] Results saved: ${outfile}${NC}"
+}
+
+# ── OS Detection ──
+cmd_os() {
+    local target="${1:?Usage: ratanaos-scan os <target>}"
+    local outfile="${RESULTS_DIR}/os_$(echo $target | tr '/' '_')_$(timestamp).txt"
+
+    banner
+    echo -e "${CYAN}[*] OS fingerprinting: ${target}${NC}"
+
+    if command -v nmap &>/dev/null; then
+        if [[ $EUID -eq 0 ]]; then
+            nmap -O -T4 "$target" -oN "$outfile" 2>/dev/null
+        else
+            echo -e "${YELLOW}[!] OS detection requires root.${NC}"
+            sudo nmap -O -T4 "$target" -oN "$outfile" 2>/dev/null
+        fi
+    else
+        echo -e "${RED}[!] nmap required. Install: ratapkg install nmap${NC}"
+        return 1
+    fi
+
+    echo -e "\n${GREEN}[✓] Results saved: ${outfile}${NC}"
+}
+
+# ── Network Discovery ──
+cmd_discover() {
+    local subnet="${1:?Usage: ratanaos-scan discover <subnet> (e.g. 192.168.1.0/24)}"
+    local outfile="${RESULTS_DIR}/discover_$(echo $subnet | tr '/' '_')_$(timestamp).txt"
+
+    banner
+    echo -e "${CYAN}[*] Network discovery: ${subnet}${NC}"
+
+    if command -v nmap &>/dev/null; then
+        nmap -sn "$subnet" -oN "$outfile" 2>/dev/null
+    else
+        echo -e "${YELLOW}[!] nmap not found. Using ARP scan...${NC}"
+        echo "# RatanaOS Network Discovery — ${subnet} — $(date)" > "$outfile"
+        if command -v arp-scan &>/dev/null; then
+            arp-scan "$subnet" 2>/dev/null | tee -a "$outfile"
+        else
+            # Pure ping sweep
+            local base="${subnet%.*}"
+            for i in $(seq 1 254); do
+                ping -c 1 -W 1 "${base}.${i}" &>/dev/null && \
+                    echo -e "  ${GREEN}[ALIVE]${NC} ${base}.${i}" | tee -a "$outfile" &
+            done
+            wait
+        fi
+    fi
+
+    echo -e "\n${GREEN}[✓] Results saved: ${outfile}${NC}"
+}
+
+# ── Web Scanner ──
+cmd_web() {
+    local target="${1:?Usage: ratanaos-scan web <url>}"
+    local outfile="${RESULTS_DIR}/web_$(echo $target | tr '/:' '_')_$(timestamp).txt"
+
+    banner
+    echo -e "${CYAN}[*] Web application scan: ${target}${NC}"
+
+    echo "# RatanaOS Web Scan — ${target} — $(date)" > "$outfile"
+
+    # HTTP headers
+    echo -e "\n${BOLD}── HTTP Headers ──${NC}" | tee -a "$outfile"
+    curl -sI "$target" 2>/dev/null | tee -a "$outfile"
+
+    # Check common security headers
+    echo -e "\n${BOLD}── Security Headers Check ──${NC}" | tee -a "$outfile"
+    local headers
+    headers="$(curl -sI "$target" 2>/dev/null)"
+    
+    for h in "Strict-Transport-Security" "Content-Security-Policy" "X-Frame-Options" \
+             "X-Content-Type-Options" "X-XSS-Protection" "Referrer-Policy" \
+             "Permissions-Policy" "Cross-Origin-Opener-Policy"; do
+        if echo "$headers" | grep -qi "$h"; then
+            echo -e "  ${GREEN}[✓]${NC} ${h}" | tee -a "$outfile"
+        else
+            echo -e "  ${RED}[✗]${NC} ${h} — MISSING" | tee -a "$outfile"
+        fi
+    done
+
+    # Technology detection
+    echo -e "\n${BOLD}── Technology Detection ──${NC}" | tee -a "$outfile"
+    local server
+    server="$(echo "$headers" | grep -i '^Server:' | head -1)"
+    [[ -n "$server" ]] && echo -e "  ${CYAN}Server:${NC} ${server#*: }" | tee -a "$outfile"
+    
+    local powered
+    powered="$(echo "$headers" | grep -i '^X-Powered-By:' | head -1)"
+    [[ -n "$powered" ]] && echo -e "  ${CYAN}Powered By:${NC} ${powered#*: }" | tee -a "$outfile"
+
+    # Run nikto if available
+    if command -v nikto &>/dev/null; then
+        echo -e "\n${BOLD}── Nikto Scan ──${NC}" | tee -a "$outfile"
+        nikto -h "$target" -maxtime 60 2>/dev/null | tee -a "$outfile"
+    fi
+
+    echo -e "\n${GREEN}[✓] Results saved: ${outfile}${NC}"
+}
+
+# ── List Past Scans ──
+cmd_history() {
+    banner
+    echo -e "${BOLD}  Scan History${NC}"
+    echo -e "  ────────────"
+    if [[ -d "${RESULTS_DIR}" ]] && ls "${RESULTS_DIR}"/*.txt &>/dev/null; then
+        ls -lht "${RESULTS_DIR}"/*.txt | awk '{printf "  %s %s  %s\n", $6, $7, $NF}'
+    else
+        echo -e "  ${DIM}No scans found.${NC}"
+    fi
+    echo ""
+}
+
+# ── Entry ──
+case "${1:-help}" in
+    quick)    shift; cmd_quick "$@" ;;
+    full)     shift; cmd_full "$@" ;;
+    stealth)  shift; cmd_stealth "$@" ;;
+    vuln)     shift; cmd_vuln "$@" ;;
+    os)       shift; cmd_os "$@" ;;
+    discover) shift; cmd_discover "$@" ;;
+    web)      shift; cmd_web "$@" ;;
+    history)  cmd_history ;;
+    *)
+        banner
+        echo -e "  ${BOLD}Usage:${NC} ratanaos-scan <command> [target]"
+        echo ""
+        echo -e "  ${BOLD}Scanning:${NC}"
+        echo "    quick    <target>      Quick scan (top 100 ports)"
+        echo "    full     <target>      Full scan (all 65535 ports)"
+        echo "    stealth  <target>      SYN stealth scan"
+        echo "    vuln     <target>      Vulnerability scan (NSE scripts)"
+        echo "    os       <target>      OS fingerprinting"
+        echo "    discover <subnet>      Network host discovery"
+        echo "    web      <url>         Web application scan"
+        echo ""
+        echo -e "  ${BOLD}Management:${NC}"
+        echo "    history                List past scan results"
+        echo ""
+        ;;
+esac

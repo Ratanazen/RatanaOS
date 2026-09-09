@@ -16,3 +16,9 @@ gdt_flush:
     retfq
 .reload_cs:
     ret
+
+global tss_flush
+tss_flush:
+    mov ax, 0x28 ; index 5 = 0x28 + RPL 3 = 0x28
+    ltr ax
+    ret

@@ -11,6 +11,7 @@ make
 
 mkdir -p iso/boot/grub
 cp build/ratanaos.bin iso/boot/ratanaos.bin
+cp build/ratanaos32.bin iso/boot/ratanaos32.bin
 
 if which grub-mkrescue >/dev/null 2>&1; then
     grub-mkrescue -o build/ratanaos.iso iso

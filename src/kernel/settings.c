@@ -30,6 +30,9 @@ void settings_reset_defaults(void) {
     active_settings.dock_icon_size = 48;
     active_settings.dock_spacing = 6;
     active_settings.dock_magnification = true;
+    active_settings.show_desktop_icons = true;
+    active_settings.desktop_icon_size = 48;
+    active_settings.show_icon_labels = true;
     active_settings.window_radius = 10;
     active_settings.transparency = true;
     active_settings.shadows = true;
@@ -54,11 +57,16 @@ void settings_apply(void) {
     theme_set_window_radius(active_settings.window_radius);
     ui_scale_set(active_settings.ui_scale);
     font_set_active_size(active_settings.font_size);
-    icon_set_theme(active_settings.icon_theme);
 
-    dock_set_icon_size(active_settings.dock_icon_size);
-    dock_set_spacing(active_settings.dock_spacing);
-    dock_set_magnification(active_settings.dock_magnification);
+    icon_config_t icfg;
+    icfg.theme = active_settings.icon_theme;
+    icfg.dock_icon_size = active_settings.dock_icon_size;
+    icfg.dock_spacing = active_settings.dock_spacing;
+    icfg.dock_magnification = active_settings.dock_magnification;
+    icfg.show_desktop_icons = active_settings.show_desktop_icons;
+    icfg.desktop_icon_size = active_settings.desktop_icon_size;
+    icfg.show_icon_labels = active_settings.show_icon_labels;
+    icon_config_set(&icfg);
 }
 
 void settings_save(void) {
@@ -87,7 +95,11 @@ void settings_print(void) {
     kprintf("UI Scaling:         %d%%\n", active_settings.ui_scale);
     kprintf("Font Size:          %s\n", font_get_size_name(active_settings.font_size));
     kprintf("Dock Icon Size:     %d px\n", active_settings.dock_icon_size);
+    kprintf("Dock Spacing:       %d px\n", active_settings.dock_spacing);
     kprintf("Dock Magnification: %s\n", active_settings.dock_magnification ? "Enabled" : "Disabled");
+    kprintf("Desktop Icons:      %s\n", active_settings.show_desktop_icons ? "Enabled" : "Disabled");
+    kprintf("Desktop Icon Size:  %d px\n", active_settings.desktop_icon_size);
+    kprintf("Desktop Labels:     %s\n", active_settings.show_icon_labels ? "Enabled" : "Disabled");
     kprintf("Window Radius:      %d px\n", active_settings.window_radius);
     kprintf("Transparency:       %s\n", active_settings.transparency ? "Enabled" : "Disabled");
     kprintf("Window Shadows:     %s\n", active_settings.shadows ? "Enabled" : "Disabled");

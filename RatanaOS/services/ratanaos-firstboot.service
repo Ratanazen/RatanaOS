@@ -1,0 +1,13 @@
+[Unit]
+Description=RatanaOS First Boot Configuration
+ConditionPathExists=!/var/lib/ratanaos/firstboot-done
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/ratanaos-firstboot
+ExecStartPost=/bin/touch /var/lib/ratanaos/firstboot-done
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

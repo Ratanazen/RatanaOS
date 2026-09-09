@@ -1,25 +1,81 @@
 #include "../include/icons.h"
 #include "../include/gfx.h"
 #include "../include/icons_assets.h"
+#include "../include/dock.h"
 
-static icon_theme_id_t current_theme = ICON_THEME_WHITESUR;
+static icon_config_t current_icon_config = {
+    .theme = ICON_THEME_WHITESUR,
+    .dock_icon_size = 48,
+    .dock_spacing = 6,
+    .dock_magnification = true,
+    .show_desktop_icons = true,
+    .desktop_icon_size = 48,
+    .show_icon_labels = true,
+};
+
+void icon_config_init(void) {
+    icon_config_reset_defaults();
+}
+
+void icon_config_get(icon_config_t* cfg) {
+    if (cfg) {
+        *cfg = current_icon_config;
+    }
+}
+
+void icon_config_set(const icon_config_t* cfg) {
+    if (!cfg) return;
+    if (cfg->theme >= 0 && cfg->theme < ICON_THEME_COUNT) {
+        current_icon_config.theme = cfg->theme;
+    }
+    if (cfg->dock_icon_size >= 32 && cfg->dock_icon_size <= 64) {
+        current_icon_config.dock_icon_size = cfg->dock_icon_size;
+    }
+    if (cfg->dock_spacing >= 2 && cfg->dock_spacing <= 16) {
+        current_icon_config.dock_spacing = cfg->dock_spacing;
+    }
+    current_icon_config.dock_magnification = cfg->dock_magnification;
+    current_icon_config.show_desktop_icons = cfg->show_desktop_icons;
+    if (cfg->desktop_icon_size >= 32 && cfg->desktop_icon_size <= 64) {
+        current_icon_config.desktop_icon_size = cfg->desktop_icon_size;
+    }
+    current_icon_config.show_icon_labels = cfg->show_icon_labels;
+    icon_config_apply();
+}
+
+void icon_config_reset_defaults(void) {
+    current_icon_config.theme = ICON_THEME_WHITESUR;
+    current_icon_config.dock_icon_size = 48;
+    current_icon_config.dock_spacing = 6;
+    current_icon_config.dock_magnification = true;
+    current_icon_config.show_desktop_icons = true;
+    current_icon_config.desktop_icon_size = 48;
+    current_icon_config.show_icon_labels = true;
+    icon_config_apply();
+}
+
+void icon_config_apply(void) {
+    dock_set_icon_size(current_icon_config.dock_icon_size);
+    dock_set_spacing(current_icon_config.dock_spacing);
+    dock_set_magnification(current_icon_config.dock_magnification);
+}
 
 void icon_set_theme(icon_theme_id_t theme) {
     if (theme >= 0 && theme < ICON_THEME_COUNT) {
-        current_theme = theme;
+        current_icon_config.theme = theme;
     }
 }
 
 icon_theme_id_t icon_get_theme(void) {
-    return current_theme;
+    return current_icon_config.theme;
 }
 
 void icon_theme_next(void) {
-    current_theme = (icon_theme_id_t)((current_theme + 1) % ICON_THEME_COUNT);
+    current_icon_config.theme = (icon_theme_id_t)((current_icon_config.theme + 1) % ICON_THEME_COUNT);
 }
 
 const char* icon_get_theme_name(void) {
-    return icons_theme_get_name(current_theme);
+    return icons_theme_get_name(current_icon_config.theme);
 }
 
 // -------------------------------------------------------------
@@ -51,11 +107,63 @@ void gfx_draw_icon_rgba(int x, int y, int w, int h, const uint32_t* pixels) {
     }
 }
 
+// -------------------------------------------------------------
+// 32-bit ARGB Scaled Blitter (Arbitrary dimensions with Alpha)
+// -------------------------------------------------------------
+void gfx_draw_icon_rgba_scaled(int x, int y, int target_w, int target_h, int src_w, int src_h, const uint32_t* pixels) {
+    if (!pixels || target_w <= 0 || target_h <= 0 || src_w <= 0 || src_h <= 0) return;
+    int sw = gfx_get_width();
+    int sh = gfx_get_height();
+
+    if (target_w == src_w && target_h == src_h) {
+        gfx_draw_icon_rgba(x, y, target_w, target_h, pixels);
+        return;
+    }
+
+    uint32_t step_x = ((uint32_t)src_w << 16) / (uint32_t)target_w;
+    uint32_t step_y = ((uint32_t)src_h << 16) / (uint32_t)target_h;
+
+    for (int cy = 0; cy < target_h; cy++) {
+        int dst_y = y + cy;
+        if (dst_y < 0 || dst_y >= sh) continue;
+
+        uint32_t src_y_fp = cy * step_y;
+        int src_y = src_y_fp >> 16;
+        if (src_y >= src_h) src_y = src_h - 1;
+
+        const uint32_t* row_pixels = &pixels[src_y * src_w];
+
+        for (int cx = 0; cx < target_w; cx++) {
+            int dst_x = x + cx;
+            if (dst_x < 0 || dst_x >= sw) continue;
+
+            uint32_t src_x_fp = cx * step_x;
+            int src_x = src_x_fp >> 16;
+            if (src_x >= src_w) src_x = src_w - 1;
+
+            uint32_t src = row_pixels[src_x];
+            uint8_t a = (src >> 24) & 0xFF;
+            if (a == 0) continue;
+
+            if (a == 255) {
+                gfx_draw_pixel(dst_x, dst_y, src & 0x00FFFFFF);
+            } else {
+                gfx_draw_pixel_alpha(dst_x, dst_y, src & 0x00FFFFFF, a);
+            }
+        }
+    }
+}
+
 static bool try_draw_theme_icon(icon_id_t id, int x, int y, int size) {
-    if (current_theme == ICON_THEME_VECTOR) return false;
-    const uint32_t* data = icons_asset_get(current_theme, id);
+    if (current_icon_config.theme == ICON_THEME_VECTOR) return false;
+    const uint32_t* data = icons_asset_get(current_icon_config.theme, id);
     if (!data) return false;
-    gfx_draw_icon_rgba(x, y, size, size, data);
+    int src_size = (id == ICON_ID_ABOUT_64) ? ICON_SIZE_64 : ICON_SIZE_48;
+    if (size == src_size) {
+        gfx_draw_icon_rgba(x, y, size, size, data);
+    } else {
+        gfx_draw_icon_rgba_scaled(x, y, size, size, src_size, src_size, data);
+    }
     return true;
 }
 
@@ -618,5 +726,35 @@ void icon_draw_siri(int x, int y) {
     gfx_draw_circle(x + 6, y + 6, 2, 0x00FFD60A);
     gfx_draw_pixel(x + 6, y + 6, COLOR_WHITE);
 }
+
+// -------------------------------------------------------------
+// Scaled Icon Drawing Dispatcher
+// -------------------------------------------------------------
+void icon_draw_scaled(icon_id_t id, int x, int y, int size) {
+    if (size <= 0) size = 48;
+    if (try_draw_theme_icon(id, x, y, size)) return;
+
+    // Vector fallback dispatcher
+    switch (id) {
+        case ICON_ID_FINDER:      icon_draw_finder_48(x + (size - 48)/2, y + (size - 48)/2); break;
+        case ICON_ID_LAUNCHPAD:   icon_draw_launchpad_48(x + (size - 48)/2, y + (size - 48)/2); break;
+        case ICON_ID_SAFARI:      icon_draw_safari_48(x + (size - 48)/2, y + (size - 48)/2); break;
+        case ICON_ID_TERMINAL:    icon_draw_terminal_48(x + (size - 48)/2, y + (size - 48)/2); break;
+        case ICON_ID_SYSMON:      icon_draw_sysmon_48(x + (size - 48)/2, y + (size - 48)/2); break;
+        case ICON_ID_CALCULATOR:  icon_draw_calculator_48(x + (size - 48)/2, y + (size - 48)/2); break;
+        case ICON_ID_PAINT:       icon_draw_paint_48(x + (size - 48)/2, y + (size - 48)/2); break;
+        case ICON_ID_NOTES:       icon_draw_notes_48(x + (size - 48)/2, y + (size - 48)/2); break;
+        case ICON_ID_MUSIC:       icon_draw_music_48(x + (size - 48)/2, y + (size - 48)/2); break;
+        case ICON_ID_SETTINGS:    icon_draw_settings_48(x + (size - 48)/2, y + (size - 48)/2); break;
+        case ICON_ID_APPSTORE:    icon_draw_appstore_48(x + (size - 48)/2, y + (size - 48)/2); break;
+        case ICON_ID_ABOUT:       icon_draw_about_48(x + (size - 48)/2, y + (size - 48)/2); break;
+        case ICON_ID_TRASH:       icon_draw_trash_48(x + (size - 48)/2, y + (size - 48)/2); break;
+        case ICON_ID_DRIVE:       icon_draw_drive_48(x + (size - 48)/2, y + (size - 48)/2); break;
+        case ICON_ID_FOLDER:      icon_draw_folder_48(x + (size - 48)/2, y + (size - 48)/2); break;
+        case ICON_ID_ABOUT_64:    icon_draw_apple_64(x + (size - 64)/2, y + (size - 64)/2); break;
+        default: break;
+    }
+}
+
 
 

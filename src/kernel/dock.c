@@ -91,29 +91,29 @@ void dock_draw(const bool* window_open_states, const bool* window_active_states,
     int step = icon_s + space;
 
     // 0: Finder
-    icon_draw_finder_48(start_x + step * 0, icon_y);
+    icon_draw_scaled(ICON_ID_FINDER, start_x + step * 0, icon_y, icon_s);
     // 1: Launchpad
-    icon_draw_launchpad_48(start_x + step * 1, icon_y);
+    icon_draw_scaled(ICON_ID_LAUNCHPAD, start_x + step * 1, icon_y, icon_s);
     // 2: Safari
-    icon_draw_safari_48(start_x + step * 2, icon_y);
+    icon_draw_scaled(ICON_ID_SAFARI, start_x + step * 2, icon_y, icon_s);
     // 3: Terminal
-    icon_draw_terminal_48(start_x + step * 3, icon_y);
+    icon_draw_scaled(ICON_ID_TERMINAL, start_x + step * 3, icon_y, icon_s);
     // 4: Activity Monitor
-    icon_draw_sysmon_48(start_x + step * 4, icon_y);
+    icon_draw_scaled(ICON_ID_SYSMON, start_x + step * 4, icon_y, icon_s);
     // 5: Calculator
-    icon_draw_calculator_48(start_x + step * 5, icon_y);
+    icon_draw_scaled(ICON_ID_CALCULATOR, start_x + step * 5, icon_y, icon_s);
     // 6: Paint Studio
-    icon_draw_paint_48(start_x + step * 6, icon_y);
+    icon_draw_scaled(ICON_ID_PAINT, start_x + step * 6, icon_y, icon_s);
     // 7: Notes
-    icon_draw_notes_48(start_x + step * 7, icon_y);
+    icon_draw_scaled(ICON_ID_NOTES, start_x + step * 7, icon_y, icon_s);
     // 8: Music
-    icon_draw_music_48(start_x + step * 8, icon_y);
+    icon_draw_scaled(ICON_ID_MUSIC, start_x + step * 8, icon_y, icon_s);
     // 9: System Settings
-    icon_draw_settings_48(start_x + step * 9, icon_y);
+    icon_draw_scaled(ICON_ID_SETTINGS, start_x + step * 9, icon_y, icon_s);
     // 10: App Store
-    icon_draw_appstore_48(start_x + step * 10, icon_y);
+    icon_draw_scaled(ICON_ID_APPSTORE, start_x + step * 10, icon_y, icon_s);
     // 11: About This Mac
-    icon_draw_about_48(start_x + step * 11, icon_y);
+    icon_draw_scaled(ICON_ID_ABOUT, start_x + step * 11, icon_y, icon_s);
 
     // Dock Divider Line
     int div_x = start_x + step * DOCK_APP_COUNT - 2;
@@ -124,7 +124,7 @@ void dock_draw(const bool* window_open_states, const bool* window_active_states,
 
     // 12: Trash Icon
     int trash_x = div_x + 10;
-    icon_draw_trash_48(trash_x, icon_y);
+    icon_draw_scaled(ICON_ID_TRASH, trash_x, icon_y, icon_s);
 
     // 4. Active Running Application Indicator Dots
     for (int i = 0; i < DOCK_APP_COUNT && i < count; i++) {

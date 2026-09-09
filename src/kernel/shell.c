@@ -6,7 +6,7 @@
 #include "../include/io.h"
 #include "../include/rtc.h"
 #include "../include/heap.h"
-#include "../include/pmm.h"
+#include "../include/physical.h"
 #include "../include/pci.h"
 #include "../include/cpuid.h"
 #include "../include/speaker.h"
@@ -134,8 +134,8 @@ static void cmd_fetch(void) {
 }
 
 static void cmd_mem(void) {
-    uint64_t total_pages = pmm_get_total_pages();
-    uint64_t free_pages = pmm_get_free_pages();
+    uint64_t total_pages = phys_get_total_pages();
+    uint64_t free_pages = phys_get_free_pages();
     uint64_t total_phys = total_pages * PAGE_SIZE;
     uint64_t free_phys = free_pages * PAGE_SIZE;
     uint64_t used_phys = (total_phys >= free_phys) ? (total_phys - free_phys) : 0;
@@ -191,23 +191,126 @@ static void cmd_beep(char* args) {
 
 static void cmd_icons(char* args) {
     while (*args == ' ') args++;
-    if (strcmp(args, "whitesur") == 0) {
+    settings_t* s = settings_get();
+
+    if (*args == '\0' || strcmp(args, "config") == 0 || strcmp(args, "status") == 0) {
+        kprintf("\n--- RatanaOS Icon Subsystem Configuration ---\n");
+        kprintf("Active Theme:       %s\n", icon_get_theme_name());
+        kprintf("Dock Icon Size:     %d px\n", dock_get_icon_size());
+        kprintf("Dock Spacing:       %d px\n", dock_get_spacing());
+        kprintf("Dock Magnification: %s\n", dock_get_magnification() ? "Enabled" : "Disabled");
+        kprintf("Desktop Icons:      %s\n", s->show_desktop_icons ? "Enabled" : "Disabled");
+        kprintf("Desktop Icon Size:  %d px\n", s->desktop_icon_size);
+        kprintf("Desktop Labels:     %s\n", s->show_icon_labels ? "Enabled" : "Disabled");
+        kprintf("Scaling Blitter:    32-bit ARGB Fixed-Point Pipeline\n");
+        kprintf("----------------------------------------------\n");
+        kprintf("Usage:\n");
+        kprintf("  icons theme <whitesur|mactahoe|vector|next>\n");
+        kprintf("  icons size <32..64>\n");
+        kprintf("  icons spacing <2..16>\n");
+        kprintf("  icons mag <on|off>\n");
+        kprintf("  icons desktop <on|off>\n");
+        kprintf("  icons desktop-size <32|48|64>\n");
+        kprintf("  icons labels <on|off>\n");
+        kprintf("  icons reset\n\n");
+    } else if (strcmp(args, "whitesur") == 0 || strcmp(args, "theme whitesur") == 0) {
         icon_set_theme(ICON_THEME_WHITESUR);
+        s->icon_theme = ICON_THEME_WHITESUR;
         kprintf("Active macOS Icon Theme: %s\n", icon_get_theme_name());
-    } else if (strcmp(args, "mactahoe") == 0) {
+    } else if (strcmp(args, "mactahoe") == 0 || strcmp(args, "theme mactahoe") == 0) {
         icon_set_theme(ICON_THEME_MACTAHOE);
+        s->icon_theme = ICON_THEME_MACTAHOE;
         kprintf("Active macOS Icon Theme: %s\n", icon_get_theme_name());
-    } else if (strcmp(args, "vector") == 0) {
+    } else if (strcmp(args, "vector") == 0 || strcmp(args, "theme vector") == 0) {
         icon_set_theme(ICON_THEME_VECTOR);
+        s->icon_theme = ICON_THEME_VECTOR;
         kprintf("Active macOS Icon Theme: %s\n", icon_get_theme_name());
-    } else if (strcmp(args, "next") == 0) {
+    } else if (strcmp(args, "next") == 0 || strcmp(args, "theme next") == 0) {
         icon_theme_next();
+        s->icon_theme = icon_get_theme();
         kprintf("Switched to Icon Theme: %s\n", icon_get_theme_name());
-    } else if (*args == '\0') {
-        kprintf("Current Icon Theme: %s\n", icon_get_theme_name());
-        kprintf("Available Themes: whitesur, mactahoe, vector, next\n");
+    } else if (strncmp(args, "size", 4) == 0) {
+        char* val = args + 4;
+        while (*val == ' ') val++;
+        int sz = atoi(val);
+        if (sz >= 32 && sz <= 64) {
+            dock_set_icon_size(sz);
+            s->dock_icon_size = sz;
+            kprintf("Dock Icon Size set to %d px.\n", sz);
+        } else {
+            kprintf("Error: Size must be between 32 and 64 px.\n");
+        }
+    } else if (strncmp(args, "spacing", 7) == 0) {
+        char* val = args + 7;
+        while (*val == ' ') val++;
+        int sp = atoi(val);
+        if (sp >= 2 && sp <= 16) {
+            dock_set_spacing(sp);
+            s->dock_spacing = sp;
+            kprintf("Dock Spacing set to %d px.\n", sp);
+        } else {
+            kprintf("Error: Spacing must be between 2 and 16 px.\n");
+        }
+    } else if (strncmp(args, "mag", 3) == 0) {
+        char* val = args + 3;
+        while (*val == ' ') val++;
+        if (strcmp(val, "on") == 0 || strcmp(val, "1") == 0 || strcmp(val, "enable") == 0) {
+            dock_set_magnification(true);
+            s->dock_magnification = true;
+            kprintf("Dock Magnification enabled.\n");
+        } else if (strcmp(val, "off") == 0 || strcmp(val, "0") == 0 || strcmp(val, "disable") == 0) {
+            dock_set_magnification(false);
+            s->dock_magnification = false;
+            kprintf("Dock Magnification disabled.\n");
+        } else {
+            kprintf("Usage: icons mag <on | off>\n");
+        }
+    } else if (strncmp(args, "desktop-size", 12) == 0) {
+        char* val = args + 12;
+        while (*val == ' ') val++;
+        int sz = atoi(val);
+        if (sz >= 32 && sz <= 64) {
+            s->desktop_icon_size = sz;
+            kprintf("Desktop Icon Size set to %d px.\n", sz);
+        } else {
+            kprintf("Error: Desktop Icon Size must be between 32 and 64 px.\n");
+        }
+    } else if (strncmp(args, "desktop", 7) == 0) {
+        char* val = args + 7;
+        while (*val == ' ') val++;
+        if (strcmp(val, "on") == 0 || strcmp(val, "1") == 0 || strcmp(val, "enable") == 0) {
+            s->show_desktop_icons = true;
+            kprintf("Desktop Icons enabled.\n");
+        } else if (strcmp(val, "off") == 0 || strcmp(val, "0") == 0 || strcmp(val, "disable") == 0) {
+            s->show_desktop_icons = false;
+            kprintf("Desktop Icons disabled.\n");
+        } else {
+            kprintf("Usage: icons desktop <on | off>\n");
+        }
+    } else if (strncmp(args, "labels", 6) == 0) {
+        char* val = args + 6;
+        while (*val == ' ') val++;
+        if (strcmp(val, "on") == 0 || strcmp(val, "1") == 0) {
+            s->show_icon_labels = true;
+            kprintf("Desktop Icon Labels enabled.\n");
+        } else if (strcmp(val, "off") == 0 || strcmp(val, "0") == 0) {
+            s->show_icon_labels = false;
+            kprintf("Desktop Icon Labels disabled.\n");
+        } else {
+            kprintf("Usage: icons labels <on | off>\n");
+        }
+    } else if (strcmp(args, "reset") == 0) {
+        icon_config_reset_defaults();
+        s->icon_theme = ICON_THEME_WHITESUR;
+        s->dock_icon_size = 48;
+        s->dock_spacing = 6;
+        s->dock_magnification = true;
+        s->show_desktop_icons = true;
+        s->desktop_icon_size = 48;
+        s->show_icon_labels = true;
+        kprintf("Icon Subsystem configuration reset to macOS defaults.\n");
     } else {
-        kprintf("Unknown icon theme '%s'. Usage: icons <whitesur | mactahoe | vector | next>\n", args);
+        kprintf("Unknown subcommand '%s'. Type 'icons config' for options.\n", args);
     }
 }
 

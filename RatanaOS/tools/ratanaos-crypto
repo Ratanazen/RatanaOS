@@ -1,0 +1,236 @@
+#!/bin/bash
+# ============================================================================
+# ratanaos-crypto — RatanaOS Cryptography & Steganography Toolkit
+# ============================================================================
+
+set -euo pipefail
+
+VERSION="1.0.0"
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+DIM='\033[2m'
+NC='\033[0m'
+
+CRYPTO_DIR="${HOME}/.ratanaos/crypto"
+mkdir -p "${CRYPTO_DIR}"
+
+banner() {
+    echo -e "${GREEN}${BOLD}"
+    echo "  ╦═╗╔═╗╔╦╗╔═╗  ╔═╗╦═╗╦ ╦╔═╗╔╦╗╔═╗"
+    echo "  ╠╦╝╠═╣ ║ ╠═╣  ║  ╠╦╝╚╦╝╠═╝ ║ ║ ║"
+    echo "  ╩╚═╩ ╩ ╩ ╩ ╩  ╚═╝╩╚═ ╩ ╩   ╩ ╚═╝"
+    echo -e "${NC}${DIM}  RatanaOS Cryptography Toolkit v${VERSION}${NC}"
+    echo ""
+}
+
+# ── Encrypt File (AES-256-CBC) ──
+cmd_encrypt() {
+    local file="${1:?Usage: ratanaos-crypto encrypt <file>}"
+    local outfile="${file}.enc"
+
+    banner
+    echo -e "${CYAN}[*] Encrypting: ${file}${NC}"
+    openssl enc -aes-256-cbc -salt -pbkdf2 -in "$file" -out "$outfile"
+    echo -e "${GREEN}[✓] Encrypted: ${outfile}${NC}"
+}
+
+# ── Decrypt File ──
+cmd_decrypt() {
+    local file="${1:?Usage: ratanaos-crypto decrypt <file.enc>}"
+    local outfile="${file%.enc}"
+
+    banner
+    echo -e "${CYAN}[*] Decrypting: ${file}${NC}"
+    openssl enc -aes-256-cbc -d -pbkdf2 -in "$file" -out "$outfile"
+    echo -e "${GREEN}[✓] Decrypted: ${outfile}${NC}"
+}
+
+# ── Generate Key Pair ──
+cmd_keygen() {
+    local name="${1:-ratanaos}"
+    local keyfile="${CRYPTO_DIR}/${name}_key"
+
+    banner
+    echo -e "${CYAN}[*] Generating RSA-4096 key pair...${NC}"
+    openssl genrsa -out "${keyfile}.pem" 4096 2>/dev/null
+    openssl rsa -in "${keyfile}.pem" -pubout -out "${keyfile}_pub.pem" 2>/dev/null
+    chmod 600 "${keyfile}.pem"
+
+    echo -e "${GREEN}[✓] Private key: ${keyfile}.pem${NC}"
+    echo -e "${GREEN}[✓] Public key:  ${keyfile}_pub.pem${NC}"
+}
+
+# ── Hash Identification ──
+cmd_identify() {
+    local hash="${1:?Usage: ratanaos-crypto identify <hash>}"
+
+    banner
+    echo -e "${CYAN}[*] Identifying hash: ${hash}${NC}"
+    local len=${#hash}
+
+    echo -e "\n  ${BOLD}Hash length: ${len} characters${NC}"
+    echo ""
+
+    case $len in
+        32)  echo -e "  ${GREEN}→ MD5${NC} (128-bit)"
+             echo -e "  ${DIM}→ Could also be: NTLM, MD4${NC}" ;;
+        40)  echo -e "  ${GREEN}→ SHA-1${NC} (160-bit)"
+             echo -e "  ${DIM}→ Could also be: RIPEMD-160, MySQL5${NC}" ;;
+        56)  echo -e "  ${GREEN}→ SHA-224${NC} (224-bit)" ;;
+        64)  echo -e "  ${GREEN}→ SHA-256${NC} (256-bit)"
+             echo -e "  ${DIM}→ Could also be: SHA3-256, BLAKE2s${NC}" ;;
+        96)  echo -e "  ${GREEN}→ SHA-384${NC} (384-bit)" ;;
+        128) echo -e "  ${GREEN}→ SHA-512${NC} (512-bit)"
+             echo -e "  ${DIM}→ Could also be: SHA3-512, BLAKE2b, Whirlpool${NC}" ;;
+        13)  echo -e "  ${GREEN}→ DES (Unix crypt)${NC}" ;;
+        34)  echo -e "  ${GREEN}→ bcrypt${NC}" ;;
+        *)   
+            if [[ "$hash" =~ ^\$2[aby]?\$ ]]; then
+                echo -e "  ${GREEN}→ bcrypt${NC}"
+            elif [[ "$hash" =~ ^\$6\$ ]]; then
+                echo -e "  ${GREEN}→ SHA-512 (Unix crypt)${NC}"
+            elif [[ "$hash" =~ ^\$5\$ ]]; then
+                echo -e "  ${GREEN}→ SHA-256 (Unix crypt)${NC}"
+            elif [[ "$hash" =~ ^\$1\$ ]]; then
+                echo -e "  ${GREEN}→ MD5 (Unix crypt)${NC}"
+            elif [[ "$hash" =~ ^\$argon2 ]]; then
+                echo -e "  ${GREEN}→ Argon2${NC}"
+            else
+                echo -e "  ${YELLOW}→ Unknown hash type${NC}"
+            fi
+            ;;
+    esac
+}
+
+# ── Password Generator ──
+cmd_passgen() {
+    local length="${1:-32}"
+
+    banner
+    echo -e "${CYAN}[*] Generating secure passwords (length: ${length})${NC}"
+    echo ""
+    echo -e "  ${BOLD}Alphanumeric + Symbols:${NC}"
+    for i in 1 2 3; do
+        echo "    $(openssl rand -base64 48 | tr -dc 'A-Za-z0-9!@#$%^&*()_+=-' | head -c $length)"
+    done
+    echo ""
+    echo -e "  ${BOLD}Alphanumeric Only:${NC}"
+    for i in 1 2 3; do
+        echo "    $(openssl rand -base64 48 | tr -dc 'A-Za-z0-9' | head -c $length)"
+    done
+    echo ""
+    echo -e "  ${BOLD}Hex:${NC}"
+    echo "    $(openssl rand -hex $((length/2)))"
+    echo ""
+}
+
+# ── Steganography: Hide ──
+cmd_steg_hide() {
+    local image="${1:?Usage: ratanaos-crypto steg-hide <image> <secret-file>}"
+    local secret="${2:?Missing secret file}"
+    local outfile="${image%.png}_steg.png"
+
+    banner
+    echo -e "${CYAN}[*] Hiding data in image...${NC}"
+
+    if command -v steghide &>/dev/null; then
+        steghide embed -cf "$image" -ef "$secret" -sf "$outfile"
+    else
+        # Simple cat-based steganography (append data to image)
+        cp "$image" "$outfile"
+        echo "---RATANAOS_STEG_START---" >> "$outfile"
+        base64 "$secret" >> "$outfile"
+        echo "---RATANAOS_STEG_END---" >> "$outfile"
+        echo -e "${YELLOW}[!] Using basic steganography (steghide not installed)${NC}"
+    fi
+
+    echo -e "${GREEN}[✓] Data hidden in: ${outfile}${NC}"
+}
+
+# ── Steganography: Extract ──
+cmd_steg_extract() {
+    local image="${1:?Usage: ratanaos-crypto steg-extract <image>}"
+
+    banner
+    echo -e "${CYAN}[*] Extracting hidden data...${NC}"
+
+    if command -v steghide &>/dev/null; then
+        steghide extract -sf "$image"
+    else
+        # Extract our simple steg format
+        if grep -q "RATANAOS_STEG_START" "$image" 2>/dev/null; then
+            sed -n '/RATANAOS_STEG_START/,/RATANAOS_STEG_END/p' "$image" | \
+                grep -v 'RATANAOS_STEG' | base64 -d
+            echo -e "${GREEN}[✓] Data extracted${NC}"
+        else
+            echo -e "${YELLOW}[!] No hidden data found (or steghide format)${NC}"
+        fi
+    fi
+}
+
+# ── SSL Certificate Analysis ──
+cmd_ssl() {
+    local host="${1:?Usage: ratanaos-crypto ssl <hostname>}"
+    local port="${2:-443}"
+
+    banner
+    echo -e "${CYAN}[*] SSL/TLS analysis: ${host}:${port}${NC}"
+    echo ""
+
+    echo -e "${BOLD}── Certificate Details ──${NC}"
+    echo | openssl s_client -connect "${host}:${port}" -servername "$host" 2>/dev/null | \
+        openssl x509 -noout -text 2>/dev/null | head -40
+
+    echo ""
+    echo -e "${BOLD}── Supported Ciphers ──${NC}"
+    for cipher in $(openssl ciphers 'ALL:eNULL' | tr ':' ' '); do
+        result=$(echo -n | openssl s_client -cipher "$cipher" -connect "${host}:${port}" 2>/dev/null)
+        if [[ "$?" -eq 0 ]]; then
+            echo -e "  ${GREEN}[ACCEPTED]${NC} ${cipher}"
+        fi
+    done 2>/dev/null | head -20
+
+    echo ""
+    echo -e "${BOLD}── Protocol Support ──${NC}"
+    for proto in ssl3 tls1 tls1_1 tls1_2 tls1_3; do
+        if echo | openssl s_client -"$proto" -connect "${host}:${port}" 2>/dev/null | grep -q "CONNECTED"; then
+            echo -e "  ${GREEN}[✓]${NC} ${proto}"
+        else
+            echo -e "  ${DIM}[✗] ${proto}${NC}"
+        fi
+    done
+}
+
+# ── Entry ──
+case "${1:-help}" in
+    encrypt)      shift; cmd_encrypt "$@" ;;
+    decrypt)      shift; cmd_decrypt "$@" ;;
+    keygen)       shift; cmd_keygen "$@" ;;
+    identify)     shift; cmd_identify "$@" ;;
+    passgen)      shift; cmd_passgen "$@" ;;
+    steg-hide)    shift; cmd_steg_hide "$@" ;;
+    steg-extract) shift; cmd_steg_extract "$@" ;;
+    ssl)          shift; cmd_ssl "$@" ;;
+    *)
+        banner
+        echo -e "  ${BOLD}Usage:${NC} ratanaos-crypto <command> [args]"
+        echo ""
+        echo -e "  ${BOLD}Encryption:${NC}"
+        echo "    encrypt <file>              AES-256 encrypt file"
+        echo "    decrypt <file.enc>          Decrypt file"
+        echo "    keygen  [name]              Generate RSA-4096 key pair"
+        echo ""
+        echo -e "  ${BOLD}Analysis:${NC}"
+        echo "    identify <hash>             Identify hash type"
+        echo "    passgen  [length]           Generate secure passwords"
+        echo "    ssl      <host> [port]      SSL/TLS analysis"
+        echo ""
+        echo -e "  ${BOLD}Steganography:${NC}"
+        echo "    steg-hide    <image> <file>   Hide data in image"
+        echo "    steg-extract <image>          Extract hidden data"
+        echo ""
+        ;;
+esac

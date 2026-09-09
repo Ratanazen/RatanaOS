@@ -1,5 +1,5 @@
-#include "../include/heap.h"
-#include "../include/string.h"
+#include "../../include/heap.h"
+#include "../../include/string.h"
 
 typedef struct block_header {
     size_t size;                // Size of data area
