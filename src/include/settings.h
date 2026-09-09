@@ -35,6 +35,15 @@ typedef struct {
     bool               transparency;
     bool               shadows;
 
+    theme_mode_t       theme_mode;
+    window_style_t     window_style;
+    dock_position_t    dock_position;
+    dock_style_t       dock_style;
+    bool               dock_autohide;
+    menubar_style_t    menubar_style;
+    int                font_scale;
+    int                window_shadow_size;
+
     uint32_t           checksum;
 } settings_t;
 
