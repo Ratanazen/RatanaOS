@@ -40,3 +40,33 @@ aa-status
 # Verify sudo privileges
 sudo -l
 ```
+
+---
+
+## 🔐 LUKS Full-Disk Encryption (Phase 9)
+- **Availability**: Enabled as an opt-in option in the Calamares installer
+  partition module. Users select "Encrypt system" during installation.
+- **Implementation**: Standard Debian `cryptsetup` + `cryptsetup-initramfs`.
+  The initramfs prompts for the LUKS passphrase at boot.
+- **Default**: Encryption is NOT forced — it is presented as a checkbox
+  during install, matching standard Debian/Ubuntu installer behavior.
+
+## 🔑 UEFI Secure Boot (Phase 9)
+- **Chain**: Debian's `shim-signed` → `grub-efi-amd64-signed` → Linux kernel.
+- **RatanaOS GRUB Theme**: Theme files under `/boot/grub/themes/ratanaos/`
+  are non-executable data assets (images, fonts, text config). They do NOT
+  break the Secure Boot signature chain — only executable bootloader code
+  is verified by shim/GRUB, not theme resources. **Confirmed safe.**
+- **Hybrid Boot**: The ISO image is built with both `syslinux` (BIOS/Legacy)
+  and `grub-efi` (UEFI) bootloaders, supporting cold boot on both
+  firmware types.
+- **Test Commands**:
+  \`\`\`bash
+  # UEFI boot test (requires OVMF firmware)
+  qemu-system-x86_64 -bios /usr/share/OVMF/OVMF_CODE.fd \\
+    -cdrom build/ratanaos-live-amd64.hybrid.iso -m 2048 -smp 2
+
+  # Legacy BIOS boot test
+  qemu-system-x86_64 \\
+    -cdrom build/ratanaos-live-amd64.hybrid.iso -m 2048 -smp 2
+  \`\`\`
