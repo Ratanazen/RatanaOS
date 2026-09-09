@@ -17,3 +17,6 @@ thunar-archive-plugin
 xfce4-terminal
 mousepad
 evince
+
+# System snapshot & restore (Phase 15)
+timeshift

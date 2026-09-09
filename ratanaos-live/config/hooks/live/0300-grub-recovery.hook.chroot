@@ -1,0 +1,19 @@
+#!/bin/sh
+set -e
+# Ensure GRUB recovery mode entries are NOT hidden by theme customization.
+# Debian's default GRUB config generates recovery entries automatically
+# via /etc/grub.d/10_linux. RatanaOS's GRUB theme only affects visual
+# presentation (colors, fonts, background) — it does not modify the
+# menu entry generation scripts.
+#
+# This hook explicitly verifies the recovery entry configuration is intact.
+if [ -f /etc/default/grub ]; then
+    # Ensure GRUB_DISABLE_RECOVERY is NOT set to "true"
+    if grep -q '^GRUB_DISABLE_RECOVERY="true"' /etc/default/grub 2>/dev/null; then
+        sed -i 's/^GRUB_DISABLE_RECOVERY="true"/GRUB_DISABLE_RECOVERY="false"/' /etc/default/grub
+    fi
+    # Ensure GRUB timeout allows menu access
+    if ! grep -q '^GRUB_TIMEOUT=' /etc/default/grub 2>/dev/null; then
+        echo 'GRUB_TIMEOUT=5' >> /etc/default/grub
+    fi
+fi
