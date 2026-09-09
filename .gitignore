@@ -6,4 +6,9 @@ build/
 .vscode/
 disk.img
 hello.txt
+hello_linux
+hello_dyn
+debian-test-rootfs/
+*.py
+
 
