@@ -79,11 +79,12 @@ case "${ACTION}" in
         run_in_container_non_interactive lb config \
             --distribution bookworm \
             --archive-areas "main contrib non-free non-free-firmware" \
-            --debian-installer live \
+            --debian-installer none \
             --iso-application "RatanaOS" \
             --iso-volume "RatanaOS" \
             --binary-images iso-hybrid \
             --bootloader syslinux,grub-efi
+
         ;;
     build)
         build_docker_image

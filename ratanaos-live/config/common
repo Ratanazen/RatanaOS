@@ -31,7 +31,7 @@ LB_CACHE_INDICES="false"
 LB_CACHE_PACKAGES="true"
 
 # Control if completed stages should be cached
-LB_CACHE_STAGES="bootstrap"
+LB_CACHE_STAGES="bootstrap chroot rootfs"
 
 # Set debconf(1) frontend to use
 LB_DEBCONF_FRONTEND="noninteractive"
@@ -58,7 +58,7 @@ LB_SYSTEM="live"
 LB_IMAGE_NAME="live-image"
 
 # Set options to use with apt
-APT_OPTIONS="--yes -o Acquire::Retries=5"
+APT_OPTIONS="--yes -o Acquire::Retries=5 -o Acquire::http::Timeout=60"
 
 # Set options to use with aptitude
 APTITUDE_OPTIONS="--assume-yes -o Acquire::Retries=5"

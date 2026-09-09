@@ -7,9 +7,10 @@
 locales
 locales-all
 
-# Khmer Unicode fonts (KhmerOS — the standard Cambodian Unicode typefaces)
+# Khmer Unicode fonts (KhmerOS — standard Cambodian Unicode typefaces)
 fonts-khmeros
-fonts-khmeros-core
+fonts-sil-mondulkiri
+
 
 # Additional international font coverage
 fonts-noto

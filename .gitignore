@@ -21,5 +21,8 @@ ratanaos-live/cache/
 ratanaos-live/local/
 ratanaos-live/*.iso
 ratanaos-live/live-image-amd64.*
+ratanaos-live/binary.*
+ratanaos-live/chroot.*
 *.zsync
+
 

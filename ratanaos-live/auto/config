@@ -4,7 +4,7 @@ set -e
 lb config noauto \
     --distribution bookworm \
     --archive-areas "main contrib non-free non-free-firmware" \
-    --debian-installer live \
+    --debian-installer none \
     --iso-application "RatanaOS" \
     --iso-publisher "Ratanazen" \
     --iso-volume "RatanaOS $(date +%Y%m%d)" \
@@ -14,4 +14,12 @@ lb config noauto \
     --bootloader syslinux,grub-efi \
     --security true \
     --updates true \
+    --cache true \
+    --cache-packages true \
+    --cache-stages "bootstrap chroot rootfs" \
+    --mirror-bootstrap "http://deb.debian.org/debian/" \
+    --mirror-chroot "http://deb.debian.org/debian/" \
+    --mirror-binary "http://deb.debian.org/debian/" \
+    --apt-options "--yes -o Acquire::Retries=5 -o Acquire::http::Timeout=60" \
     "${@}"
+
