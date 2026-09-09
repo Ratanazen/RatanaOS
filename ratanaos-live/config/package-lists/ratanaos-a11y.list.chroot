@@ -1,0 +1,19 @@
+# ==============================================================================
+# RatanaOS Accessibility Package List (Phase 11)
+# ==============================================================================
+
+# Screen reader
+orca
+
+# On-screen keyboard
+onboard
+
+# High-contrast and large-print cursor themes
+adwaita-icon-theme
+gnome-accessibility-themes
+
+# Magnification (XFCE built-in zoom via xfwm4 compositor)
+# No additional package needed — xfwm4 supports Alt+scroll zoom natively.
+
+# AT-SPI2 accessibility bridge (ensures GTK widgets are screen-reader-visible)
+at-spi2-core
