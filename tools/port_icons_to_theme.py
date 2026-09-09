@@ -13,23 +13,71 @@ THEMES = {
 
 SIZES = [16, 22, 24, 32, 48, 64, 128, 256]
 
-ICON_ALIASES = {
-    'finder': ['system-file-manager', 'file-manager', 'org.xfce.thunar', 'thunar', 'desktop'],
-    'launchpad': ['applications-other', 'xfce4-appfinder', 'xfce-system-menu', 'start-here', 'apple-logo'],
-    'safari': ['web-browser', 'firefox-esr', 'firefox', 'browser', 'internet-web-browser'],
-    'terminal': ['utilities-terminal', 'terminal', 'xfce4-terminal', 'console'],
-    'sysmon': ['utilities-system-monitor', 'taskmanager', 'xfce4-taskmanager', 'htop', 'gnome-system-monitor'],
-    'calculator': ['accessories-calculator', 'calc', 'gnome-calculator'],
-    'paint': ['gimp', 'accessories-image-viewer', 'drawing'],
-    'notes': ['accessories-text-editor', 'mousepad', 'gedit', 'text-editor'],
-    'music': ['multimedia-player', 'gnome-music', 'audio-player'],
-    'settings': ['preferences-system', 'xfce4-settings-manager', 'preferences-desktop', 'preferences-other'],
-    'appstore': ['softwarecenter', 'system-software-install', 'calamares', 'package-manager'],
-    'about': ['help-about', 'distributor-logo', 'ratanaos', 'system-help', 'ratanaos-logo'],
-    'trash': ['user-trash', 'user-trash-full', 'trash-empty'],
-    'drive': ['drive-harddisk', 'system-devices', 'drive-multidisk'],
-    'folder': ['folder', 'inode-directory', 'folder-open']
+# Comprehensive FreeDesktop icon mappings across XFCE, GNOME, and KDE
+ICON_MAPPINGS = {
+    'finder': {
+        'categories': ['apps', 'places'],
+        'aliases': ['system-file-manager', 'file-manager', 'org.xfce.thunar', 'thunar', 'org.gnome.Nautilus', 'dolphin', 'nautilus', 'desktop']
+    },
+    'launchpad': {
+        'categories': ['apps', 'actions'],
+        'aliases': ['applications-other', 'xfce4-appfinder', 'xfce-system-menu', 'start-here', 'apple-logo', 'view-app-grid', 'org.kde.plasma.kickoff', 'gnome-main-menu']
+    },
+    'safari': {
+        'categories': ['apps'],
+        'aliases': ['web-browser', 'firefox-esr', 'firefox', 'browser', 'internet-web-browser', 'org.gnome.Epiphany', 'falkon', 'chromium']
+    },
+    'terminal': {
+        'categories': ['apps'],
+        'aliases': ['utilities-terminal', 'terminal', 'xfce4-terminal', 'org.gnome.Terminal', 'konsole', 'console', 'alacritty', 'kitty']
+    },
+    'sysmon': {
+        'categories': ['apps'],
+        'aliases': ['utilities-system-monitor', 'taskmanager', 'xfce4-taskmanager', 'htop', 'gnome-system-monitor', 'org.kde.ksysguard', 'ksysguard']
+    },
+    'calculator': {
+        'categories': ['apps'],
+        'aliases': ['accessories-calculator', 'calc', 'gnome-calculator', 'kcalc', 'org.gnome.Calculator']
+    },
+    'paint': {
+        'categories': ['apps'],
+        'aliases': ['gimp', 'accessories-image-viewer', 'drawing', 'org.gnome.eog', 'gwenview', 'kolourpaint']
+    },
+    'notes': {
+        'categories': ['apps'],
+        'aliases': ['accessories-text-editor', 'mousepad', 'gedit', 'text-editor', 'kate', 'kwrite', 'org.gnome.TextEditor']
+    },
+    'music': {
+        'categories': ['apps', 'mimetypes'],
+        'aliases': ['multimedia-player', 'gnome-music', 'audio-player', 'rhythmbox', 'elisa', 'audacious', 'audio-x-generic']
+    },
+    'settings': {
+        'categories': ['apps', 'categories'],
+        'aliases': ['preferences-system', 'xfce4-settings-manager', 'preferences-desktop', 'preferences-other', 'gnome-control-center', 'systemsettings']
+    },
+    'appstore': {
+        'categories': ['apps'],
+        'aliases': ['softwarecenter', 'system-software-install', 'calamares', 'package-manager', 'gnome-software', 'discover', 'org.kde.discover']
+    },
+    'about': {
+        'categories': ['apps', 'actions'],
+        'aliases': ['help-about', 'distributor-logo', 'ratanaos', 'system-help', 'ratanaos-logo', 'info', 'dialog-information']
+    },
+    'trash': {
+        'categories': ['apps', 'places', 'status'],
+        'aliases': ['user-trash', 'user-trash-full', 'trash-empty', 'user-trash-empty', 'trashcan_empty', 'trashcan_full']
+    },
+    'drive': {
+        'categories': ['devices', 'places'],
+        'aliases': ['drive-harddisk', 'system-devices', 'drive-multidisk', 'drive-removable-media', 'computer', 'harddrive']
+    },
+    'folder': {
+        'categories': ['places', 'mimetypes'],
+        'aliases': ['folder', 'inode-directory', 'folder-open', 'user-home', 'folder-home', 'folder-documents', 'folder-download', 'folder-pictures', 'folder-music', 'folder-videos']
+    }
 }
+
+CATEGORIES = ['apps', 'places', 'devices', 'status', 'actions', 'mimetypes', 'categories']
 
 def main():
     with open(SRC_FILE, 'r') as f:
@@ -63,46 +111,53 @@ def main():
             pixels.append((r, g, b, a))
         img_base.putdata(pixels)
 
-        # Generate all sizes
-        for size in SIZES:
-            out_dir = os.path.join(TARGET_BASE, theme_name, f"{size}x{size}/apps")
-            os.makedirs(out_dir, exist_ok=True)
+        mapping = ICON_MAPPINGS.get(icon_name, {'categories': ['apps'], 'aliases': []})
+        cats = mapping.get('categories', ['apps'])
+        aliases = mapping.get('aliases', [])
 
+        for size in SIZES:
             if size == base_size:
                 scaled_img = img_base
             else:
                 scaled_img = img_base.resize((size, size), Image.Resampling.LANCZOS)
 
-            # Save primary icon
-            scaled_img.save(os.path.join(out_dir, f"{icon_name}.png"))
+            for cat in cats:
+                out_dir = os.path.join(TARGET_BASE, theme_name, f"{size}x{size}/{cat}")
+                os.makedirs(out_dir, exist_ok=True)
+                scaled_img.save(os.path.join(out_dir, f"{icon_name}.png"))
+                for alias in aliases:
+                    scaled_img.save(os.path.join(out_dir, f"{alias}.png"))
 
-            # Save aliases
-            for alias in ICON_ALIASES.get(icon_name, []):
-                scaled_img.save(os.path.join(out_dir, f"{alias}.png"))
-
-    # Generate index.theme
+    # Generate full FreeDesktop index.theme for both WhiteSur and MacTahoe
     for theme_key, theme_name in THEMES.items():
         theme_dir = os.path.join(TARGET_BASE, theme_name)
-        dir_entries = [f"{s}x{s}/apps" for s in SIZES]
-        dirs_str = ",".join(dir_entries)
+        dir_entries = []
+        for s in SIZES:
+            for cat in CATEGORIES:
+                cat_path = os.path.join(theme_dir, f"{s}x{s}/{cat}")
+                if os.path.exists(cat_path):
+                    dir_entries.append(f"{s}x{s}/{cat}")
 
+        dirs_str = ",".join(dir_entries)
         index_content = f"""[Icon Theme]
 Name={theme_name}
-Comment=RatanaOS {'WhiteSur' if 'WhiteSur' in theme_name else 'MacTahoe'} macOS Icon Suite
-Inherits=Adwaita,gnome,hicolor
+Comment=RatanaOS {'WhiteSur' if 'WhiteSur' in theme_name else 'MacTahoe'} macOS Sequoia 2026 Icon Suite (FreeDesktop / GNOME / KDE / XFCE)
+Inherits=Adwaita,breeze,gnome,hicolor
 Directories={dirs_str}
 
 """
-        for s in SIZES:
-            index_content += f"""[{s}x{s}/apps]
-Size={s}
-Context=Applications
+        for entry in dir_entries:
+            size_part, cat_part = entry.split("/")
+            s_val = size_part.split("x")[0]
+            index_content += f"""[{entry}]
+Size={s_val}
+Context={cat_part.capitalize()}
 Type=Fixed
 
 """
         with open(os.path.join(theme_dir, "index.theme"), "w") as f:
             f.write(index_content)
-        print(f"[+] Successfully generated FreeDesktop icon theme: {theme_name}")
+        print(f"[+] Successfully generated Full macOS 2026 FreeDesktop icon suite: {theme_name}")
 
 if __name__ == "__main__":
     main()

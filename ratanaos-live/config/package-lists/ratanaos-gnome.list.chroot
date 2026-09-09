@@ -1,0 +1,9 @@
+# ==============================================================================
+# RatanaOS GNOME Desktop Layer (macOS 2026 Style)
+# ==============================================================================
+gnome-core
+gnome-shell
+nautilus
+gnome-tweaks
+gnome-terminal
+gnome-control-center

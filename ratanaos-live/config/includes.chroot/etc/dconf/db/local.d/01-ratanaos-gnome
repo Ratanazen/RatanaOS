@@ -1,0 +1,15 @@
+# RatanaOS macOS Sequoia 2026 Style for GNOME
+[org/gnome/desktop/interface]
+gtk-theme='RatanaOS-Dark'
+icon-theme='RatanaOS-WhiteSur'
+color-scheme='prefer-dark'
+font-name='Cantarell 11'
+document-font-name='Cantarell 11'
+monospace-font-name='Monospace 11'
+
+[org/gnome/desktop/wm/preferences]
+button-layout='close,minimize,maximize:'
+theme='RatanaOS-Dark'
+
+[org/gnome/shell]
+favorite-apps=['org.gnome.Nautilus.desktop', 'firefox-esr.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Calculator.desktop', 'org.gnome.TextEditor.desktop', 'gnome-control-center.desktop', 'calamares.desktop']

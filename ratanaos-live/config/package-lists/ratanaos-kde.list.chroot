@@ -1,0 +1,9 @@
+# ==============================================================================
+# RatanaOS KDE Plasma Desktop Layer (macOS 2026 Style)
+# ==============================================================================
+kde-plasma-desktop
+plasma-workspace
+dolphin
+konsole
+systemsettings
+kwrite
