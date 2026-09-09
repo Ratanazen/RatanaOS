@@ -428,3 +428,18 @@ live-clean:
 	./tools/docker-live-build.sh clean
 
 
+
+# ==============================================================================
+# Image Variant Targets (Phase 10)
+# ==============================================================================
+iso-desktop: live-iso
+	@echo "==> Desktop ISO build complete (default variant)."
+
+iso-minimal:
+	@echo "==> [TODO] Minimal variant not yet configured. See docs/VARIANTS.md."
+
+iso-server:
+	@echo "==> [TODO] Server variant not yet configured. See docs/VARIANTS.md."
+
+iso-all: iso-desktop
+	@echo "==> All configured variants built."
