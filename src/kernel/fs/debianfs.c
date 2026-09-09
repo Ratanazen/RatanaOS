@@ -24,20 +24,33 @@ void debianfs_init(void) {
     const debianfs_entry_t* entries = (const debianfs_entry_t*)(debian_rootfs_img + sizeof(debianfs_header_t));
     const uint8_t* data_start = (const uint8_t*)(entries + num_files);
 
-    serial_printf("DEBIANFS: Mounting %u files at /mnt/debian...\n", num_files);
+    serial_printf("DEBIANFS: Mounting %u files at /system/debian and /mnt/debian...\n", num_files);
 
     for (uint32_t i = 0; i < num_files; i++) {
-        vfs_node_t* node = (vfs_node_t*)kmalloc(sizeof(vfs_node_t));
-        if (!node) continue;
-        memset(node, 0, sizeof(vfs_node_t));
+        // Mount at /system/debian/
+        vfs_node_t* node1 = (vfs_node_t*)kmalloc(sizeof(vfs_node_t));
+        if (node1) {
+            memset(node1, 0, sizeof(vfs_node_t));
+            ksprintf(node1->name, "/system/debian/%s", entries[i].path);
+            node1->flags = VFS_FILE;
+            node1->size = entries[i].size;
+            node1->data = (uint8_t*)(data_start + entries[i].offset);
+            node1->fs_type = FS_RAMFS;
+            vfs_register_node(node1);
+        }
 
-        ksprintf(node->name, "/mnt/debian/%s", entries[i].path);
-        node->flags = VFS_FILE;
-        node->size = entries[i].size;
-        node->data = (uint8_t*)(data_start + entries[i].offset);
-        node->fs_type = FS_RAMFS;
+        // Mount alias at /mnt/debian/
+        vfs_node_t* node2 = (vfs_node_t*)kmalloc(sizeof(vfs_node_t));
+        if (node2) {
+            memset(node2, 0, sizeof(vfs_node_t));
+            ksprintf(node2->name, "/mnt/debian/%s", entries[i].path);
+            node2->flags = VFS_FILE;
+            node2->size = entries[i].size;
+            node2->data = (uint8_t*)(data_start + entries[i].offset);
+            node2->fs_type = FS_RAMFS;
+            vfs_register_node(node2);
+        }
 
-        vfs_register_node(node);
-        serial_printf("DEBIANFS: Mounted %s (%u bytes)\n", node->name, node->size);
+        serial_printf("DEBIANFS: Mounted %s (%u bytes)\n", entries[i].path, entries[i].size);
     }
 }

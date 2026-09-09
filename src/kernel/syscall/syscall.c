@@ -6,6 +6,7 @@
 #include "../../include/process.h"
 #include "../../include/string.h"
 #include "../../include/heap.h"
+#include "../../include/timer.h"
 
 static registers_t* syscall_handler_int80(registers_t* regs) {
     uint64_t syscall_num = regs->rax;
@@ -289,6 +290,21 @@ static registers_t* syscall_handler_int80(registers_t* regs) {
             }
             strncpy(current_process->cwd, path, 63);
             current_process->cwd[63] = '\0';
+            regs->rax = 0;
+            break;
+        }
+
+        case 13: { // Linux sys_rt_sigaction(sig, act, oact, sigsetsize)
+            regs->rax = 0; // Stub success for signal setup
+            break;
+        }
+
+        case 96: { // Linux sys_gettimeofday(tv, tz)
+            struct { uint64_t tv_sec; uint64_t tv_usec; } *tv = (void*)regs->rdi;
+            if (tv) {
+                tv->tv_sec = timer_get_ticks() / 100;
+                tv->tv_usec = (timer_get_ticks() % 100) * 10000;
+            }
             regs->rax = 0;
             break;
         }

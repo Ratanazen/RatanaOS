@@ -18,6 +18,7 @@ This document tracks the implementation status of Linux x86_64 ABI and system ca
 | `mmap` | `9` | **Partial** | Physical/virtual memory page frame allocation |
 | `munmap` | `11` | **Stub** | Virtual memory page unmapping |
 | `brk` | `12` | **Working** | Process user heap expansion (`sys_brk`) |
+| `rt_sigaction` | `13` | **Stub** | Linux signal handler registration stub |
 | `pipe` | `22` | **Working** | In-kernel FIFO pipe creation (`vfs_create_pipe`) |
 | `yield` | `24` | **Working** | Preemptive scheduler yield (`process_yield`) |
 | `dup` | `32` | **Working** | File descriptor duplicate |
@@ -29,6 +30,7 @@ This document tracks the implementation status of Linux x86_64 ABI and system ca
 | `uname` | `63` | **Working** | Linux release identification (`sys_uname`) |
 | `getcwd` | `79` | **Working** | Current working directory buffer copy |
 | `chdir` | `80` | **Working** | Process working directory update |
+| `gettimeofday` | `96` | **Partial** | RTC clock time query |
 | `arch_prctl` | `158` | **Working** | x86_64 FS/GS MSR register thread local storage (TLS) |
 | `exit_group` | `231` | **Working** | Thread group exit (`process_exit`) |
 | `openat` | `257` | **Partial** | Relative path open shim |
