@@ -1,0 +1,15 @@
+#!/bin/sh
+set -e
+
+# RatanaOS Debian 13 (Trixie) Live-Build Auto Configuration
+lb config noauto \
+    --mode debian \
+    --distribution trixie \
+    --architectures amd64 \
+    --archive-areas "main contrib non-free non-free-firmware" \
+    --binary-images iso-hybrid \
+    --bootloader grub-pc \
+    --system live \
+    --memtest none \
+    --win32-loader false \
+    "${@}"

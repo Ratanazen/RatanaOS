@@ -1,0 +1,9 @@
+# RatanaOS Minimal Debian 13 (Trixie) Package Selection
+busybox
+coreutils
+util-linux
+dash
+bash
+libc6
+libgcc-s1
+libstdc++6
