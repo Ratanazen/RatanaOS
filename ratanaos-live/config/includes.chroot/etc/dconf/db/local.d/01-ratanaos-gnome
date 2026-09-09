@@ -11,5 +11,23 @@ monospace-font-name='Monospace 11'
 button-layout='close,minimize,maximize:'
 theme='RatanaOS-Dark'
 
+[org/gnome/desktop/background]
+picture-uri='file:///usr/share/backgrounds/ratanaos/ratanaos-sequoia-dark.png'
+picture-uri-dark='file:///usr/share/backgrounds/ratanaos/ratanaos-sequoia-dark.png'
+picture-options='zoom'
+
 [org/gnome/shell]
+enabled-extensions=['dash-to-dock@vmgweb.com']
 favorite-apps=['org.gnome.Nautilus.desktop', 'firefox-esr.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Calculator.desktop', 'org.gnome.TextEditor.desktop', 'gnome-control-center.desktop', 'calamares.desktop']
+
+[org/gnome/shell/extensions/dash-to-dock]
+dock-position='BOTTOM'
+extend-height=false
+dock-fixed=false
+autohide=true
+dash-max-icon-size=48
+transparency-mode='DYNAMIC'
+custom-theme-shrink=true
+show-trash=true
+show-mounts=true
+
