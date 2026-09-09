@@ -34,9 +34,10 @@ docker run --rm \
         --distribution bookworm \
         --archive-areas "main contrib non-free non-free-firmware" \
         --debian-installer none \
-        --iso-application "RatanaOS Fast" \
+        --iso-application "RatanaOS Live (macOS Sequoia Edition)" \
         --iso-publisher "Ratanazen" \
-        --iso-volume "RatanaOS-Fast $(date +%Y%m%d)" \
+        --iso-volume "RATANAOS_LIVE" \
+        --bootappend-live "boot=live components username=ratana hostname=ratana user-fullname=\"Ratana\" quiet splash" \
         --linux-packages linux-image \
         --memtest none \
         --binary-images iso-hybrid \
