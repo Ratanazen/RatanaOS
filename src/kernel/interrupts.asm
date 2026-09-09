@@ -201,3 +201,80 @@ isr128:
     pop rax
     add rsp, 16
     iretq
+
+global syscall_entry_stub
+extern syscall_handler_linux
+syscall_entry_stub:
+    swapgs
+    mov [gs:0x00], rsp    ; Save user stack to gs_kernel_struct.user_rsp
+    mov rsp, [gs:0x08]    ; Load kernel stack from gs_kernel_struct.kernel_rsp
+    
+    ; Construct trap_frame_t (168 bytes)
+    ; We need to push 21 fields.
+    ; SS, RSP, RFLAGS, CS, RIP are pushed by SYSCALL?!
+    ; No! SYSCALL DOES NOT PUSH ANYTHING to the stack! It saves them in registers!
+    ; RIP -> RCX
+    ; RFLAGS -> R11
+    ; CS -> STAR[47:32]
+    ; SS -> STAR[47:32] + 8
+    
+    ; So we push them manually to emulate a trap_frame_t!
+    push qword 0x23 ; SS (Ring 3 data)
+    push qword [gs:0x00] ; RSP
+    push r11 ; RFLAGS
+    push qword 0x1B ; CS (Ring 3 code)
+    push rcx ; RIP
+    push qword 0 ; err_code
+    push qword 0x80 ; int_no
+    
+    ; General registers
+    push rax
+    push rbx
+    push rcx
+    push rdx
+    push rsi
+    push rdi
+    push rbp
+    push r8
+    push r9
+    push r10
+    push r11
+    push r12
+    push r13
+    push r14
+    push r15
+    
+    mov rdi, rsp   ; trap_frame_t* regs
+    call syscall_handler_linux
+    
+    ; Restore general registers
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+    pop r11
+    pop r10
+    pop r9
+    pop r8
+    pop rbp
+    pop rdi
+    pop rsi
+    pop rdx
+    pop rcx
+    pop rbx
+    pop rax
+    
+    add rsp, 16 ; skip int_no and err_code
+    
+    ; Pop RIP and RFLAGS back into RCX and R11
+    pop rcx ; RIP
+    add rsp, 8 ; skip CS
+    pop r11 ; RFLAGS
+    ; SS and RSP are restored via swapgs and SYSRET?
+    ; Wait, SYSRET restores RIP from RCX, and RFLAGS from R11.
+    ; RSP is restored from [gs:0x00] manually before SYSRET!
+    
+    mov rsp, [gs:0x00]    ; Restore user stack
+    swapgs
+    o64 sysret
+

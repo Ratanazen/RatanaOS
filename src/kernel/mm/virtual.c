@@ -45,16 +45,29 @@ pml4_t* vmm_create_address_space(void) {
     uint64_t* pml4 = (uint64_t*)phys_alloc_page();
     memset(pml4, 0, PAGE_SIZE);
     
-    // Allocate a new PDPT for PML4[0] to prevent modifying the shared kernel PDPT
+    // Allocate a new PDPT for PML4[0]
     uint64_t* pdpt = (uint64_t*)phys_alloc_page();
     memset(pdpt, 0, PAGE_SIZE);
     pml4[0] = (uint64_t)pdpt | PAGE_PRESENT | PAGE_WRITABLE | PAGE_USER;
     
     uint64_t* k_pdpt = (uint64_t*)(kernel_pml4[0] & ~0xFFF);
     
-    // The kernel uses PDPT entries 0 to 3 for the first 4GB.
-    // Shallow copy those so the kernel is mapped.
-    for (int i = 0; i < 4; i++) {
+    // For pdpt[0] (0 to 1GB), we allocate a dedicated Page Directory
+    // so user programs can map things at 0x400000 without sharing the kernel's PD.
+    uint64_t* pd0 = (uint64_t*)phys_alloc_page();
+    memset(pd0, 0, PAGE_SIZE);
+    pdpt[0] = (uint64_t)pd0 | PAGE_PRESENT | PAGE_WRITABLE | PAGE_USER;
+    
+    uint64_t* k_pd0 = (uint64_t*)(k_pdpt[0] & ~0xFFF);
+    // Copy the kernel's 2MB mappings into this new PD, preserving their flags (no PAGE_USER).
+    if (k_pdpt[0] & PAGE_PRESENT) {
+        for (int i = 0; i < 512; i++) {
+            pd0[i] = k_pd0[i]; 
+        }
+    }
+    
+    // For pdpt[1..3] (1GB to 4GB), we can just share the kernel's PDs.
+    for (int i = 1; i < 4; i++) {
         pdpt[i] = k_pdpt[i]; // Share the PDTs for the kernel
     }
     
@@ -73,6 +86,9 @@ bool vmm_map_page(pml4_t* pml4, uint64_t virtual_addr, uint64_t physical_addr, u
         memset((void*)pdpt, 0, PAGE_SIZE);
         pml4[pml4_idx] = pdpt | PAGE_PRESENT | PAGE_WRITABLE | PAGE_USER;
     }
+    
+    // Ensure PAGE_USER is set on PML4
+    if (flags & PAGE_USER) pml4[pml4_idx] |= PAGE_USER;
 
     uint64_t* pdpt = (uint64_t*)(pml4[pml4_idx] & ~0xFFF);
     if (!(pdpt[pdpt_idx] & PAGE_PRESENT)) {
@@ -81,19 +97,40 @@ bool vmm_map_page(pml4_t* pml4, uint64_t virtual_addr, uint64_t physical_addr, u
         memset((void*)pd, 0, PAGE_SIZE);
         pdpt[pdpt_idx] = pd | PAGE_PRESENT | PAGE_WRITABLE | PAGE_USER;
     }
+    
+    // Ensure PAGE_USER is set on PDPT
+    if (flags & PAGE_USER) pdpt[pdpt_idx] |= PAGE_USER;
 
     uint64_t* pd = (uint64_t*)(pdpt[pdpt_idx] & ~0xFFF);
-    if (!(pd[pd_idx] & PAGE_PRESENT)) {
+    
+    // If the PD entry exists but is a 2MB huge page (kernel mapping), we must shatter it into a 4KB PT!
+    if ((pd[pd_idx] & PAGE_PRESENT) && (pd[pd_idx] & 0x80)) { // 0x80 is PAGE_SIZE
+        uint64_t pt = (uint64_t)phys_alloc_page();
+        if (!pt) return false;
+        memset((void*)pt, 0, PAGE_SIZE);
+        uint64_t base_phys = pd[pd_idx] & ~0x1FFFFF;
+        uint64_t base_flags = pd[pd_idx] & 0xFFF;
+        base_flags &= ~0x80; // Remove PAGE_SIZE bit
+        
+        uint64_t* pt_ptr = (uint64_t*)pt;
+        for (int i = 0; i < 512; i++) {
+            pt_ptr[i] = (base_phys + i * PAGE_SIZE) | base_flags;
+        }
+        pd[pd_idx] = pt | PAGE_PRESENT | PAGE_WRITABLE | PAGE_USER;
+    }
+    else if (!(pd[pd_idx] & PAGE_PRESENT)) {
         uint64_t pt = (uint64_t)phys_alloc_page();
         if (!pt) return false;
         memset((void*)pt, 0, PAGE_SIZE);
         pd[pd_idx] = pt | PAGE_PRESENT | PAGE_WRITABLE | PAGE_USER;
     }
 
+    // Ensure PAGE_USER is set on PD
+    if (flags & PAGE_USER) pd[pd_idx] |= PAGE_USER;
+
     uint64_t* pt = (uint64_t*)(pd[pd_idx] & ~0xFFF);
     pt[pt_idx] = (physical_addr & ~0xFFF) | flags;
     
-    invlpg(virtual_addr);
     return true;
 }
 

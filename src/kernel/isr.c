@@ -38,7 +38,10 @@ uint64_t isr_handler(registers_t* regs) {
                 (void*)regs->rip, (uint32_t)regs->cs, (void*)regs->rflags, (uint32_t)regs->err_code);
         vga_set_color(old_color);
         uint64_t cr2; __asm__ volatile("mov %%cr2, %0" : "=r"(cr2)); 
-        serial_printf("\n [64-BIT KERNEL PANIC] CPU Exception %u (Error Code: %u) at RIP: 0x%x, CR2: 0x%x\n", (uint32_t)regs->int_no, (uint32_t)regs->err_code, regs->rip, cr2);
+        char buf1[32], buf2[32]; 
+utoa64(regs->rip, buf1, 16); 
+utoa64(cr2, buf2, 16); 
+serial_printf("\n [64-BIT KERNEL PANIC] CPU Exception %u (Error Code: %u) at RIP: 0x%s, CR2: 0x%s\n", (uint32_t)regs->int_no, (uint32_t)regs->err_code, buf1, buf2);
         
         __asm__ volatile ("cli; hlt");
     }

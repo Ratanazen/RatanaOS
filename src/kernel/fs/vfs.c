@@ -338,6 +338,7 @@ void vfs_register_node(vfs_node_t* node) {
 }
 
 vfs_node_t* vfs_open(const char* path) {
+    if ((uint64_t)path < 0x1000) return 0;
     if (!path) return NULL;
     vfs_node_t* curr = root_fs;
     while (curr) {

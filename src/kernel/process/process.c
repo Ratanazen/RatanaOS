@@ -99,6 +99,9 @@ trap_frame_t* process_switch(trap_frame_t* frame) {
     current_process->state = PROCESS_RUNNING;
 
     tss_set_kernel_stack(current_process->kernel_stack);
+    extern void syscall_update_kernel_stack(uint64_t);
+    syscall_update_kernel_stack(current_process->kernel_stack);
+    
     vmm_switch_address_space(current_process->pml4);
 
     return current_process->context;

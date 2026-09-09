@@ -8,6 +8,20 @@
 #include "../../include/heap.h"
 #include "../../include/timer.h"
 
+void syscall_handler_linux(registers_t* regs) {
+    serial_printf("LINUX SYSCALL: %d\n", regs->rax);
+    
+    if (regs->rax == 60 || regs->rax == 231) {
+        serial_printf("LINUX: exit(%d)\n", regs->rdi);
+        
+        process_exit();
+    } else if (regs->rax == 12) { // brk
+        regs->rax = 0x80000000;
+    } else {
+        regs->rax = -1; // ENOSYS
+    }
+}
+
 static registers_t* syscall_handler_int80(registers_t* regs) {
     uint64_t syscall_num = regs->rax;
     
@@ -342,7 +356,42 @@ static registers_t* syscall_handler_int80(registers_t* regs) {
     return regs;
 }
 
+
+static uint64_t gs_kernel_struct[2]; // [0] = user_rsp, [1] = kernel_rsp
+extern void syscall_entry_stub(void);
+extern uint64_t current_kernel_stack;
+
 void syscall_init(void) {
     register_interrupt_handler(0x80, syscall_handler_int80);
     serial_printf("SYSCALL: Full RatanaOS ABI dispatcher registered on int 0x80\n");
+    
+    // Setup x86_64 SYSCALL/SYSRET
+    uint32_t eax, edx;
+    
+    // Enable SCE (bit 0) in EFER
+    __asm__ volatile("rdmsr" : "=a"(eax), "=d"(edx) : "c"(0xC0000080));
+    eax |= 1;
+    __asm__ volatile("wrmsr" :: "a"(eax), "d"(edx), "c"(0xC0000080));
+    
+    // STAR (0xC0000081): 
+    // Bits 32-47: Kernel CS (0x08)
+    // Bits 48-63: User CS (0x1B) - sysret uses this for CS and SS
+    eax = 0;
+    edx = (0x08 << 0) | (0x1B << 16); 
+    __asm__ volatile("wrmsr" :: "a"(eax), "d"(edx), "c"(0xC0000081));
+    
+    // LSTAR (0xC0000082): RIP for syscall_entry_stub
+    uint64_t lstar = (uint64_t)syscall_entry_stub;
+    __asm__ volatile("wrmsr" :: "a"((uint32_t)lstar), "d"((uint32_t)(lstar >> 32)), "c"(0xC0000082));
+    
+    // FMASK (0xC0000084): Mask RFLAGS during syscall (disable IF)
+    __asm__ volatile("wrmsr" :: "a"(0x200), "d"(0), "c"(0xC0000084));
+    
+    // Set KernelGSBase (0xC0000102) to our struct
+    uint64_t gs_base = (uint64_t)&gs_kernel_struct;
+    __asm__ volatile("wrmsr" :: "a"((uint32_t)gs_base), "d"((uint32_t)(gs_base >> 32)), "c"(0xC0000102));
+}
+
+void syscall_update_kernel_stack(uint64_t stack) {
+    gs_kernel_struct[1] = stack;
 }
