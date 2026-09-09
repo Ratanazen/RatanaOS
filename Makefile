@@ -430,6 +430,15 @@ live-clean:
 
 
 # ==============================================================================
+# Fast Live-Build (<10 Minutes Full Build)
+# ==============================================================================
+live-iso-fast:
+	@echo "==> Running RatanaOS Fast ISO Build Engine (<10 minutes)..."
+	./tools/fast-live-build.sh
+
+iso-fast: live-iso-fast
+
+# ==============================================================================
 # Image Variant Targets (Phase 10)
 # ==============================================================================
 iso-desktop: live-iso
@@ -443,3 +452,4 @@ iso-server:
 
 iso-all: iso-desktop
 	@echo "==> All configured variants built."
+
