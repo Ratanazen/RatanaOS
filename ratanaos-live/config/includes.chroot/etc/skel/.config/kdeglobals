@@ -3,7 +3,7 @@ ColorScheme=BreezeDark
 Name=RatanaOS Sequoia Dark
 
 [Icons]
-Theme=RatanaOS-WhiteSur
+Theme=WhiteSur-dark
 
 [KDE]
 widgetStyle=Breeze

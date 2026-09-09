@@ -1,7 +1,8 @@
 # RatanaOS macOS Sequoia 2026 Style for GNOME
 [org/gnome/desktop/interface]
-gtk-theme='RatanaOS-Dark'
-icon-theme='RatanaOS-WhiteSur'
+gtk-theme='WhiteSur-Dark'
+icon-theme='WhiteSur-dark'
+cursor-theme='WhiteSur-cursors'
 color-scheme='prefer-dark'
 font-name='Cantarell 11'
 document-font-name='Cantarell 11'
@@ -9,7 +10,12 @@ monospace-font-name='Monospace 11'
 
 [org/gnome/desktop/wm/preferences]
 button-layout='close,minimize,maximize:'
-theme='RatanaOS-Dark'
+theme='WhiteSur-Dark'
+auto-raise=false
+focus-mode='click'
+
+[org/gnome/mutter]
+center-new-windows=true
 
 [org/gnome/desktop/background]
 picture-uri='file:///usr/share/backgrounds/ratanaos/ratanaos-sequoia-dark.png'
@@ -17,17 +23,29 @@ picture-uri-dark='file:///usr/share/backgrounds/ratanaos/ratanaos-sequoia-dark.p
 picture-options='zoom'
 
 [org/gnome/shell]
-enabled-extensions=['dash-to-dock@vmgweb.com']
+enabled-extensions=['dash-to-dock@vmgweb.com', 'user-theme@gnome-shell-extensions.gcampax.github.com', 'appindicatorsupport@rgcjonas.gmail.com', 'panel-osd@berend.de.schouwer.gmail.com']
 favorite-apps=['org.gnome.Nautilus.desktop', 'firefox-esr.desktop', 'org.gnome.Terminal.desktop', 'org.gnome.Calculator.desktop', 'org.gnome.TextEditor.desktop', 'gnome-control-center.desktop', 'calamares.desktop']
+
+[org/gnome/shell/extensions/user-theme]
+name='WhiteSur-Dark'
 
 [org/gnome/shell/extensions/dash-to-dock]
 dock-position='BOTTOM'
 extend-height=false
 dock-fixed=false
 autohide=true
-dash-max-icon-size=48
+dash-max-icon-size=52
 transparency-mode='DYNAMIC'
 custom-theme-shrink=true
 show-trash=true
 show-mounts=true
+apply-custom-theme=true
+running-indicator-style='DOTS'
+custom-background-color=true
+background-color='rgba(25,25,30,0.55)'
+
+[org/gnome/shell/extensions/panel-osd]
+x-pos=97
+y-pos=97
+
 

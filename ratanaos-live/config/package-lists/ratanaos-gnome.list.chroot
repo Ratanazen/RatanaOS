@@ -8,4 +8,10 @@ gnome-tweaks
 gnome-terminal
 gnome-control-center
 gnome-shell-extension-dashtodock
+gnome-shell-extension-appindicator
+gnome-shell-extension-panel-osd
+gnome-shell-extension-manager
+gnome-shell-extensions
+gnome-shell-extensions-extra
+
 
