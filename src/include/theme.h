@@ -24,10 +24,48 @@ typedef enum {
     ACCENT_COUNT
 } ui_accent_color_t;
 
+typedef enum {
+    THEME_MODE_LIGHT = 0,
+    THEME_MODE_DARK = 1,
+    THEME_MODE_AUTO = 2,
+    THEME_MODE_COUNT
+} theme_mode_t;
+
+typedef enum {
+    WINDOW_STYLE_MACOS = 0,
+    WINDOW_STYLE_CLASSIC = 1,
+    WINDOW_STYLE_MINIMAL = 2,
+    WINDOW_STYLE_TRANSPARENT = 3,
+    WINDOW_STYLE_COUNT
+} window_style_t;
+
+typedef enum {
+    DOCK_POS_BOTTOM = 0,
+    DOCK_POS_LEFT = 1,
+    DOCK_POS_RIGHT = 2,
+    DOCK_POS_COUNT
+} dock_position_t;
+
+typedef enum {
+    DOCK_STYLE_GLASS = 0,
+    DOCK_STYLE_CLASSIC = 1,
+    DOCK_STYLE_TRANSPARENT = 2,
+    DOCK_STYLE_COMPACT = 3,
+    DOCK_STYLE_COUNT
+} dock_style_t;
+
+typedef enum {
+    MENUBAR_STYLE_GLASS = 0,
+    MENUBAR_STYLE_SOLID = 1,
+    MENUBAR_STYLE_TRANSPARENT = 2,
+    MENUBAR_STYLE_COUNT
+} menubar_style_t;
+
 typedef struct {
     // Preset ID & State
     ui_theme_preset_t preset;
     ui_accent_color_t accent_id;
+    theme_mode_t      mode;
     bool dark_mode;
     bool transparency_enabled;
     bool shadows_enabled;
@@ -45,7 +83,9 @@ typedef struct {
     uint32_t window_title_active;
     uint32_t window_title_inactive;
 
-    // Sidebars & Panels
+    // Sidebars, Panels & Surfaces (Semantic Tokens)
+    uint32_t surface;
+    uint32_t surface_secondary;
     uint32_t sidebar_bg;
     uint32_t sidebar_border;
     uint32_t sidebar_item_hover;
@@ -61,6 +101,8 @@ typedef struct {
 
     // Accent, Borders & Separators
     uint32_t accent;
+    uint32_t accent_hover;
+    uint32_t accent_pressed;
     uint32_t border;
     uint32_t separator;
 
@@ -78,6 +120,11 @@ typedef struct {
     uint32_t selection_bg;
     uint32_t selection_text;
 
+    // System Bars & Surfaces
+    uint32_t menu_bar;
+    uint32_t dock_bg;
+    uint32_t shadow;
+
     // Alpha / Translucency
     uint8_t window_alpha;
     uint8_t menubar_alpha;
@@ -87,11 +134,20 @@ typedef struct {
 
     // Metrics & Radii
     int window_radius;
+    int window_border_width;
     int window_shadow_size;
     int button_radius;
     int dock_radius;
     int control_radius;
     int sidebar_radius;
+
+    // Styles & Layouts
+    window_style_t   window_style;
+    dock_position_t  dock_position;
+    dock_style_t     dock_style;
+    menubar_style_t  menubar_style;
+    bool             dock_autohide;
+    int              font_scale;
 } ui_theme_t;
 
 // UI Scale Helper Macro
@@ -103,6 +159,10 @@ void theme_set_preset(ui_theme_preset_t preset);
 ui_theme_preset_t theme_get_preset(void);
 const char* theme_get_preset_name(ui_theme_preset_t preset);
 
+void theme_set_mode(theme_mode_t mode);
+theme_mode_t theme_get_mode(void);
+const char* theme_get_mode_name(theme_mode_t mode);
+
 void theme_set_accent(ui_accent_color_t accent);
 ui_accent_color_t theme_get_accent(void);
 const char* theme_get_accent_name(ui_accent_color_t accent);
@@ -113,6 +173,29 @@ void theme_next(void);
 void theme_set_transparency(bool enabled);
 void theme_set_shadows(bool enabled);
 void theme_set_window_radius(int radius);
+void theme_set_window_shadow_size(int size);
+void theme_set_window_style(window_style_t style);
+window_style_t theme_get_window_style(void);
+const char* theme_get_window_style_name(window_style_t style);
+
+void theme_set_dock_position(dock_position_t pos);
+dock_position_t theme_get_dock_position(void);
+const char* theme_get_dock_position_name(dock_position_t pos);
+
+void theme_set_dock_style(dock_style_t style);
+dock_style_t theme_get_dock_style(void);
+const char* theme_get_dock_style_name(dock_style_t style);
+
+void theme_set_dock_autohide(bool enabled);
+bool theme_get_dock_autohide(void);
+
+void theme_set_menubar_style(menubar_style_t style);
+menubar_style_t theme_get_menubar_style(void);
+const char* theme_get_menubar_style_name(menubar_style_t style);
+
+void theme_set_font_scale(int percent);
+int  theme_get_font_scale(void);
+
 void theme_update(void); // Updates auto mode from RTC
 
 // Global UI Scaling

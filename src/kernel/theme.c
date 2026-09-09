@@ -2,6 +2,7 @@
 #include "../include/gfx.h"
 #include "../include/rtc.h"
 #include "../include/string.h"
+#include "../include/font.h"
 
 static ui_theme_t current_theme;
 static int global_ui_scale_percent = 100; // 100% default
@@ -27,6 +28,38 @@ static const char* preset_names[UI_THEME_COUNT] = {
     "RatanaOS Light",
     "macOS Dark",
     "macOS Light",
+    "Auto (Day/Night)"
+};
+
+static const char* window_style_names[WINDOW_STYLE_COUNT] = {
+    "macOS Standard",
+    "Classic Rect",
+    "Minimal Flat",
+    "Transparent Acrylic"
+};
+
+static const char* dock_position_names[DOCK_POS_COUNT] = {
+    "Bottom",
+    "Left",
+    "Right"
+};
+
+static const char* dock_style_names[DOCK_STYLE_COUNT] = {
+    "Frosted Glass",
+    "Classic Solid",
+    "Transparent",
+    "Compact"
+};
+
+static const char* menubar_style_names[MENUBAR_STYLE_COUNT] = {
+    "Frosted Glass",
+    "Solid Opaque",
+    "Transparent"
+};
+
+static const char* theme_mode_names[THEME_MODE_COUNT] = {
+    "Light",
+    "Dark",
     "Auto (Day/Night)"
 };
 
@@ -56,11 +89,20 @@ static void apply_theme_preset(ui_theme_preset_t preset, ui_accent_color_t accen
     current_theme.transparency_enabled = true;
     current_theme.shadows_enabled = true;
     current_theme.window_radius = 10;
+    current_theme.window_border_width = 1;
     current_theme.window_shadow_size = 6;
     current_theme.button_radius = 6;
     current_theme.dock_radius = 16;
     current_theme.control_radius = 9;
     current_theme.sidebar_radius = 6;
+    current_theme.window_style = WINDOW_STYLE_MACOS;
+    current_theme.dock_position = DOCK_POS_BOTTOM;
+    current_theme.dock_style = DOCK_STYLE_GLASS;
+    current_theme.menubar_style = MENUBAR_STYLE_GLASS;
+    current_theme.dock_autohide = false;
+    if (current_theme.font_scale < 80 || current_theme.font_scale > 150) {
+        current_theme.font_scale = 100;
+    }
 
     if (is_dark) {
         if (preset == UI_THEME_RATANA_DARK || preset == UI_THEME_AUTO) {
@@ -252,6 +294,15 @@ static void apply_theme_preset(ui_theme_preset_t preset, ui_accent_color_t accen
         }
     }
 
+    // Assign semantic tokens
+    current_theme.surface = current_theme.panel_bg;
+    current_theme.surface_secondary = current_theme.sidebar_bg;
+    current_theme.accent_hover = acc;
+    current_theme.accent_pressed = acc;
+    current_theme.menu_bar = current_theme.window_titlebar;
+    current_theme.dock_bg = current_theme.panel_bg;
+    current_theme.shadow = 0x00000000;
+
     // Refresh wallpaper buffer with active theme gradient
     gfx_generate_wallpaper(current_theme.wallpaper_top, current_theme.wallpaper_mid, current_theme.wallpaper_bot);
 }
@@ -328,9 +379,153 @@ void theme_set_shadows(bool enabled) {
 }
 
 void theme_set_window_radius(int radius) {
-    if (radius >= 0 && radius <= 20) {
+    if (radius >= 0 && radius <= 24) {
         current_theme.window_radius = radius;
     }
+}
+
+void theme_set_mode(theme_mode_t mode) {
+    if (mode == THEME_MODE_LIGHT) {
+        theme_set_preset(UI_THEME_RATANA_LIGHT);
+    } else if (mode == THEME_MODE_DARK) {
+        theme_set_preset(UI_THEME_RATANA_DARK);
+    } else if (mode == THEME_MODE_AUTO) {
+        theme_set_preset(UI_THEME_AUTO);
+    }
+    current_theme.mode = mode;
+}
+
+theme_mode_t theme_get_mode(void) {
+    return current_theme.mode;
+}
+
+const char* theme_get_mode_name(theme_mode_t mode) {
+    if (mode >= 0 && mode < THEME_MODE_COUNT) return theme_mode_names[mode];
+    return "Dark";
+}
+
+void theme_set_window_style(window_style_t style) {
+    if (style >= 0 && style < WINDOW_STYLE_COUNT) {
+        current_theme.window_style = style;
+        if (style == WINDOW_STYLE_CLASSIC) {
+            current_theme.window_radius = 4;
+            current_theme.window_shadow_size = 4;
+        } else if (style == WINDOW_STYLE_MINIMAL) {
+            current_theme.window_radius = 0;
+            current_theme.window_shadow_size = 0;
+            current_theme.shadows_enabled = false;
+        } else if (style == WINDOW_STYLE_TRANSPARENT) {
+            current_theme.window_radius = 12;
+            current_theme.transparency_enabled = true;
+            current_theme.window_alpha = 200;
+        } else { // WINDOW_STYLE_MACOS
+            current_theme.window_radius = 10;
+            current_theme.window_shadow_size = 6;
+            current_theme.shadows_enabled = true;
+            current_theme.transparency_enabled = true;
+            current_theme.window_alpha = 245;
+        }
+    }
+}
+
+window_style_t theme_get_window_style(void) {
+    return current_theme.window_style;
+}
+
+const char* theme_get_window_style_name(window_style_t style) {
+    if (style >= 0 && style < WINDOW_STYLE_COUNT) return window_style_names[style];
+    return "macOS Standard";
+}
+
+void theme_set_window_shadow_size(int size) {
+    if (size >= 0 && size <= 16) {
+        current_theme.window_shadow_size = size;
+        current_theme.shadows_enabled = (size > 0);
+    }
+}
+
+void theme_set_dock_position(dock_position_t pos) {
+    if (pos >= 0 && pos < DOCK_POS_COUNT) {
+        current_theme.dock_position = pos;
+    }
+}
+
+dock_position_t theme_get_dock_position(void) {
+    return current_theme.dock_position;
+}
+
+const char* theme_get_dock_position_name(dock_position_t pos) {
+    if (pos >= 0 && pos < DOCK_POS_COUNT) return dock_position_names[pos];
+    return "Bottom";
+}
+
+void theme_set_dock_style(dock_style_t style) {
+    if (style >= 0 && style < DOCK_STYLE_COUNT) {
+        current_theme.dock_style = style;
+        if (style == DOCK_STYLE_GLASS) {
+            current_theme.dock_alpha = 215;
+            current_theme.dock_radius = 16;
+        } else if (style == DOCK_STYLE_CLASSIC) {
+            current_theme.dock_alpha = 255;
+            current_theme.dock_radius = 8;
+        } else if (style == DOCK_STYLE_TRANSPARENT) {
+            current_theme.dock_alpha = 140;
+            current_theme.dock_radius = 16;
+        } else if (style == DOCK_STYLE_COMPACT) {
+            current_theme.dock_alpha = 230;
+            current_theme.dock_radius = 10;
+        }
+    }
+}
+
+dock_style_t theme_get_dock_style(void) {
+    return current_theme.dock_style;
+}
+
+const char* theme_get_dock_style_name(dock_style_t style) {
+    if (style >= 0 && style < DOCK_STYLE_COUNT) return dock_style_names[style];
+    return "Frosted Glass";
+}
+
+void theme_set_dock_autohide(bool enabled) {
+    current_theme.dock_autohide = enabled;
+}
+
+bool theme_get_dock_autohide(void) {
+    return current_theme.dock_autohide;
+}
+
+void theme_set_menubar_style(menubar_style_t style) {
+    if (style >= 0 && style < MENUBAR_STYLE_COUNT) {
+        current_theme.menubar_style = style;
+        if (style == MENUBAR_STYLE_GLASS) {
+            current_theme.menubar_alpha = 230;
+        } else if (style == MENUBAR_STYLE_SOLID) {
+            current_theme.menubar_alpha = 255;
+        } else if (style == MENUBAR_STYLE_TRANSPARENT) {
+            current_theme.menubar_alpha = 160;
+        }
+    }
+}
+
+menubar_style_t theme_get_menubar_style(void) {
+    return current_theme.menubar_style;
+}
+
+const char* theme_get_menubar_style_name(menubar_style_t style) {
+    if (style >= 0 && style < MENUBAR_STYLE_COUNT) return menubar_style_names[style];
+    return "Frosted Glass";
+}
+
+void theme_set_font_scale(int percent) {
+    if (percent < 80) percent = 80;
+    if (percent > 150) percent = 150;
+    current_theme.font_scale = percent;
+    font_set_scale(percent);
+}
+
+int theme_get_font_scale(void) {
+    return current_theme.font_scale;
 }
 
 void theme_update(void) {
