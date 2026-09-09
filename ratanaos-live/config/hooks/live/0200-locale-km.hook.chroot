@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+# Generate Khmer and English UTF-8 locales
+echo "km_KH UTF-8" >> /etc/locale.gen
+echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
+locale-gen
+
+# Set default live session to English (let Calamares ask during install)
+update-locale LANG=en_US.UTF-8
+
+# Pre-configure IBus as the default input method
+im-config -n ibus || true

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Exec=ibus-daemon -drxR
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name=IBus Daemon
+Comment=Input method framework for multilingual text entry
