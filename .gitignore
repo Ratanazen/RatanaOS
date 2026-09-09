@@ -10,5 +10,7 @@ hello_linux
 hello_dyn
 debian-test-rootfs/
 *.py
-
-
+!tools/*.py
+iso/ratana/
+iso/system/
+iso/debian/

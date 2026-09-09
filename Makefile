@@ -67,7 +67,7 @@ TARGET = $(BUILD_DIR)/ratanaos.bin
 TARGET32 = $(BUILD_DIR)/ratanaos32.bin
 ISO_TARGET = $(BUILD_DIR)/ratanaos.iso
 
-.PHONY: all clean run run-iso iso test test-all test-qemu dirs bake-icons user-apps check-deps debug benchmark debian-live debian-rootfs
+.PHONY: all clean run run-iso iso iso-full test test-all test-qemu dirs bake-icons user-apps check-deps debug benchmark debian-live debian-rootfs
 
 all: dirs user-apps $(TARGET) $(TARGET32)
 
@@ -235,6 +235,10 @@ iso-with-debian:
 		exit 1; \
 	fi
 	@$(MAKE) iso DEBIAN_ISO=$(DEBIAN_ISO)
+
+# Build Complete 500 MB Distribution ISO with Full GUI Assets, Icons & Debian Live
+iso-full:
+	@python3 tools/build_full_iso.py
 
 # Debian live-build pipeline & rootfs targets
 debian-live:
