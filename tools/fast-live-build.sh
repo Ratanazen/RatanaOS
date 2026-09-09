@@ -41,8 +41,8 @@ docker run --rm \
         --memtest none \
         --binary-images iso-hybrid \
         --bootloader syslinux,grub-efi \
-        --compression zstd \
-        --zstd-options "-3 -T0" \
+        --chroot-squashfs-compression-type zstd \
+        --chroot-squashfs-compression-level 3 \
         --cache true \
         --cache-packages true \
         --cache-stages "bootstrap chroot rootfs" \
