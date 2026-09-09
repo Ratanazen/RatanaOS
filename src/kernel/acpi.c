@@ -34,8 +34,15 @@ static acpi_rsdp_t* acpi_scan_rsdp_range(uint64_t start, uint64_t end) {
     for (uint64_t p = start; p < end; p += 16) {
         if (memcmp((const void*)p, "RSD PTR ", 8) == 0) {
             acpi_rsdp_t* candidate = (acpi_rsdp_t*)p;
-            if (acpi_validate_checksum(candidate, sizeof(acpi_rsdp_t))) {
-                return candidate;
+            // ACPI 1.0 checksum is strictly over the first 20 bytes
+            if (acpi_validate_checksum(candidate, 20)) {
+                if (candidate->revision >= 2 && candidate->length >= sizeof(acpi_rsdp_t)) {
+                    if (acpi_validate_checksum(candidate, candidate->length)) {
+                        return candidate;
+                    }
+                } else {
+                    return candidate;
+                }
             }
         }
     }

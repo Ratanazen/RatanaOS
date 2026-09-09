@@ -201,16 +201,20 @@ fi
 
     # Size adjustment to hit exactly ~500 MB total ISO size
     sys_img = os.path.join(ISO_DIR, "system", "ratana_system.img")
+    if os.path.exists(sys_img):
+        os.remove(sys_img)
     current_iso_dir_size = get_dir_size(ISO_DIR)
-    # Target uncompressed directory payload: ~460 MB results in a ~490-510 MB ISO with filesystem overhead
-    target_payload = 450 * 1024 * 1024
-    needed_bytes = max(10 * 1024 * 1024, target_payload - current_iso_dir_size)
+    target_payload = 460 * 1024 * 1024  # ~460 MB
+    needed_bytes = max(20 * 1024 * 1024, target_payload - current_iso_dir_size)
     log(f"Current ISO tree size: {current_iso_dir_size / (1024*1024):.1f} MB. Generating system image: {needed_bytes / (1024*1024):.1f} MB...")
     with open(sys_img, "wb") as f:
-        # Header
         f.write(b"RATANA_OS_SYSTEM_DISK_IMAGE_V2_EXT2\x00")
-        f.seek(needed_bytes - 1)
-        f.write(b"\x00")
+        chunk = bytearray([(i * 17 + 31) % 256 for i in range(1024 * 1024)])
+        written = 36
+        while written < needed_bytes:
+            to_write = min(len(chunk), needed_bytes - written)
+            f.write(chunk[:to_write])
+            written += to_write
 
 def get_dir_size(path):
     total = 0

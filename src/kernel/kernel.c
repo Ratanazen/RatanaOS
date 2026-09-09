@@ -82,14 +82,14 @@ void kernel_main(uint64_t mbi_addr, uint64_t magic) {
     debianfs_init();
     syscall_init();
     
-    // Load /system/debian/bin/hello_dyn
+    // Autoload Debian binary if present
     vfs_node_t* init_file = vfs_open("/system/debian/bin/hello_dyn");
+    if (!init_file) {
+        init_file = vfs_open("/system/debian/bin/hello_linux");
+    }
     if (init_file) {
-        elf_load_and_run(init_file, "hello_dyn");
-        serial_printf("STEP 12: STI enabled\n");
-        __asm__ volatile("sti");
-    } else {
-        serial_printf("ERROR: /system/debian/bin/hello_dyn not found\n");
+        elf_load_and_run(init_file, "hello");
+        serial_printf("LINUX ABI: Loaded and scheduled %s\n", init_file->name);
     }
 
     rtc_init();

@@ -34,40 +34,92 @@ void serial_write_string(const char* str) {
 void serial_printf(const char* format, ...) {
     va_list args;
     va_start(args, format);
-    char buf[32];
+    char buf[64];
 
     for (size_t i = 0; format[i] != '\0'; i++) {
         if (format[i] == '%') {
             i++;
+            char pad_char = ' ';
+            int width = 0;
+            int precision = -1;
+
+            if (format[i] == '0') {
+                pad_char = '0';
+                i++;
+            }
+
+            while (format[i] >= '0' && format[i] <= '9') {
+                width = width * 10 + (format[i] - '0');
+                i++;
+            }
+
+            if (format[i] == '.') {
+                i++;
+                precision = 0;
+                while (format[i] >= '0' && format[i] <= '9') {
+                    precision = precision * 10 + (format[i] - '0');
+                    i++;
+                }
+            }
+
             switch (format[i]) {
                 case 's': {
                     const char* s = va_arg(args, const char*);
                     if (!s) s = "(null)";
-                    serial_write_string(s);
+                    int slen = (int)strlen(s);
+                    if (precision >= 0 && precision < slen) slen = precision;
+                    while (slen < width) {
+                        serial_write_char(pad_char);
+                        width--;
+                    }
+                    for (int j = 0; j < slen; j++) {
+                        serial_write_char(s[j]);
+                    }
                     break;
                 }
                 case 'd':
                 case 'i': {
                     int d = va_arg(args, int);
                     itoa(d, buf, 10);
+                    int blen = (int)strlen(buf);
+                    while (blen < width) {
+                        serial_write_char(pad_char);
+                        width--;
+                    }
                     serial_write_string(buf);
                     break;
                 }
                 case 'u': {
                     uint32_t u = va_arg(args, uint32_t);
                     utoa(u, buf, 10);
+                    int blen = (int)strlen(buf);
+                    while (blen < width) {
+                        serial_write_char(pad_char);
+                        width--;
+                    }
                     serial_write_string(buf);
                     break;
                 }
-                case 'x': {
-                    uint32_t x = va_arg(args, uint32_t);
+                case 'p':
+                case 'x':
+                case 'X': {
+                    uint64_t x = (format[i] == 'p') ? va_arg(args, uint64_t) : va_arg(args, uint32_t);
                     utoa(x, buf, 16);
+                    int blen = (int)strlen(buf);
+                    while (blen < width) {
+                        serial_write_char(pad_char);
+                        width--;
+                    }
                     serial_write_string(buf);
                     break;
                 }
                 case 'c': {
                     char c = (char)va_arg(args, int);
                     serial_write_char(c);
+                    break;
+                }
+                case '%': {
+                    serial_write_char('%');
                     break;
                 }
                 default:
@@ -83,3 +135,4 @@ void serial_printf(const char* format, ...) {
     }
     va_end(args);
 }
+
