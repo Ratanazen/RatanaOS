@@ -1,0 +1,19 @@
+# ==============================================================================
+# RatanaOS Desktop Package List (XFCE4 + LightDM)
+# ==============================================================================
+task-xfce-desktop
+xfce4-goodies
+network-manager
+network-manager-gnome
+firefox-esr
+file-roller
+gnome-disk-utility
+gparted
+lightdm
+lightdm-gtk-greeter
+plank
+thunar
+thunar-archive-plugin
+xfce4-terminal
+mousepad
+evince

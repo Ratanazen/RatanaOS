@@ -1,0 +1,8 @@
+# ==============================================================================
+# RatanaOS Boot Splash & Live Boot Configuration
+# ==============================================================================
+live-boot
+live-config
+live-config-systemd
+plymouth
+plymouth-themes

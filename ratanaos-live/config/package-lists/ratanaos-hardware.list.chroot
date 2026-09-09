@@ -1,0 +1,67 @@
+# ==============================================================================
+# RatanaOS Hardware & Driver Coverage Manifest
+# Zero gaps vs stock Debian/Arch across CPU, GPU, Network, Audio, Storage, Power
+# ==============================================================================
+
+# CPU Microcode (Intel & AMD)
+intel-microcode
+amd64-microcode
+
+# GPU Video Drivers & OpenGL/Vulkan Support
+# Open-source Nouveau, AMDGPU/Radeon, and Intel i915 included by default
+xserver-xorg-video-all
+xserver-xorg-video-nouveau
+xserver-xorg-video-amdgpu
+xserver-xorg-video-intel
+mesa-vulkan-drivers
+libgl1-mesa-dri
+firmware-misc-nonfree
+
+# Storage & Filesystem Tooling
+dosfstools
+mtools
+e2fsprogs
+btrfs-progs
+xfsprogs
+nvme-cli
+smartmontools
+
+# Network Drivers & Wireless Firmware
+firmware-linux
+firmware-linux-free
+firmware-linux-nonfree
+firmware-realtek
+firmware-iwlwifi
+firmware-atheros
+firmware-brcm80211
+wireless-tools
+wpasupplicant
+bluez
+bluez-tools
+blueman
+
+# Modern Audio Stack (PipeWire + PulseAudio emulation)
+pipewire
+pipewire-pulse
+pipewire-audio-client-libraries
+wireplumber
+pavucontrol
+alsa-utils
+
+# Input Devices & Multitouch Gestures
+xserver-xorg-input-libinput
+libinput-tools
+
+# Power Management & ACPI
+upower
+acpi
+acpid
+pm-utils
+xfce4-power-manager
+
+# Printing & Scanning Support
+cups
+cups-filters
+printer-driver-all
+system-config-printer
+simple-scan

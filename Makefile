@@ -396,17 +396,35 @@ live-iso: live-config
 
 live-run:
 	@if [ -f "$(LIVE_ISO)" ]; then \
-		echo "==> Booting RatanaOS Live ISO in QEMU (2GB RAM, KVM, VirtIO)..."; \
-		qemu-system-x86_64 -cdrom $(LIVE_ISO) -m 2G -smp 2 -enable-kvm -net nic,model=virtio -net user -vga virtio; \
+		echo "==> Booting RatanaOS Live ISO in QEMU (2GB RAM, KVM, VirtIO, Intel HDA)..."; \
+		qemu-system-x86_64 -m 2048 -smp 2 -enable-kvm \
+			-cdrom $(LIVE_ISO) \
+			-netdev user,id=net0 -device virtio-net-pci,netdev=net0 \
+			-device virtio-vga -device intel-hda -device hda-duplex; \
 	elif [ -f "$(BUILD_DIR)/ratanaos_full.iso" ]; then \
 		echo "==> Booting RatanaOS Full ISO in QEMU..."; \
-		qemu-system-x86_64 -cdrom $(BUILD_DIR)/ratanaos_full.iso -m 2G -smp 2 -enable-kvm -vga std; \
+		qemu-system-x86_64 -cdrom $(BUILD_DIR)/ratanaos_full.iso -m 2048 -smp 2 -enable-kvm -vga std; \
 	else \
 		echo "Error: No Live ISO found. Run 'make live-iso' first."; \
+		exit 1; \
+	fi
+
+live-checksum:
+	@if [ -f "$(LIVE_ISO)" ]; then \
+		sha256sum $(LIVE_ISO) > $(BUILD_DIR)/RatanaOS.iso.sha256; \
+		echo "==> Checksum written to $(BUILD_DIR)/RatanaOS.iso.sha256:"; \
+		cat $(BUILD_DIR)/RatanaOS.iso.sha256; \
+	elif [ -f "$(BUILD_DIR)/ratanaos_full.iso" ]; then \
+		sha256sum $(BUILD_DIR)/ratanaos_full.iso > $(BUILD_DIR)/RatanaOS.iso.sha256; \
+		echo "==> Checksum written to $(BUILD_DIR)/RatanaOS.iso.sha256:"; \
+		cat $(BUILD_DIR)/RatanaOS.iso.sha256; \
+	else \
+		echo "Error: No ISO found to checksum."; \
 		exit 1; \
 	fi
 
 live-clean:
 	@echo "==> Cleaning live-build cache and artifacts..."
 	./tools/docker-live-build.sh clean
+
 

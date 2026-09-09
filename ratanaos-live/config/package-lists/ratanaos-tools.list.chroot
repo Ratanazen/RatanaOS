@@ -1,0 +1,19 @@
+# ==============================================================================
+# RatanaOS Developer & System Utilities
+# Audience: Developer-focused & power-user desktop
+# ==============================================================================
+build-essential
+git
+curl
+wget
+vim
+nano
+htop
+neofetch
+pciutils
+usbutils
+sudo
+ca-certificates
+rsync
+unzip
+zip
