@@ -5,6 +5,9 @@
 #include "../include/dock.h"
 #include "../include/stdio.h"
 #include "../include/string.h"
+#include "../include/vfs.h"
+
+#define SETTINGS_CONF_PATH "/etc/ratana/settings.conf"
 
 static settings_t active_settings;
 static settings_t saved_settings;
@@ -42,7 +45,7 @@ void settings_reset_defaults(void) {
 void settings_init(void) {
     settings_reset_defaults();
     saved_settings = active_settings;
-    settings_apply();
+    settings_load();
 }
 
 settings_t* settings_get(void) {
@@ -72,15 +75,100 @@ void settings_apply(void) {
 void settings_save(void) {
     active_settings.checksum = calculate_checksum(&active_settings);
     saved_settings = active_settings;
-    kprintf("Settings saved to the volatile in-memory backend.\n");
+
+    char conf_buf[512];
+    ksprintf(conf_buf,
+             "ui_theme=%d\n"
+             "icon_theme=%d\n"
+             "accent=%d\n"
+             "ui_scale=%d\n"
+             "font_size=%d\n"
+             "dock_icon_size=%d\n"
+             "dock_spacing=%d\n"
+             "dock_magnification=%d\n"
+             "show_desktop_icons=%d\n"
+             "desktop_icon_size=%d\n"
+             "show_icon_labels=%d\n"
+             "window_radius=%d\n"
+             "transparency=%d\n"
+             "shadows=%d\n",
+             active_settings.ui_theme,
+             active_settings.icon_theme,
+             active_settings.accent,
+             active_settings.ui_scale,
+             active_settings.font_size,
+             active_settings.dock_icon_size,
+             active_settings.dock_spacing,
+             active_settings.dock_magnification ? 1 : 0,
+             active_settings.show_desktop_icons ? 1 : 0,
+             active_settings.desktop_icon_size,
+             active_settings.show_icon_labels ? 1 : 0,
+             active_settings.window_radius,
+             active_settings.transparency ? 1 : 0,
+             active_settings.shadows ? 1 : 0);
+
+    vfs_node_t* conf_node = vfs_create_file(SETTINGS_CONF_PATH, VFS_FILE);
+    if (conf_node) {
+        vfs_write(conf_node, 0, strlen(conf_buf), (const uint8_t*)conf_buf);
+        kprintf("Settings saved to persistent config file: %s\n", SETTINGS_CONF_PATH);
+    } else {
+        kprintf("Settings saved to volatile in-memory backup.\n");
+    }
 }
 
 void settings_load(void) {
+    vfs_node_t* conf_node = vfs_open(SETTINGS_CONF_PATH);
+    if (conf_node && conf_node->size > 0) {
+        char buf[512];
+        memset(buf, 0, sizeof(buf));
+        int read_bytes = vfs_read(conf_node, 0, sizeof(buf) - 1, (uint8_t*)buf);
+        if (read_bytes > 0) {
+            buf[read_bytes] = '\0';
+            // Parse line by line simple key=val
+            char* line = buf;
+            while (*line) {
+                char* next_line = strchr(line, '\n');
+                if (next_line) *next_line = '\0';
+
+                char* eq = strchr(line, '=');
+                if (eq) {
+                    *eq = '\0';
+                    char* key = line;
+                    char* val = eq + 1;
+                    int val_i = atoi(val);
+
+                    if (strcmp(key, "ui_theme") == 0) active_settings.ui_theme = (ui_theme_preset_t)val_i;
+                    else if (strcmp(key, "icon_theme") == 0) active_settings.icon_theme = (icon_theme_id_t)val_i;
+                    else if (strcmp(key, "accent") == 0) active_settings.accent = (ui_accent_color_t)val_i;
+                    else if (strcmp(key, "ui_scale") == 0) active_settings.ui_scale = val_i;
+                    else if (strcmp(key, "font_size") == 0) active_settings.font_size = (font_size_t)val_i;
+                    else if (strcmp(key, "dock_icon_size") == 0) active_settings.dock_icon_size = val_i;
+                    else if (strcmp(key, "dock_spacing") == 0) active_settings.dock_spacing = val_i;
+                    else if (strcmp(key, "dock_magnification") == 0) active_settings.dock_magnification = (val_i != 0);
+                    else if (strcmp(key, "show_desktop_icons") == 0) active_settings.show_desktop_icons = (val_i != 0);
+                    else if (strcmp(key, "desktop_icon_size") == 0) active_settings.desktop_icon_size = val_i;
+                    else if (strcmp(key, "show_icon_labels") == 0) active_settings.show_icon_labels = (val_i != 0);
+                    else if (strcmp(key, "window_radius") == 0) active_settings.window_radius = val_i;
+                    else if (strcmp(key, "transparency") == 0) active_settings.transparency = (val_i != 0);
+                    else if (strcmp(key, "shadows") == 0) active_settings.shadows = (val_i != 0);
+                }
+
+                if (!next_line) break;
+                line = next_line + 1;
+            }
+            active_settings.checksum = calculate_checksum(&active_settings);
+            saved_settings = active_settings;
+            settings_apply();
+            kprintf("Settings successfully restored from %s\n", SETTINGS_CONF_PATH);
+            return;
+        }
+    }
+
     if (saved_settings.magic == SETTINGS_MAGIC &&
         saved_settings.checksum == calculate_checksum(&saved_settings)) {
         active_settings = saved_settings;
         settings_apply();
-        kprintf("Settings loaded from the volatile in-memory backend.\n");
+        kprintf("Settings loaded from volatile backup.\n");
     } else {
         settings_reset_defaults();
         settings_apply();
@@ -103,18 +191,20 @@ void settings_print(void) {
     kprintf("Window Radius:      %d px\n", active_settings.window_radius);
     kprintf("Transparency:       %s\n", active_settings.transparency ? "Enabled" : "Disabled");
     kprintf("Window Shadows:     %s\n", active_settings.shadows ? "Enabled" : "Disabled");
+    kprintf("Config File:        %s\n", SETTINGS_CONF_PATH);
     kprintf("Storage Backend:    %s\n", settings_get_backend_name());
     kprintf("--------------------------------------\n\n");
 }
 
 settings_backend_t settings_get_backend(void) {
-    return SETTINGS_BACKEND_VOLATILE;
+    return SETTINGS_BACKEND_VFS_CONF;
 }
 
 const char* settings_get_backend_name(void) {
-    return "Volatile memory (not persistent across reboot)";
+    return "VFS Configuration Storage (/etc/ratana/settings.conf)";
 }
 
 bool settings_is_persistent(void) {
-    return false;
+    return true;
 }
+

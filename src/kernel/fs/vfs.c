@@ -390,10 +390,42 @@ int vfs_read(vfs_node_t* node, uint32_t offset, uint32_t size, uint8_t* buffer) 
     return (int)read_size;
 }
 
+vfs_node_t* vfs_create_file(const char* path, uint32_t flags) {
+    if (!path) return NULL;
+    vfs_node_t* existing = vfs_open(path);
+    if (existing) return existing;
+
+    vfs_node_t* node = (vfs_node_t*)kmalloc(sizeof(vfs_node_t));
+    if (!node) return NULL;
+    memset(node, 0, sizeof(vfs_node_t));
+    strcpy(node->name, path);
+    node->flags = flags ? flags : VFS_FILE;
+    node->fs_type = FS_RAMFS;
+    node->size = 0;
+    node->data = (uint8_t*)kmalloc(4096);
+    if (node->data) memset(node->data, 0, 4096);
+    vfs_register_node(node);
+    return node;
+}
+
 int vfs_write(vfs_node_t* node, uint32_t offset, uint32_t size, const uint8_t* buffer) {
     if (!node || !buffer) return -1;
     if (node->write) {
         return node->write(node, offset, size, buffer);
+    }
+    if (node->fs_type == FS_RAMFS) {
+        if (!node->data) {
+            node->data = (uint8_t*)kmalloc(4096);
+            if (node->data) memset(node->data, 0, 4096);
+        }
+        if (!node->data) return -1;
+        uint32_t max_write = 4096 - offset;
+        if (size > max_write) size = max_write;
+        memcpy(node->data + offset, buffer, size);
+        if (offset + size > node->size) {
+            node->size = offset + size;
+        }
+        return (int)size;
     }
     return -1; // Read-only for standard files
 }

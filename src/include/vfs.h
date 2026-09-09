@@ -45,6 +45,7 @@ typedef struct vfs_node {
 void vfs_init(void);
 void vfs_register_node(vfs_node_t* node);
 vfs_node_t* vfs_open(const char* path);
+vfs_node_t* vfs_create_file(const char* path, uint32_t flags);
 int vfs_read(vfs_node_t* node, uint32_t offset, uint32_t size, uint8_t* buffer);
 int vfs_write(vfs_node_t* node, uint32_t offset, uint32_t size, const uint8_t* buffer);
 void vfs_close(vfs_node_t* node);

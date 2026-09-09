@@ -9,7 +9,8 @@
 #define SETTINGS_MAGIC 0x52415441 // 'RATA'
 
 typedef enum {
-    SETTINGS_BACKEND_VOLATILE = 0
+    SETTINGS_BACKEND_VOLATILE = 0,
+    SETTINGS_BACKEND_VFS_CONF = 1
 } settings_backend_t;
 
 typedef struct {
