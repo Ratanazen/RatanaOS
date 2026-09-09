@@ -74,3 +74,16 @@
 - **Graphics Engine**: 32-bit ARGB software renderer (`src/drivers/gfx.c`) with double buffering, alpha blending, and geometry primitives.
 - **Icon Rendering Pipeline**: Pre-rendered asset tables and dynamic bilinear scaling (`src/drivers/icons.c`, `src/drivers/icons_assets.c`).
 - **Desktop Environment**: Translucent menu bar with Apple menu, dynamic dock with active indicators and bounce animations, multi-window manager, and native tabbed `System Settings.app`.
+
+### 8. macOS Theme Engine & UI Customization
+- **Theme Engine (`ui_theme_t`)**: Centralized semantic token engine governing background colors, elevated surfaces, borders, text, and active accents.
+- **Color Palettes**: Light, Dark, and RTC CMOS Auto modes with 8 macOS Sequoia accent colors.
+- **Dynamic Typography**: 7 semantic font roles with multi-scale percentage adjustments ($80\%$ to $150\%$).
+- **Dock Customization**: 3-edge anchoring (Bottom, Left, Right), 4 styles (Glass, Classic, Transparent, Compact), and cursor proximity auto-hide.
+- **Window Decorations**: 4 styles (macOS Sequoia, Classic 2D, Minimalist, Acrylic Glass) with soft blur drop shadows and rounded corners.
+- **Configuration Persistence**: Automatic serialization/deserialization to `/etc/ratana/settings.conf` with 16-bit additive checksum protection.
+
+### 9. Build System & Host Environment
+- **Host System**: Arch Linux x86_64 (freestanding GCC, NASM, GNU LD, xorriso, GRUB).
+- **Artifacts**: 64-bit ELF kernel (`ratanaos.bin`), 32-bit Multiboot wrapper (`ratanaos32.bin`), Hybrid bootable ISO (`ratanaos.iso`), Ext2 disk image (`disk.img`).
+
