@@ -1,0 +1,24 @@
+#!/bin/sh
+set -e
+echo "==> Setting RatanaOS macOS Tahoe wallpaper as system-wide default..."
+mkdir -p /usr/share/images/desktop-base /usr/share/backgrounds/ratanaos /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml
+
+cp -f /usr/share/backgrounds/ratanaos/ratanaos-tahoe-blue.png /usr/share/images/desktop-base/default 2>/dev/null || true
+cp -f /usr/share/backgrounds/ratanaos/ratanaos-tahoe-blue.png /usr/share/images/desktop-base/desktop-background 2>/dev/null || true
+cp -f /usr/share/backgrounds/ratanaos/ratanaos-tahoe-blue.png /usr/share/images/desktop-base/login-background.svg 2>/dev/null || true
+cp -f /usr/share/backgrounds/ratanaos/ratanaos-tahoe-blue.png /usr/share/backgrounds/ratanaos/ratanaos-default.png 2>/dev/null || true
+
+cat << 'XFCE_EOF' > /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xfce4-desktop" version="1.0">
+  <property name="backdrop" type="empty">
+    <property name="screen0" type="empty">
+      <property name="monitor0" type="empty">
+        <property name="image-path" type="string" value="/usr/share/backgrounds/ratanaos/ratanaos-tahoe-blue.png"/>
+        <property name="image-style" type="int" value="5"/>
+      </property>
+    </property>
+  </property>
+</channel>
+XFCE_EOF
+
