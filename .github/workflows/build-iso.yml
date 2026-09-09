@@ -1,0 +1,83 @@
+name: Build RatanaOS Desktop ISO
+
+on:
+  push:
+    branches:
+      - 'release/*'
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      variant:
+        description: 'ISO variant to build'
+        required: true
+        default: 'desktop'
+        type: choice
+        options:
+          - desktop
+
+jobs:
+  build-iso:
+    runs-on: ubuntu-latest
+    container:
+      image: debian:bookworm
+      options: --privileged
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install live-build and dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            live-build debootstrap squashfs-tools xorriso \
+            isolinux syslinux-common syslinux-efi \
+            grub-pc-bin grub-efi-amd64-bin \
+            mtools dosfstools ca-certificates git rsync cpio
+
+      - name: Configure live-build
+        working-directory: ratanaos-live
+        run: |
+          lb config \
+            --distribution bookworm \
+            --archive-areas "main contrib non-free non-free-firmware" \
+            --debian-installer live \
+            --iso-application "RatanaOS" \
+            --iso-publisher "Ratanazen" \
+            --iso-volume "RatanaOS $(date +%Y%m%d)" \
+            --linux-packages linux-image \
+            --memtest none \
+            --binary-images iso-hybrid \
+            --bootloader syslinux,grub-efi
+
+      - name: Build live ISO
+        working-directory: ratanaos-live
+        run: lb build 2>&1 | tee ../build.log
+
+      - name: Compute SHA-256 checksum
+        run: |
+          ISO_FILE=$(find ratanaos-live -name "*.iso" -type f | head -1)
+          if [ -n "$ISO_FILE" ]; then
+            sha256sum "$ISO_FILE" > "${ISO_FILE}.sha256"
+            echo "ISO_PATH=$ISO_FILE" >> $GITHUB_ENV
+            echo "SHA_PATH=${ISO_FILE}.sha256" >> $GITHUB_ENV
+          fi
+
+      - name: Upload ISO artifact
+        if: env.ISO_PATH != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: ratanaos-desktop-iso
+          path: |
+            ${{ env.ISO_PATH }}
+            ${{ env.SHA_PATH }}
+          retention-days: 14
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log
+          retention-days: 7
