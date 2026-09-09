@@ -62,7 +62,7 @@ LB_DEBIAN_INSTALLER_PRESEEDFILE=""
 LB_DEBIAN_INSTALLER_GUI="true"
 
 # Set hdd label
-LB_HDD_LABEL="DEBIAN_LIVE"
+LB_HDD_LABEL="RATANA_LIVE"
 
 # Set hdd filesystem size
 LB_HDD_SIZE="auto"
@@ -71,7 +71,7 @@ LB_HDD_SIZE="auto"
 LB_HDD_PARTITION_START=""
 
 # Set iso author
-LB_ISO_APPLICATION="RatanaOS Fast"
+LB_ISO_APPLICATION="RatanaOS Live (macOS Sequoia Edition)"
 
 # Set iso preparer
 LB_ISO_PREPARER="live-build @LB_VERSION@; https://salsa.debian.org/live-team/live-build"
@@ -80,7 +80,7 @@ LB_ISO_PREPARER="live-build @LB_VERSION@; https://salsa.debian.org/live-team/liv
 LB_ISO_PUBLISHER="Ratanazen"
 
 # Set iso volume (max 32 chars)
-LB_ISO_VOLUME="RatanaOS-Fast 20260909"
+LB_ISO_VOLUME="RATANAOS_LIVE"
 
 # Set jffs2 eraseblock size
 LB_JFFS2_ERASEBLOCK=""

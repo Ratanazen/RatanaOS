@@ -1,0 +1,19 @@
+label live-@FLAVOUR@
+	menu label ^RatanaOS 2026 Live (macOS Sequoia Edition)
+	menu default
+	linux @LINUX@
+	initrd @INITRD@
+	append @APPEND_LIVE@ quiet splash
+
+label live-@FLAVOUR@-toram
+	menu label RatanaOS 2026 Live (Copy to RAM)
+	linux @LINUX@
+	initrd @INITRD@
+	append @APPEND_LIVE@ toram quiet splash
+
+label live-@FLAVOUR@-failsafe
+	menu label RatanaOS 2026 Live (Fail-safe mode)
+	linux @LINUX@
+	initrd @INITRD@
+	append @APPEND_LIVE_FAILSAFE@
+

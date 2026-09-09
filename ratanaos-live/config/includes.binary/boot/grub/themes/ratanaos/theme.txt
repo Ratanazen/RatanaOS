@@ -1,5 +1,5 @@
 # RatanaOS GRUB Theme
-title-text: "RatanaOS Live (Debian 12 Bookworm)"
+title-text: "RatanaOS Live (macOS Sequoia 2026 Edition)"
 title-font: "Sans Regular 16"
 title-color: "#FFFFFF"
 message-font: "Sans Regular 12"

@@ -1,10 +1,10 @@
 NAME="RatanaOS"
-VERSION="1.0 (Sequoia)"
+VERSION="1.0 (macOS Sequoia Edition)"
 ID=ratanaos
 ID_LIKE=debian
-PRETTY_NAME="RatanaOS 1.0 (Sequoia)"
+PRETTY_NAME="RatanaOS 1.0 (macOS Sequoia 2026 Edition)"
 VERSION_ID="1.0"
-VERSION_CODENAME=bookworm
+VERSION_CODENAME=sequoia
 HOME_URL="https://github.com/Ratanazen/RatanaOS"
 SUPPORT_URL="https://github.com/Ratanazen/RatanaOS/issues"
 BUG_REPORT_URL="https://github.com/Ratanazen/RatanaOS/issues"

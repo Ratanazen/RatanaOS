@@ -1,11 +1,9 @@
-
-       /\        OS:        RatanaOS 1.0 (Sequoia)
-      /  \       Kernel:    Linux 6.1 (Debian Bookworm amd64)
-     / /\ \      Desktop:   XFCE4 + Plank (macOS Sequoia Theme)
-    / /__\ \     Base:      Debian GNU/Linux (ID_LIKE=debian)
+       /\        OS:        RatanaOS 1.0 (macOS Sequoia Edition)
+      /  \       Kernel:    Linux 6.1 (amd64)
+     / /\ \      Desktop:   GNOME / macOS Sequoia (WhiteSur)
+    / /__\ \     Base:      RatanaOS
    / /    \ \    Packages:  APT / dpkg
   /_/      \_\   Platform:  x86_64
 
 Welcome to RatanaOS!
 Documentation & Source: https://github.com/Ratanazen/RatanaOS
-

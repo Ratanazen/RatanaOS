@@ -31,14 +31,14 @@ Item {
                     height: 64
                 }
                 Text {
-                    text: "Welcome to RatanaOS 1.0 (Sequoia)"
+                    text: "Welcome to RatanaOS 1.0 (macOS Sequoia Edition)"
                     color: "#FFFFFF"
                     font.pixelSize: 20
                     font.bold: true
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
                 Text {
-                    text: "A production-ready Debian derivative with an elegant macOS desktop."
+                    text: "An ultra-fast operating system with an elegant macOS desktop."
                     color: "#CCCCCC"
                     font.pixelSize: 13
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -52,14 +52,14 @@ Item {
                 anchors.centerIn: parent
                 spacing: 16
                 Text {
-                    text: "100% Debian Ecosystem & APT"
+                    text: "RatanaOS Core & Package Ecosystem"
                     color: "#FFFFFF"
                     font.pixelSize: 20
                     font.bold: true
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
                 Text {
-                    text: "Inherit over 60,000 packages directly from Debian Bookworm repositories."
+                    text: "Access over 60,000 native packages and applications seamlessly."
                     color: "#CCCCCC"
                     font.pixelSize: 13
                     anchors.horizontalCenter: parent.horizontalCenter

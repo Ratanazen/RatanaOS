@@ -9,9 +9,9 @@ windowPlacement: center
 strings:
     productName:         "RatanaOS"
     shortProductName:    "RatanaOS"
-    version:             "1.0 (Bookworm)"
+    version:             "1.0 (macOS Sequoia 2026 Edition)"
     shortVersion:        "1.0"
-    versionedName:       "RatanaOS 1.0 (Bookworm)"
+    versionedName:       "RatanaOS 1.0 (macOS Sequoia 2026 Edition)"
     shortVersionedName:  "RatanaOS 1.0"
     bootloaderEntryName: "RatanaOS"
     productUrl:          "https://github.com/Ratanazen/RatanaOS"
