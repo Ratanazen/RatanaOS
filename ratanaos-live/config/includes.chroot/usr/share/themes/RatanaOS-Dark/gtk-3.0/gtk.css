@@ -1,0 +1,44 @@
+/* RatanaOS macOS Sequoia GTK 3 Theme */
+@define-color bg_color #1E1E1E;
+@define-color fg_color #FFFFFF;
+@define-color accent_color #007AFF;
+@define-color panel_bg rgba(30, 30, 30, 0.85);
+
+* {
+    border-radius: 6px;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Ubuntu", sans-serif;
+}
+
+window {
+    background-color: @bg_color;
+    color: @fg_color;
+}
+
+headerbar {
+    background-color: @bg_color;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+    min-height: 38px;
+}
+
+.xfce4-panel {
+    background-color: @panel_bg;
+    color: @fg_color;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+button {
+    border-radius: 6px;
+    padding: 4px 10px;
+    background: #2A2A2A;
+    color: @fg_color;
+    border: 1px solid rgba(128, 128, 128, 0.3);
+}
+
+button:hover {
+    background: #383838;
+}
+
+button.suggested-action {
+    background: @accent_color;
+    color: white;
+}

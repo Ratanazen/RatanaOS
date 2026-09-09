@@ -1,0 +1,13 @@
+[PlankDockPreferences]
+Theme=Transparent
+Position=3
+Alignment=3
+Offset=0
+IconSize=48
+ZoomEnabled=true
+ZoomPercent=130
+HideMode=1
+UnhideDelay=0
+HideDelay=0
+AutoPinning=true
+ItemPackList=finder;launchpad;firefox-esr;terminal;settings;trash

@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+lb config noauto \
+    --distribution bookworm \
+    --archive-areas "main contrib non-free non-free-firmware" \
+    --debian-installer live \
+    --iso-application "RatanaOS" \
+    --iso-volume "RatanaOS" \
+    --binary-images iso-hybrid \
+    --bootloader syslinux,grub-efi \
+    --security true \
+    --updates true \
+    "${@}"

@@ -14,3 +14,9 @@ debian-test-rootfs/
 iso/ratana/
 iso/system/
 iso/debian/
+ratanaos-live/.build/
+ratanaos-live/chroot/
+ratanaos-live/binary/
+ratanaos-live/cache/
+ratanaos-live/local/
+ratanaos-live/*.iso

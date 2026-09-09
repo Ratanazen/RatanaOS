@@ -1,0 +1,19 @@
+# RatanaOS Plymouth Script
+Window.SetBackgroundTopColor(0.08, 0.08, 0.08);
+Window.SetBackgroundBottomColor(0.08, 0.08, 0.08);
+
+logo.image = Image("logo.png");
+logo.sprite = Sprite(logo.image);
+logo.opacity = 1.0;
+
+screen_width = Window.GetWidth();
+screen_height = Window.GetHeight();
+
+logo.x = (screen_width - logo.image.GetWidth()) / 2;
+logo.y = (screen_height - logo.image.GetHeight()) / 2 - 20;
+logo.sprite.SetPosition(logo.x, logo.y, 10);
+
+fun refresh_callback () {
+    # Pulse or keep static
+}
+Plymouth.SetRefreshFunction (refresh_callback);

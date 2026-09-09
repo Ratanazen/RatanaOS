@@ -380,3 +380,33 @@ benchmark: all
 	@echo "[BENCHMARK 5] VFS Pipe IPC Throughput:    1.42 GB/s"
 	@echo "[BENCHMARK 6] GUI 32-bit Framebuffer:     60 FPS (1024x768 double-buffered)"
 	@echo "==============================================\n"
+
+# ==============================================================================
+# Debian Live-Build Integration Targets (v4.0)
+# ==============================================================================
+LIVE_ISO = $(BUILD_DIR)/ratanaos-live-amd64.hybrid.iso
+
+live-config:
+	@echo "==> Configuring RatanaOS Debian live-build..."
+	./tools/docker-live-build.sh config
+
+live-iso: live-config
+	@echo "==> Building RatanaOS Debian Live Hybrid ISO..."
+	./tools/docker-live-build.sh build
+
+live-run:
+	@if [ -f "$(LIVE_ISO)" ]; then \
+		echo "==> Booting RatanaOS Live ISO in QEMU (2GB RAM, KVM, VirtIO)..."; \
+		qemu-system-x86_64 -cdrom $(LIVE_ISO) -m 2G -smp 2 -enable-kvm -net nic,model=virtio -net user -vga virtio; \
+	elif [ -f "$(BUILD_DIR)/ratanaos_full.iso" ]; then \
+		echo "==> Booting RatanaOS Full ISO in QEMU..."; \
+		qemu-system-x86_64 -cdrom $(BUILD_DIR)/ratanaos_full.iso -m 2G -smp 2 -enable-kvm -vga std; \
+	else \
+		echo "Error: No Live ISO found. Run 'make live-iso' first."; \
+		exit 1; \
+	fi
+
+live-clean:
+	@echo "==> Cleaning live-build cache and artifacts..."
+	./tools/docker-live-build.sh clean
+

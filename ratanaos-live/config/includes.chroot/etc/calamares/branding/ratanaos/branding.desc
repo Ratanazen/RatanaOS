@@ -1,0 +1,29 @@
+---
+componentName:  ratanaos
+welcomeStyleCalamares:   false
+welcomeExpandingLogo:    true
+windowExpanding:    normal
+windowSize: 800px,520px
+windowPlacement: center
+
+strings:
+    productName:         "RatanaOS"
+    shortProductName:    "RatanaOS"
+    version:             "1.0 (Bookworm)"
+    shortVersion:        "1.0"
+    versionedName:       "RatanaOS 1.0 (Bookworm)"
+    shortVersionedName:  "RatanaOS 1.0"
+    bootloaderEntryName: "RatanaOS"
+    productUrl:          "https://github.com/Ratanazen/RatanaOS"
+    supportUrl:          "https://github.com/Ratanazen/RatanaOS/issues"
+    releaseNotesUrl:     "https://github.com/Ratanazen/RatanaOS"
+
+images:
+    productLogo:         "squid.png"
+    productIcon:         "squid.png"
+    productWelcome:      "squid.png"
+
+style:
+   SidebarBackground:    "#1E1E1E"
+   SidebarText:          "#FFFFFF"
+   SidebarTextSelect:    "#007AFF"

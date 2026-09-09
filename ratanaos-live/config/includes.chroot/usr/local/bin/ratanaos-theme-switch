@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# RatanaOS Dynamic Theme Switcher
+CURRENT=$(xfconf-query -c xsettings -p /Net/ThemeName 2>/dev/null || echo "RatanaOS-Dark")
+
+if [ "$1" = "dark" ] || [ "$CURRENT" = "RatanaOS-Light" ]; then
+    echo "Switching to RatanaOS Dark Mode..."
+    xfconf-query -c xsettings -p /Net/ThemeName -s "RatanaOS-Dark"
+    xfconf-query -c xfwm4 -p /general/theme -s "RatanaOS-Dark"
+    xfconf-query -c xsettings -p /Net/IconThemeName -s "WhiteSur"
+elif [ "$1" = "light" ] || [ "$CURRENT" = "RatanaOS-Dark" ]; then
+    echo "Switching to RatanaOS Light Mode..."
+    xfconf-query -c xsettings -p /Net/ThemeName -s "RatanaOS-Light"
+    xfconf-query -c xfwm4 -p /general/theme -s "RatanaOS-Light"
+    xfconf-query -c xsettings -p /Net/IconThemeName -s "MacTahoe"
+fi
