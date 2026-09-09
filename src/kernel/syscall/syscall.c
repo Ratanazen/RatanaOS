@@ -7,26 +7,48 @@
 #include "../../include/string.h"
 #include "../../include/heap.h"
 #include "../../include/timer.h"
+#include "../../include/physical.h"
+#include "../../include/virtual.h"
 
-void syscall_handler_linux(registers_t* regs) {
-    serial_printf("LINUX SYSCALL: %d\n", regs->rax);
+static uint64_t next_user_mmap_addr = 0x700000000000ULL;
+
+static uint64_t do_mmap(uint64_t addr, size_t length, int prot, int flags, int fd, uint64_t offset) {
+    (void)prot; (void)flags;
+    if (!current_process || length == 0) return (uint64_t)-1;
     
-    if (regs->rax == 60 || regs->rax == 231) {
-        serial_printf("LINUX: exit(%d)\n", regs->rdi);
-        
-        process_exit();
-    } else if (regs->rax == 12) { // brk
-        regs->rax = 0x80000000;
-    } else {
-        regs->rax = -1; // ENOSYS
+    uint64_t vaddr = addr;
+    if (vaddr == 0) {
+        vaddr = next_user_mmap_addr;
+        next_user_mmap_addr += (length + 0xFFF) & ~0xFFF;
     }
+    
+    uint64_t page_start = vaddr & ~0xFFF;
+    uint64_t page_end = (vaddr + length + 0xFFF) & ~0xFFF;
+    
+    for (uint64_t a = page_start; a < page_end; a += PAGE_SIZE) {
+        uint64_t phys = (uint64_t)phys_alloc_page();
+        vmm_map_page(current_process->pml4, a, phys, PAGE_PRESENT | PAGE_WRITABLE | PAGE_USER);
+    }
+    
+    uint64_t current_cr3;
+    __asm__ volatile("mov %%cr3, %0" : "=r"(current_cr3));
+    vmm_switch_address_space(current_process->pml4);
+    memset((void*)vaddr, 0, length);
+    
+    if (fd >= 0 && fd < MAX_FDS && current_process->fds[fd]) {
+        vfs_node_t* node = current_process->fds[fd];
+        vfs_read(node, (uint32_t)offset, (uint32_t)length, (uint8_t*)vaddr);
+    }
+    
+    __asm__ volatile("mov %0, %%cr3" :: "r"(current_cr3));
+    return vaddr;
 }
 
-static registers_t* syscall_handler_int80(registers_t* regs) {
+static registers_t* do_syscall_dispatch(registers_t* regs) {
     uint64_t syscall_num = regs->rax;
     
     switch (syscall_num) {
-        case SYS_READ: { // sys_read(fd, buf, count)
+        case SYS_READ: { // sys_read(fd, buf, count) - 0
             int fd = (int)regs->rdi;
             char* buf = (char*)regs->rsi;
             size_t count = (size_t)regs->rdx;
@@ -44,7 +66,7 @@ static registers_t* syscall_handler_int80(registers_t* regs) {
             break;
         }
 
-        case SYS_WRITE: { // sys_write(fd, buf, count)
+        case SYS_WRITE: { // sys_write(fd, buf, count) - 1
             int fd = (int)regs->rdi;
             const char* buf = (const char*)regs->rsi;
             size_t count = (size_t)regs->rdx;
@@ -69,7 +91,7 @@ static registers_t* syscall_handler_int80(registers_t* regs) {
             break;
         }
 
-        case SYS_OPEN: { // sys_open(path, flags, mode)
+        case SYS_OPEN: { // sys_open(path, flags, mode) - 2
             const char* path = (const char*)regs->rdi;
             if (!path || !current_process) {
                 regs->rax = (uint64_t)-1;
@@ -80,7 +102,6 @@ static registers_t* syscall_handler_int80(registers_t* regs) {
                 regs->rax = (uint64_t)-1;
                 break;
             }
-            // Find free FD
             int free_fd = -1;
             for (int i = 3; i < MAX_FDS; i++) {
                 if (!current_process->fds[i]) {
@@ -97,7 +118,7 @@ static registers_t* syscall_handler_int80(registers_t* regs) {
             break;
         }
 
-        case SYS_CLOSE: { // sys_close(fd)
+        case SYS_CLOSE: { // sys_close(fd) - 3
             int fd = (int)regs->rdi;
             if (!current_process || fd < 0 || fd >= MAX_FDS || !current_process->fds[fd]) {
                 regs->rax = (uint64_t)-1;
@@ -109,7 +130,7 @@ static registers_t* syscall_handler_int80(registers_t* regs) {
             break;
         }
 
-        case SYS_STAT: { // sys_stat(path, statbuf)
+        case SYS_STAT: { // sys_stat(path, statbuf) - 4
             const char* path = (const char*)regs->rdi;
             stat_t* st = (stat_t*)regs->rsi;
             if (!path || !st) {
@@ -123,13 +144,13 @@ static registers_t* syscall_handler_int80(registers_t* regs) {
             }
             memset(st, 0, sizeof(stat_t));
             st->st_size = node->size;
-            st->st_ino = node->inode;
-            st->st_mode = (node->flags == VFS_DIRECTORY) ? 0040755 : 0100644;
+            st->st_ino = node->inode ? node->inode : 1;
+            st->st_mode = (node->flags == VFS_DIRECTORY) ? 0040755 : 0100755;
             regs->rax = 0;
             break;
         }
 
-        case SYS_FSTAT: { // sys_fstat(fd, statbuf)
+        case SYS_FSTAT: { // sys_fstat(fd, statbuf) - 5
             int fd = (int)regs->rdi;
             stat_t* st = (stat_t*)regs->rsi;
             if (!st || !current_process || fd < 0 || fd >= MAX_FDS || !current_process->fds[fd]) {
@@ -139,19 +160,77 @@ static registers_t* syscall_handler_int80(registers_t* regs) {
             vfs_node_t* node = current_process->fds[fd];
             memset(st, 0, sizeof(stat_t));
             st->st_size = node->size;
-            st->st_ino = node->inode;
-            st->st_mode = (node->flags == VFS_DIRECTORY) ? 0040755 : 0100644;
+            st->st_ino = node->inode ? node->inode : 1;
+            st->st_mode = (node->flags == VFS_DIRECTORY) ? 0040755 : 0100755;
             regs->rax = 0;
             break;
         }
 
-        case SYS_BRK: { // sys_brk(addr)
+        case SYS_LSEEK: { // sys_lseek(fd, offset, whence) - 8
+            regs->rax = regs->rsi;
+            break;
+        }
+
+        case SYS_MMAP: { // sys_mmap(addr, len, prot, flags, fd, off) - 9
+            uint64_t addr = regs->rdi;
+            size_t length = (size_t)regs->rsi;
+            int prot = (int)regs->rdx;
+            int flags = (int)regs->r10;
+            int fd = (int)regs->r8;
+            uint64_t offset = regs->r9;
+            regs->rax = do_mmap(addr, length, prot, flags, fd, offset);
+            break;
+        }
+
+        case 10: { // sys_mprotect(addr, len, prot)
+            regs->rax = 0;
+            break;
+        }
+
+        case SYS_MUNMAP: { // sys_munmap(addr, len) - 11
+            regs->rax = 0;
+            break;
+        }
+
+        case SYS_BRK: { // sys_brk(addr) - 12
             uint64_t addr = regs->rdi;
             regs->rax = sys_brk(addr);
             break;
         }
 
-        case SYS_PIPE: { // sys_pipe(pipefd[2])
+        case 13: { // Linux sys_rt_sigaction(sig, act, oact, sigsetsize)
+            regs->rax = 0;
+            break;
+        }
+
+        case 14: { // Linux sys_rt_sigprocmask(how, set, oset, sigsetsize)
+            regs->rax = 0;
+            break;
+        }
+
+        case SYS_IOCTL: { // sys_ioctl(fd, request, argp) - 16
+            uint64_t req = regs->rsi;
+            if (req == 0x5413) { // TIOCGWINSZ
+                struct { uint16_t ws_row; uint16_t ws_col; uint16_t ws_xpixel; uint16_t ws_ypixel; } *ws = (void*)regs->rdx;
+                if (ws) {
+                    ws->ws_row = 24;
+                    ws->ws_col = 80;
+                    ws->ws_xpixel = 640;
+                    ws->ws_ypixel = 480;
+                }
+            }
+            regs->rax = 0;
+            break;
+        }
+
+        case 21: { // Linux sys_access(pathname, mode)
+            const char* path = (const char*)regs->rdi;
+            vfs_node_t* node = vfs_open(path);
+            regs->rax = node ? 0 : (uint64_t)-2; // 0 or -ENOENT
+            break;
+        }
+
+        case SYS_PIPE: { // sys_pipe(pipefd[2]) - 22
             int* pipefd = (int*)regs->rdi;
             if (!pipefd || !current_process) {
                 regs->rax = (uint64_t)-1;
@@ -184,13 +263,13 @@ static registers_t* syscall_handler_int80(registers_t* regs) {
             break;
         }
 
-        case SYS_YIELD: { // sys_yield()
+        case SYS_YIELD: { // sys_yield() - 24
             regs = (registers_t*)scheduler_tick((trap_frame_t*)regs);
             regs->rax = 0;
             break;
         }
 
-        case SYS_DUP: { // sys_dup(oldfd)
+        case SYS_DUP: { // sys_dup(oldfd) - 32
             int oldfd = (int)regs->rdi;
             if (!current_process || oldfd < 0 || oldfd >= MAX_FDS || !current_process->fds[oldfd]) {
                 regs->rax = (uint64_t)-1;
@@ -212,7 +291,7 @@ static registers_t* syscall_handler_int80(registers_t* regs) {
             break;
         }
 
-        case SYS_DUP2: { // sys_dup2(oldfd, newfd)
+        case SYS_DUP2: { // sys_dup2(oldfd, newfd) - 33
             int oldfd = (int)regs->rdi;
             int newfd = (int)regs->rsi;
             if (!current_process || oldfd < 0 || oldfd >= MAX_FDS || newfd < 0 || newfd >= MAX_FDS || !current_process->fds[oldfd]) {
@@ -231,22 +310,23 @@ static registers_t* syscall_handler_int80(registers_t* regs) {
             break;
         }
 
-        case SYS_GETPID: { // sys_getpid()
+        case SYS_GETPID: { // sys_getpid() - 39
             regs->rax = current_process ? current_process->pid : 1;
             break;
         }
 
-        case SYS_GETPPID: { // sys_getppid()
-            regs->rax = current_process ? current_process->parent_pid : 0;
+        case 41: { // Linux sys_socket
+            regs->rax = (uint64_t)-1; // ENOSYS
             break;
         }
 
-        case SYS_FORK: { // sys_fork()
+        case 56:   // Linux sys_clone
+        case SYS_FORK: { // sys_fork() - 57
             regs->rax = process_fork((trap_frame_t*)regs);
             break;
         }
 
-        case SYS_EXECVE: { // sys_execve(path, argv, envp)
+        case SYS_EXECVE: { // sys_execve(path, argv, envp) - 59
             const char* path = (const char*)regs->rdi;
             vfs_node_t* file = vfs_open(path);
             if (file) {
@@ -257,34 +337,39 @@ static registers_t* syscall_handler_int80(registers_t* regs) {
             break;
         }
 
-        case SYS_EXIT: { // sys_exit(code)
+        case SYS_EXIT: { // sys_exit(code) - 60
             process_exit();
             break;
         }
 
-        case SYS_WAIT4: { // sys_wait4(pid, status, options, rusage)
+        case SYS_WAIT4: { // sys_wait4(pid, status, options, rusage) - 61
             uint64_t pid = regs->rdi;
             int* status = (int*)regs->rsi;
             regs->rax = sys_wait4(pid, status);
             break;
         }
 
-        case SYS_UNAME: { // sys_uname(utsname)
+        case SYS_UNAME: { // sys_uname(utsname) - 63
             utsname_t* u = (utsname_t*)regs->rdi;
             if (!u) {
                 regs->rax = (uint64_t)-1;
                 break;
             }
-            strcpy(u->sysname, "RatanaOS");
-            strcpy(u->nodename, "ratana-macbook");
-            strcpy(u->release, "15.4");
-            strcpy(u->version, "1.0.0-macos-sequoia (x86_64 freestanding)");
+            strcpy(u->sysname, "Linux");
+            strcpy(u->nodename, "ratanaos");
+            strcpy(u->release, "6.6.0-ratana-x86_64");
+            strcpy(u->version, "#1 SMP RatanaOS 2026");
             strcpy(u->machine, "x86_64");
             regs->rax = 0;
             break;
         }
 
-        case SYS_GETCWD: { // sys_getcwd(buf, size)
+        case 72: { // Linux sys_fcntl
+            regs->rax = 0;
+            break;
+        }
+
+        case SYS_GETCWD: { // sys_getcwd(buf, size) - 79
             char* buf = (char*)regs->rdi;
             size_t size = (size_t)regs->rsi;
             if (!buf || size == 0 || !current_process) {
@@ -296,7 +381,7 @@ static registers_t* syscall_handler_int80(registers_t* regs) {
             break;
         }
 
-        case SYS_CHDIR: { // sys_chdir(path)
+        case SYS_CHDIR: { // sys_chdir(path) - 80
             const char* path = (const char*)regs->rdi;
             if (!path || !current_process) {
                 regs->rax = (uint64_t)-1;
@@ -308,8 +393,28 @@ static registers_t* syscall_handler_int80(registers_t* regs) {
             break;
         }
 
-        case 13: { // Linux sys_rt_sigaction(sig, act, oact, sigsetsize)
-            regs->rax = 0; // Stub success for signal setup
+        case SYS_MKDIR: { // sys_mkdir(path, mode) - 83
+            regs->rax = 0;
+            break;
+        }
+
+        case SYS_UNLINK: { // sys_unlink(path) - 87
+            regs->rax = 0;
+            break;
+        }
+
+        case 89: { // Linux sys_readlink(path, buf, bufsiz)
+            const char* path = (const char*)regs->rdi;
+            char* buf = (char*)regs->rsi;
+            size_t bufsiz = (size_t)regs->rdx;
+            if (path && buf && bufsiz > 0) {
+                if (strcmp(path, "/proc/self/exe") == 0) {
+                    strncpy(buf, current_process ? current_process->name : "/bin/hello", bufsiz);
+                    regs->rax = strlen(buf);
+                    break;
+                }
+            }
+            regs->rax = (uint64_t)-2; // -ENOENT
             break;
         }
 
@@ -320,6 +425,18 @@ static registers_t* syscall_handler_int80(registers_t* regs) {
                 tv->tv_usec = (timer_get_ticks() % 100) * 10000;
             }
             regs->rax = 0;
+            break;
+        }
+
+        case 102: // getuid
+        case 104: // getgid
+        case 107: // geteuid
+        case 108: // getegid
+            regs->rax = 0; // Root identity
+            break;
+
+        case SYS_GETPPID: { // sys_getppid() - 110
+            regs->rax = current_process ? current_process->parent_pid : 0;
             break;
         }
 
@@ -342,8 +459,85 @@ static registers_t* syscall_handler_int80(registers_t* regs) {
             break;
         }
 
+        case 218: { // Linux sys_set_tid_address(tidptr)
+            regs->rax = current_process ? current_process->pid : 1;
+            break;
+        }
+
+        case 228: { // Linux sys_clock_gettime(clockid, tp)
+            struct { uint64_t tv_sec; uint64_t tv_nsec; } *tp = (void*)regs->rsi;
+            if (tp) {
+                tp->tv_sec = timer_get_ticks() / 100;
+                tp->tv_nsec = (timer_get_ticks() % 100) * 10000000;
+            }
+            regs->rax = 0;
+            break;
+        }
+
         case 231: { // Linux x86_64 sys_exit_group(code)
             process_exit();
+            break;
+        }
+
+        case 257: { // Linux sys_openat(dirfd, path, flags, mode)
+            const char* path = (const char*)regs->rsi;
+            if (!path || !current_process) {
+                regs->rax = (uint64_t)-1;
+                break;
+            }
+            vfs_node_t* file = vfs_open(path);
+            if (!file) {
+                regs->rax = (uint64_t)-1;
+                break;
+            }
+            int free_fd = -1;
+            for (int i = 3; i < MAX_FDS; i++) {
+                if (!current_process->fds[i]) {
+                    free_fd = i;
+                    break;
+                }
+            }
+            if (free_fd == -1) {
+                regs->rax = (uint64_t)-1;
+                break;
+            }
+            current_process->fds[free_fd] = file;
+            regs->rax = (uint64_t)free_fd;
+            break;
+        }
+
+        case 262: { // Linux sys_newfstatat(dirfd, path, statbuf, flags)
+            const char* path = (const char*)regs->rsi;
+            stat_t* st = (stat_t*)regs->rdx;
+            if (!path || !st) {
+                regs->rax = (uint64_t)-1;
+                break;
+            }
+            vfs_node_t* node = vfs_open(path);
+            if (!node) {
+                regs->rax = (uint64_t)-1;
+                break;
+            }
+            memset(st, 0, sizeof(stat_t));
+            st->st_size = node->size;
+            st->st_ino = node->inode ? node->inode : 1;
+            st->st_mode = (node->flags == VFS_DIRECTORY) ? 0040755 : 0100755;
+            regs->rax = 0;
+            break;
+        }
+
+        case 302: { // Linux sys_prlimit64
+            regs->rax = 0;
+            break;
+        }
+
+        case 318: { // Linux sys_getrandom(buf, buflen, flags)
+            char* buf = (char*)regs->rdi;
+            size_t count = (size_t)regs->rsi;
+            if (buf) {
+                for (size_t i = 0; i < count; i++) buf[i] = (char)(i * 37 + 13);
+            }
+            regs->rax = count;
             break;
         }
 
@@ -354,6 +548,14 @@ static registers_t* syscall_handler_int80(registers_t* regs) {
     }
     
     return regs;
+}
+
+void syscall_handler_linux(registers_t* regs) {
+    do_syscall_dispatch(regs);
+}
+
+static registers_t* syscall_handler_int80(registers_t* regs) {
+    return do_syscall_dispatch(regs);
 }
 
 

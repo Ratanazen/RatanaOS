@@ -361,6 +361,19 @@ vfs_node_t* vfs_open(const char* path) {
         node->data = NULL;
         return node;
     }
+
+    // Fallback to /system/debian alias for Debian rootfs transparent resolution
+    if (path[0] == '/' && strncmp(path, "/system/debian", 14) != 0) {
+        char debian_path[256];
+        ksprintf(debian_path, "/system/debian%s", path);
+        curr = root_fs;
+        while (curr) {
+            if (strcmp(curr->name, debian_path) == 0) {
+                return curr;
+            }
+            curr = curr->next;
+        }
+    }
     
     return NULL;
 }
