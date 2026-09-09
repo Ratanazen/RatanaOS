@@ -12,13 +12,19 @@ typedef enum {
 } font_size_t;
 
 typedef enum {
-    FONT_ROLE_SYSTEM = 0,
-    FONT_ROLE_UI,
-    FONT_ROLE_MENU,
-    FONT_ROLE_TITLE,
-    FONT_ROLE_CAPTION,
-    FONT_ROLE_MONOSPACE,
-    FONT_ROLE_COUNT
+    FONT_ROLE_CAPTION = 0,
+    FONT_ROLE_SMALL = 1,
+    FONT_ROLE_BODY = 2,
+    FONT_ROLE_BODY_LARGE = 3,
+    FONT_ROLE_TITLE = 4,
+    FONT_ROLE_HEADING = 5,
+    FONT_ROLE_DISPLAY = 6,
+    // Aliases for compatibility
+    FONT_ROLE_SYSTEM = 2,
+    FONT_ROLE_UI = 2,
+    FONT_ROLE_MENU = 1,
+    FONT_ROLE_MONOSPACE = 2,
+    FONT_ROLE_COUNT = 7
 } font_role_t;
 
 typedef enum {
@@ -37,6 +43,11 @@ font_role_t font_get(void);
 void font_set_size(font_size_t size);
 font_size_t font_get_size(void);
 bool font_set_size_px(int pixels);
+font_size_t font_get_size_for_role(font_role_t role);
+
+void font_set_scale(int percent);
+int  font_get_scale(void);
+int  font_scale_val(int base_size);
 
 int font_get_char_width(font_size_t size);
 int font_get_char_height(font_size_t size);

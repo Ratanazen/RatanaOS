@@ -4,7 +4,8 @@
 #include "../include/string.h"
 
 static font_size_t active_font_size = FONT_SIZE_REGULAR;
-static font_role_t active_font_role = FONT_ROLE_UI;
+static font_role_t active_font_role = FONT_ROLE_BODY;
+static int active_font_scale_percent = 100;
 
 static const char* font_size_names[FONT_SIZE_COUNT] = {
     "Small (12px)",
@@ -15,7 +16,8 @@ static const char* font_size_names[FONT_SIZE_COUNT] = {
 
 void font_init(void) {
     active_font_size = FONT_SIZE_REGULAR;
-    active_font_role = FONT_ROLE_UI;
+    active_font_role = FONT_ROLE_BODY;
+    active_font_scale_percent = 100;
 }
 
 void font_set_active_size(font_size_t size) {
@@ -38,13 +40,29 @@ const char* font_get_size_name(font_size_t size) {
 void font_set(font_role_t role) {
     if (role < 0 || role >= FONT_ROLE_COUNT) return;
     active_font_role = role;
-    if (role == FONT_ROLE_TITLE) active_font_size = FONT_SIZE_TITLE;
-    else if (role == FONT_ROLE_CAPTION) active_font_size = FONT_SIZE_SMALL;
-    else active_font_size = FONT_SIZE_REGULAR;
+    active_font_size = font_get_size_for_role(role);
 }
 
 font_role_t font_get(void) {
     return active_font_role;
+}
+
+font_size_t font_get_size_for_role(font_role_t role) {
+    switch (role) {
+        case FONT_ROLE_CAPTION:
+        case FONT_ROLE_SMALL:
+            return FONT_SIZE_SMALL;
+        case FONT_ROLE_BODY:
+            return FONT_SIZE_REGULAR;
+        case FONT_ROLE_BODY_LARGE:
+        case FONT_ROLE_HEADING:
+            return FONT_SIZE_LARGE;
+        case FONT_ROLE_TITLE:
+        case FONT_ROLE_DISPLAY:
+            return FONT_SIZE_TITLE;
+        default:
+            return FONT_SIZE_REGULAR;
+    }
 }
 
 void font_set_size(font_size_t size) {
@@ -62,6 +80,21 @@ bool font_set_size_px(int pixels) {
     else if (pixels <= 24) active_font_size = FONT_SIZE_LARGE;
     else active_font_size = FONT_SIZE_TITLE;
     return true;
+}
+
+void font_set_scale(int percent) {
+    if (percent < 80) percent = 80;
+    if (percent > 150) percent = 150;
+    active_font_scale_percent = percent;
+}
+
+int font_get_scale(void) {
+    return active_font_scale_percent;
+}
+
+int font_scale_val(int base_size) {
+    int scaled = (base_size * active_font_scale_percent + 50) / 100;
+    return (scaled > 0) ? scaled : 1;
 }
 
 int font_get_char_width(font_size_t size) {
