@@ -1,8 +1,9 @@
 # ==============================================================================
-# RatanaOS GNOME Desktop Layer (macOS 2026 Style)
+# RatanaOS GNOME Desktop Layer (macOS Sequoia 2026 Style)
 # ==============================================================================
 gnome-core
 gnome-shell
+gnome-session
 nautilus
 gnome-tweaks
 gnome-terminal
@@ -10,8 +11,12 @@ gnome-control-center
 gnome-shell-extension-dashtodock
 gnome-shell-extension-appindicator
 gnome-shell-extension-panel-osd
-gnome-shell-extension-manager
 gnome-shell-extensions
-gnome-shell-extensions-extra
+eog
+evince
+file-roller
+gnome-calculator
+gnome-system-monitor
+gnome-disk-utility
 
 

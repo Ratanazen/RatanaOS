@@ -1,9 +1,17 @@
 # ==============================================================================
-# RatanaOS KDE Plasma Desktop Layer (macOS 2026 Style)
+# RatanaOS KDE Plasma Desktop Layer (macOS Sequoia 2026 Style)
 # ==============================================================================
 kde-plasma-desktop
 plasma-workspace
+kwin-x11
+kwin-wayland
 dolphin
 konsole
 systemsettings
 kwrite
+plasma-widgets-addons
+gwenview
+ark
+kcalc
+ksysguard
+

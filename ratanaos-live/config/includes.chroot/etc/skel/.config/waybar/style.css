@@ -1,0 +1,59 @@
+* {
+    border: none;
+    border-radius: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Cantarell", "SF Pro Display", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    min-height: 0;
+}
+
+window#waybar {
+    background: rgba(18, 24, 38, 0.75);
+    color: #FFFFFF;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+#custom-logo {
+    font-weight: bold;
+    font-size: 14px;
+    color: #00BBF9;
+    padding: 0 14px;
+    margin: 3px 4px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+#workspaces button {
+    padding: 0 10px;
+    background: transparent;
+    color: #94A3B8;
+    border-radius: 8px;
+    margin: 3px 2px;
+}
+
+#workspaces button.active, #workspaces button.focused {
+    color: #FFFFFF;
+    background: rgba(0, 187, 249, 0.35);
+    border: 1px solid rgba(0, 187, 249, 0.6);
+}
+
+#clock {
+    font-weight: 600;
+    color: #F8FAFC;
+    padding: 0 16px;
+}
+
+#pulseaudio, #network, #battery, #tray, #custom-power {
+    padding: 0 12px;
+    margin: 3px 2px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    color: #E2E8F0;
+}
+
+#custom-power {
+    background: rgba(239, 68, 68, 0.25);
+    color: #F87171;
+    font-size: 14px;
+    padding: 0 10px;
+}

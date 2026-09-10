@@ -1,0 +1,21 @@
+# ==============================================================================
+# RatanaOS Wayland & Hyprland / Sway Suite (macOS Sequoia 2026 Style)
+# ==============================================================================
+sway
+waybar
+wofi
+kitty
+foot
+swaybg
+swaylock
+mako-notifier
+grim
+slurp
+wl-clipboard
+policykit-1-gnome
+xdg-desktop-portal-wlr
+xdg-desktop-portal-gtk
+brightnessctl
+pamixer
+playerctl
+pavucontrol

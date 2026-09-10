@@ -1,14 +1,15 @@
-[General]
-ColorScheme=BreezeDark
-Name=RatanaOS Sequoia Dark
-
 [Icons]
 Theme=WhiteSur-dark
 
-[KDE]
+[General]
+ColorScheme=BreezeDark
+Name=Breeze Dark
+fixed=Monospace,10,-1,5,50,0,0,0,0,0
+font=Cantarell,11,-1,5,50,0,0,0,0,0
+menuFont=Cantarell,11,-1,5,50,0,0,0,0,0
+toolBarFont=Cantarell,10,-1,5,50,0,0,0,0,0
 widgetStyle=Breeze
 
-[org.kde.kdecoration2]
-ButtonsOnLeft=XIA
-ButtonsOnRight=
-BorderSize=Normal
+[KDE]
+ShowDeleteCommand=false
+SingleClick=true

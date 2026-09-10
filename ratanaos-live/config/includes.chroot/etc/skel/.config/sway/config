@@ -1,0 +1,53 @@
+# ==============================================================================
+# RatanaOS Sway Configuration (macOS Sequoia 2026 Edition)
+# ==============================================================================
+set $mod Mod4
+set $term kitty
+set $menu wofi --show drun
+
+output * bg /usr/share/backgrounds/ratanaos/tahoe_dark.jpg fill
+
+# Input
+input type:touchpad {
+    tap enabled
+    natural_scroll enabled
+}
+
+# Gaps & Borders
+gaps inner 8
+gaps outer 12
+default_border pixel 2
+default_floating_border pixel 2
+
+client.focused          #00BBF9 #1E1E2E #FFFFFF #00BBF9   #00BBF9
+client.focused_inactive #313244 #1E1E2E #A6ADC8 #313244   #313244
+client.unfocused        #181825 #1E1E2E #A6ADC8 #181825   #181825
+
+# Keybindings
+bindsym $mod+Return exec $term
+bindsym $mod+q kill
+bindsym $mod+w kill
+bindsym $mod+space exec $menu
+bindsym $mod+d exec $menu
+bindsym $mod+e exec nautilus
+bindsym $mod+b exec firefox-esr
+bindsym $mod+f fullscreen toggle
+bindsym $mod+Shift+space floating toggle
+
+# Workspaces
+bindsym $mod+1 workspace number 1
+bindsym $mod+2 workspace number 2
+bindsym $mod+3 workspace number 3
+bindsym $mod+4 workspace number 4
+bindsym $mod+5 workspace number 5
+
+bindsym $mod+Shift+1 move container to workspace number 1
+bindsym $mod+Shift+2 move container to workspace number 2
+bindsym $mod+Shift+3 move container to workspace number 3
+bindsym $mod+Shift+4 move container to workspace number 4
+bindsym $mod+Shift+5 move container to workspace number 5
+
+# Autostart
+exec_always waybar
+exec mako
+exec /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1

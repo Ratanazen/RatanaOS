@@ -1,22 +1,21 @@
 # ==============================================================================
-# RatanaOS Desktop Package List (XFCE4 + LightDM)
+# RatanaOS Base Desktop Utilities & Common Applications
 # ==============================================================================
-task-xfce-desktop
-xfce4-goodies
 network-manager
 network-manager-gnome
 firefox-esr
-file-roller
-gnome-disk-utility
 gparted
 lightdm
 lightdm-gtk-greeter
-plank
-thunar
-thunar-archive-plugin
-xfce4-terminal
-mousepad
-evince
-
-# System snapshot & restore (Phase 15)
 timeshift
+fonts-cantarell
+fonts-dejavu-core
+fonts-liberation
+fonts-noto-core
+fonts-noto-color-emoji
+papirus-icon-theme
+dconf-cli
+dconf-editor
+libglib2.0-bin
+xdg-utils
+xdg-user-dirs
