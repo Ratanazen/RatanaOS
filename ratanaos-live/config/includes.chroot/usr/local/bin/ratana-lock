@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+swaylock   --screenshots   --clock   --indicator   --indicator-radius 100   --indicator-thickness 7   --effect-blur 10x8   --effect-vignette 0.4:0.6   --ring-color 00bbf9   --key-hl-color 00f5d4   --line-color 00000000   --inside-color 111827cc   --separator-color 00000000   --text-color ffffff   --fade-in 0.2

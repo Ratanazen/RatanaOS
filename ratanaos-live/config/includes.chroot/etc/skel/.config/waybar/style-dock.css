@@ -1,0 +1,41 @@
+* {
+    border: none;
+    border-radius: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Cantarell", sans-serif;
+    font-size: 24px;
+}
+
+window#waybar {
+    background: rgba(18, 26, 44, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 24px;
+    padding: 4px 14px;
+}
+
+#custom-finder,
+#custom-launchpad,
+#custom-terminal,
+#custom-browser,
+#custom-settings,
+#custom-calculator,
+#custom-installer,
+#custom-trash {
+    padding: 6px 14px;
+    margin: 2px 4px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #FFFFFF;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#custom-finder:hover,
+#custom-launchpad:hover,
+#custom-terminal:hover,
+#custom-browser:hover,
+#custom-settings:hover,
+#custom-calculator:hover,
+#custom-installer:hover,
+#custom-trash:hover {
+    background: rgba(0, 187, 249, 0.4);
+    transform: scale(1.15);
+}

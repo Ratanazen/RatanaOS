@@ -1,0 +1,58 @@
+{
+    "layer": "top",
+    "position": "bottom",
+    "height": 56,
+    "margin-bottom": 10,
+    "spacing": 10,
+    "modules-center": [
+        "custom/finder",
+        "custom/launchpad",
+        "custom/terminal",
+        "custom/browser",
+        "custom/settings",
+        "custom/calculator",
+        "custom/installer",
+        "custom/trash"
+    ],
+
+    "custom/finder": {
+        "format": "📁",
+        "tooltip": "Finder",
+        "on-click": "nautilus"
+    },
+    "custom/launchpad": {
+        "format": "🚀",
+        "tooltip": "Launchpad",
+        "on-click": "wofi --show drun"
+    },
+    "custom/terminal": {
+        "format": "💻",
+        "tooltip": "Terminal",
+        "on-click": "kitty"
+    },
+    "custom/browser": {
+        "format": "🌐",
+        "tooltip": "Safari Browser",
+        "on-click": "firefox-esr"
+    },
+    "custom/settings": {
+        "format": "⚙️",
+        "tooltip": "System Settings",
+        "on-click": "gnome-control-center"
+    },
+    "custom/calculator": {
+        "format": "🔢",
+        "tooltip": "Calculator",
+        "on-click": "gnome-calculator"
+    },
+    "custom/installer": {
+        "format": "💿",
+        "tooltip": "Install RatanaOS",
+        "on-click": "calamares"
+    },
+    "custom/trash": {
+        "format": "🗑️",
+        "tooltip": "Trash",
+        "on-click": "nautilus trash:///"
+    }
+}

@@ -1,0 +1,49 @@
+* {
+    border: none;
+    border-radius: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Cantarell", "SF Pro Display", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+window#waybar {
+    background: rgba(14, 20, 36, 0.82);
+    color: #F8FAFC;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+#custom-apple {
+    font-weight: 700;
+    font-size: 14px;
+    color: #00BBF9;
+    padding: 0 14px;
+    margin: 2px 6px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+#window {
+    font-weight: 600;
+    color: #E2E8F0;
+    padding-left: 8px;
+}
+
+#clock {
+    font-weight: 600;
+    color: #FFFFFF;
+}
+
+#cpu, #memory, #pulseaudio, #network, #battery, #custom-controlcenter {
+    padding: 0 10px;
+    margin: 2px 3px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    color: #E2E8F0;
+}
+
+#custom-controlcenter {
+    background: rgba(239, 68, 68, 0.25);
+    color: #F87171;
+    font-size: 13px;
+    padding: 0 10px;
+}
