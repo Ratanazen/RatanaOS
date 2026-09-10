@@ -49,16 +49,16 @@ docker run --rm \
         --cache-stages "bootstrap chroot rootfs" \
         --mirror-bootstrap "http://deb.debian.org/debian/" \
         --mirror-chroot "http://deb.debian.org/debian/" \
-        --mirror-binary "http://deb.debian.org/debian/" \
+        --loadlin false \
         --apt-options "--yes -o Acquire::Retries=5 -o Acquire::http::Timeout=60"
 
 # Fix permissions
 docker run --rm -v "${ROOT_DIR}:/workspace" debian:bookworm-slim \
     chown -R "$(id -u):$(id -g)" /workspace/ratanaos-live 2>/dev/null || true
 
-# Remove stale lock and stale binary markers if any
+# Remove stale lock, binary output and stale binary markers if any
 rm -f "${LIVE_DIR}/.lock" "${LIVE_DIR}/chroot/.lock" "${LIVE_DIR}/binary/.lock" 2>/dev/null || true
-rm -rf "${LIVE_DIR}/cache/binary_rootfs" "${LIVE_DIR}/.build/binary"* 2>/dev/null || true
+rm -rf "${LIVE_DIR}/binary" "${LIVE_DIR}/cache/binary_rootfs" "${LIVE_DIR}/.build/binary"* 2>/dev/null || true
 
 echo "==> Executing Fast Live-Build..."
 docker run --rm \

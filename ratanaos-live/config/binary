@@ -89,7 +89,7 @@ LB_JFFS2_ERASEBLOCK=""
 LB_MEMTEST="none"
 
 # Set loadlin
-LB_LOADLIN="true"
+LB_LOADLIN="false"
 
 # Set win32-loader
 LB_WIN32_LOADER="false"
