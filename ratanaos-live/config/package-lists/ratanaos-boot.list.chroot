@@ -1,8 +1,11 @@
 # ==============================================================================
 # RatanaOS Boot Splash & Live Boot Configuration
 # ==============================================================================
+linux-image-amd64
+systemd-sysv
 live-boot
 live-config
 live-config-systemd
 plymouth
 plymouth-themes
+

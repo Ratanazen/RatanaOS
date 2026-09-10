@@ -59,7 +59,7 @@ docker run --rm -v "${ROOT_DIR}:/workspace" debian:bookworm-slim \
 # Remove stale lock, binary output and stale binary markers if any
 rm -f "${LIVE_DIR}/.lock" "${LIVE_DIR}/chroot/.lock" "${LIVE_DIR}/binary/.lock" 2>/dev/null || true
 rm -f "${LIVE_DIR}/chroot/var/lib/apt/lists/lock" "${LIVE_DIR}/chroot/var/lib/dpkg/lock"* "${LIVE_DIR}/chroot/var/cache/apt/archives/lock" 2>/dev/null || true
-rm -rf "${LIVE_DIR}/binary" "${LIVE_DIR}/cache/binary_rootfs" "${LIVE_DIR}/.build/binary"* 2>/dev/null || true
+rm -rf "${LIVE_DIR}/binary" "${LIVE_DIR}/cache/binary_rootfs" "${LIVE_DIR}/.build/binary"* "${LIVE_DIR}/.build/chroot_package-lists"* "${LIVE_DIR}/.build/chroot_linux-image"* "${LIVE_DIR}/.build/chroot_includes"* 2>/dev/null || true
 
 echo "==> Executing Fast Live-Build..."
 docker run --rm \
