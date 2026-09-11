@@ -1,16 +1,15 @@
 # ==============================================================================
 # RatanaOS Secure Boot, Bootloader & Disk Support for Real Hardware
+# Non-conflicting multi-arch EFI and BIOS binaries with GRUB common tools
 # ==============================================================================
 
-# UEFI Secure Boot & Standard UEFI bootloaders
+# UEFI Secure Boot & Standard UEFI bootloader binaries
 shim-signed
-grub-efi-amd64
 grub-efi-amd64-bin
 grub-efi-amd64-signed
 efibootmgr
 
-# Legacy BIOS / MBR bootloader
-grub-pc
+# Legacy BIOS / MBR bootloader binaries & common tools
 grub-pc-bin
 grub2-common
 

@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# RatanaOS Safe System Package Updater
+# ==============================================================================
+
+set -euo pipefail
+
+echo "==> RatanaOS Package Update Engine..."
+
+if command -v apt-get >/dev/null 2>&1; then
+    sudo apt-get update
+    sudo apt-get upgrade -y
+elif command -v pacman >/dev/null 2>&1; then
+    sudo pacman -Syu --noconfirm
+elif command -v dnf >/dev/null 2>&1; then
+    sudo dnf upgrade -y
+fi
+
+echo "==> Updating desktop themes, schemas, and icon caches..."
+sudo glib-compile-schemas /usr/share/glib-2.0/schemas 2>/dev/null || true
+sudo update-icon-caches /usr/share/icons/* 2>/dev/null || true
+
+echo "✅ RatanaOS system is up to date."

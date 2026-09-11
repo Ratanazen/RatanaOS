@@ -1,0 +1,30 @@
+# ==============================================================================
+# RatanaOS Common Package List
+# Base system, Linux kernel, systemd, networking, audio, and hardware drivers
+# ==============================================================================
+
+linux-image-amd64
+systemd-sysv
+live-boot
+live-config
+live-config-systemd
+sudo
+network-manager
+net-tools
+wireless-tools
+wpasupplicant
+pipewire
+pipewire-pulse
+wireplumber
+alsa-utils
+pavucontrol
+pamixer
+playerctl
+brightnessctl
+curl
+wget
+git
+pciutils
+usbutils
+ca-certificates
+locales

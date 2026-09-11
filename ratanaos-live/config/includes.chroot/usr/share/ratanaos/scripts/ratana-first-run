@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# RatanaOS First-Run Setup Wizard
+# Safely configures user preferences with automatic backup protection
+# ==============================================================================
+
+set -euo pipefail
+
+BACKUP_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/ratana/backups/$(date +%Y%m%d_%H%M%S)"
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/ratana"
+DONE_FILE="${CONFIG_DIR}/.first-run-done"
+
+mkdir -p "${BACKUP_DIR}" "${CONFIG_DIR}"
+
+echo "============================================================"
+echo " 󰀻 Welcome to RatanaOS 2026 (macOS Sequoia Edition)"
+echo "============================================================"
+
+# Create safety backup of existing configurations if any
+if [ -d "${HOME}/.config/hypr" ] || [ -d "${HOME}/.config/waybar" ]; then
+    echo "==> Creating safety backup in ${BACKUP_DIR}..."
+    cp -r "${HOME}/.config/hypr" "${BACKUP_DIR}/" 2>/dev/null || true
+    cp -r "${HOME}/.config/waybar" "${BACKUP_DIR}/" 2>/dev/null || true
+    cp -r "${HOME}/.config/sway" "${BACKUP_DIR}/" 2>/dev/null || true
+fi
+
+# 1. Apply default theme
+ratana-theme dark || true
+
+# 2. Set default wallpaper
+ratana-wallpaper set "/usr/share/backgrounds/ratanaos/ratanaos-sequoia-dark.png" || true
+
+# 3. Mark first-run completed
+touch "${DONE_FILE}"
+
+echo "============================================================"
+echo " ✅ RatanaOS initialized successfully!"
+echo " Use 'ratana-theme' to switch visual styles."
+echo " Use 'ratana-performance' to tune animations & blur."
+echo " Use Super+Space to launch applications."
+echo "============================================================"

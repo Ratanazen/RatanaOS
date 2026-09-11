@@ -1,0 +1,247 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# RatanaOS Doctor — Diagnostic & Self-Healing Utility
+# ==============================================================================
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+TARGET_USER="${SUDO_USER:-$USER}"
+TARGET_HOME=$(eval echo "~${TARGET_USER}")
+REPORT_FILE="${TARGET_HOME}/.config/ratana/doctor-report.log"
+
+PASSED_CHECKS=0
+TOTAL_CHECKS=0
+WARNINGS=0
+ERRORS=0
+
+log_check() {
+    local status="$1"
+    local desc="$2"
+    local details="$3"
+    TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
+    if [ "$status" = "OK" ]; then
+        PASSED_CHECKS=$((PASSED_CHECKS + 1))
+        printf "  [ ${GREEN}PASS${NC} ] %s\n" "$desc"
+    elif [ "$status" = "WARN" ]; then
+        WARNINGS=$((WARNINGS + 1))
+        printf "  [ ${YELLOW}WARN${NC} ] %s %s\n" "$desc" "${details:+($details)}"
+    else
+        ERRORS=$((ERRORS + 1))
+        printf "  [ ${RED}FAIL${NC} ] %s %s\n" "$desc" "${details:+($details)}"
+    fi
+}
+
+header() {
+    echo -e "\n${BOLD}${CYAN}=== $1 ===${NC}"
+}
+
+doctor_check() {
+    echo -e "${BOLD}${PURPLE}======================================================${NC}"
+    echo -e "${BOLD}${PURPLE}          RatanaOS System Health Audit               ${NC}"
+    echo -e "${BOLD}${PURPLE}======================================================${NC}"
+
+    header "1. Desktop Compositors & Display"
+    for comp in hyprland niri sway; do
+        if command -v "$comp" >/dev/null 2>&1; then
+            log_check "OK" "Compositor binary: $comp ($(command -v $comp))"
+        else
+            log_check "WARN" "Compositor binary: $comp" "Not installed or not in PATH"
+        fi
+    done
+
+    header "2. Core Desktop Components"
+    local core_tools=("waybar" "swaync" "wofi" "kitty" "swww" "swayidle" "swaylock" "grim" "slurp" "pamixer" "brightnessctl")
+    for tool in "${core_tools[@]}"; do
+        if command -v "$tool" >/dev/null 2>&1; then
+            log_check "OK" "Desktop utility: $tool"
+        else
+            log_check "WARN" "Desktop utility: $tool" "Missing binary"
+        fi
+    done
+
+    header "3. User Configuration Files"
+    local configs=(
+        "hypr/hyprland.conf"
+        "niri/config.kdl"
+        "sway/config"
+        "waybar/config.json"
+        "waybar/style.css"
+        "swaync/config.json"
+        "swaync/style.css"
+        "wofi/config"
+        "wofi/style.css"
+        "kitty/kitty.conf"
+        "ratana/theme.conf"
+    )
+    for cfg in "${configs[@]}"; do
+        if [ -f "${TARGET_HOME}/.config/$cfg" ]; then
+            log_check "OK" "User config: ~/.config/$cfg"
+        elif [ -f "/etc/skel/.config/$cfg" ]; then
+            log_check "WARN" "User config: ~/.config/$cfg" "Available in /etc/skel but missing for $TARGET_USER"
+        else
+            log_check "FAIL" "User config: ~/.config/$cfg" "Missing completely"
+        fi
+    done
+
+    header "4. System Theme Engine & Assets"
+    if [ -d "/usr/share/ratanaos/themes" ]; then
+        local theme_count
+        theme_count=$(find /usr/share/ratanaos/themes -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)
+        if [ "$theme_count" -ge 7 ]; then
+            log_check "OK" "7 System Themes present in /usr/share/ratanaos/themes ($theme_count found)"
+        else
+            log_check "WARN" "System themes directory has fewer than 7 themes ($theme_count found)"
+        fi
+    else
+        log_check "FAIL" "Directory /usr/share/ratanaos/themes does not exist"
+    fi
+
+    if [ -f "/etc/ratanaos/theme.conf" ]; then
+        log_check "OK" "System default theme config: /etc/ratanaos/theme.conf"
+    else
+        log_check "WARN" "System default theme config: /etc/ratanaos/theme.conf missing"
+    fi
+
+    header "5. Typography & Fonts"
+    local fonts=("JetBrains Mono" "Noto Sans" "Font Awesome")
+    if command -v fc-list >/dev/null 2>&1; then
+        for font in "${fonts[@]}"; do
+            if fc-list : family | grep -qi "$font"; then
+                log_check "OK" "Font family: $font detected"
+            else
+                log_check "WARN" "Font family: $font not detected in fontconfig cache"
+            fi
+        done
+    else
+        log_check "WARN" "fc-list utility not found (fontconfig missing)"
+    fi
+
+    header "6. RatanaOS Helper Utilities"
+    local helpers=("ratana-theme" "ratana-launcher" "ratana-wallpaper" "ratana-lock" "ratana-power" "ratana-screenshot" "ratana-first-run" "ratana-doctor")
+    for h in "${helpers[@]}"; do
+        if [ -x "/usr/local/bin/$h" ]; then
+            log_check "OK" "Utility: /usr/local/bin/$h (executable)"
+        else
+            log_check "WARN" "Utility: /usr/local/bin/$h missing or not executable"
+        fi
+    done
+
+    header "7. Permissions & File Ownership"
+    if [ -d "${TARGET_HOME}/.config" ]; then
+        local wrong_owner
+        wrong_owner=$(find "${TARGET_HOME}/.config" -user root 2>/dev/null | head -n 5)
+        if [ -z "$wrong_owner" ]; then
+            log_check "OK" "~/.config ownership correctly belongs to $TARGET_USER"
+        else
+            log_check "WARN" "Some files in ~/.config are owned by root! Run 'ratana-doctor fix'"
+        fi
+    fi
+
+    echo ""
+    echo -e "${BOLD}${PURPLE}======================================================${NC}"
+    echo -e "${BOLD}Summary: ${PASSED_CHECKS}/${TOTAL_CHECKS} Passed | ${YELLOW}${WARNINGS} Warnings${NC} | ${RED}${ERRORS} Errors${NC}"
+    echo -e "${BOLD}${PURPLE}======================================================${NC}"
+}
+
+doctor_fix() {
+    echo -e "${BOLD}${CYAN}[*] Starting RatanaOS Self-Healing & Configuration Repair...${NC}"
+
+    mkdir -p "${TARGET_HOME}/.config/ratana"
+    mkdir -p "${TARGET_HOME}/.config/ratana/wallpapers"
+
+    # 1. Restore missing configs from /etc/skel or /usr/share/ratanaos/skel
+    local skel_source="/etc/skel/.config"
+    if [ ! -d "$skel_source" ] && [ -d "/usr/share/ratanaos/skel" ]; then
+        skel_source="/usr/share/ratanaos/skel"
+    fi
+
+    if [ -d "$skel_source" ]; then
+        echo -e "  -> Restoring missing user configurations from ${skel_source}..."
+        for dir in hypr niri sway waybar swaync wofi rofi kitty foot starship fastfetch ratana; do
+            if [ -d "${skel_source}/${dir}" ]; then
+                if [ ! -d "${TARGET_HOME}/.config/${dir}" ]; then
+                    cp -r "${skel_source}/${dir}" "${TARGET_HOME}/.config/"
+                    echo -e "     ${GREEN}+ Restored ~/.config/${dir}${NC}"
+                fi
+            fi
+        done
+    fi
+
+    # 2. Fix theme.conf fallback
+    if [ ! -f "${TARGET_HOME}/.config/ratana/theme.conf" ]; then
+        if [ -f "/usr/share/ratanaos/themes/ratana-dark/theme.conf" ]; then
+            cp "/usr/share/ratanaos/themes/ratana-dark/theme.conf" "${TARGET_HOME}/.config/ratana/theme.conf"
+            echo -e "     ${GREEN}+ Initialized default theme: ratana-dark${NC}"
+        fi
+    fi
+
+    # 3. Fix permissions and ownership
+    echo -e "  -> Repairing file permissions and ownership for ${TARGET_USER}..."
+    chown -R "${TARGET_USER}:${TARGET_USER}" "${TARGET_HOME}/.config" 2>/dev/null || true
+    chmod -R u+rw "${TARGET_HOME}/.config" 2>/dev/null || true
+
+    # 4. Make system scripts executable
+    if [ -d "/usr/local/bin" ]; then
+        chmod +x /usr/local/bin/ratana-* 2>/dev/null || true
+    fi
+
+    # 5. Update font cache
+    if command -v fc-cache >/dev/null 2>&1; then
+        echo -e "  -> Refreshing font cache..."
+        fc-cache -f >/dev/null 2>&1 || true
+    fi
+
+    echo -e "${GREEN}${BOLD}[✔] Self-healing complete! Run 'ratana-doctor check' to verify.${NC}"
+}
+
+doctor_report() {
+    mkdir -p "$(dirname "$REPORT_FILE")"
+    {
+        echo "=========================================================="
+        echo " RatanaOS Diagnostic Report - $(date -u)"
+        echo "=========================================================="
+        echo "Kernel:        $(uname -r)"
+        echo "Architecture:  $(uname -m)"
+        echo "Host:          $(cat /etc/hostname 2>/dev/null || hostname)"
+        echo "OS:            $(cat /etc/os-release | grep PRETTY_NAME | cut -d= -f2 | tr -d '\"')"
+        echo "Current User:  ${TARGET_USER}"
+        echo "Memory:        $(free -h | awk '/^Mem:/ {print $3 "/" $2}')"
+        echo "Compositors:   $(which hyprland niri sway 2>/dev/null | tr '\n' ' ')"
+        echo "GPU:           $(lspci 2>/dev/null | grep -E -i 'vga|3d|display' || echo 'Unknown')"
+        echo ""
+        echo "Running checks..."
+        doctor_check
+    } | tee "$REPORT_FILE"
+
+    echo -e "\n${BOLD}${GREEN}Report saved to: ${REPORT_FILE}${NC}"
+}
+
+case "${1:-check}" in
+    check)
+        doctor_check
+        ;;
+    fix)
+        doctor_fix
+        ;;
+    report)
+        doctor_report
+        ;;
+    help|--help|-h)
+        echo "Usage: ratana-doctor [check|fix|report]"
+        echo "  check   - Perform health inspection of packages, themes, and configs"
+        echo "  fix     - Automatically repair broken permissions and missing configs"
+        echo "  report  - Generate full diagnostic report and save to ~/.config/ratana/doctor-report.log"
+        ;;
+    *)
+        echo "Unknown option: $1"
+        echo "Usage: ratana-doctor [check|fix|report]"
+        exit 1
+        ;;
+esac
