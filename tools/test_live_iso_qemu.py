@@ -53,12 +53,16 @@ def main():
         send_qmp_command(sock, {"execute": "human-monitor-command", "arguments": {"command-line": "sendkey ret"}})
         print("[*] Sent ENTER key to boot Live environment.")
 
-        # Wait 45s for full desktop / LightDM greeter
-        print("[*] Waiting 45 seconds for desktop initialization...")
-        time.sleep(45)
+        # Wait 50s for full desktop & autostart
+        print("[*] Waiting 50 seconds for desktop initialization...")
+        time.sleep(50)
 
-        send_qmp_command(sock, {"execute": "human-monitor-command", "arguments": {"command-line": "screendump /tmp/ratana_desktop_active.ppm"}})
-        print("[+] Captured active desktop/greeter screen.")
+        # Press Super key to exit overview if GNOME starts in overview mode
+        send_qmp_command(sock, {"execute": "human-monitor-command", "arguments": {"command-line": "sendkey meta_l"}})
+        time.sleep(2)
+
+        send_qmp_command(sock, {"execute": "human-monitor-command", "arguments": {"command-line": "screendump /tmp/ratana_desktop_sequoia.ppm"}})
+        print("[+] Captured active desktop screen.")
 
         sock.close()
     finally:
@@ -69,8 +73,8 @@ def main():
         except:
             proc.kill()
 
-    ppm = '/tmp/ratana_desktop_active.ppm'
-    png = f'{artifact_dir}/ratana_desktop_active.png'
+    ppm = '/tmp/ratana_desktop_sequoia.ppm'
+    png = f'{artifact_dir}/ratana_desktop_sequoia.png'
     if os.path.exists(ppm):
         subprocess.run(['ffmpeg', '-y', '-i', ppm, png], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         if os.path.exists(png):
