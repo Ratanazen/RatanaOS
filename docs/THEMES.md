@@ -1,25 +1,35 @@
-# RatanaOS — Shared 7-Theme Engine
+# RatanaOS 7-Theme Dynamic Engine
 
-The RatanaOS theme engine synchronizes colors, borders, corner radii, and translucency across all desktop environments, terminals, launchers, and GTK toolkits.
+## Overview
+RatanaOS includes 7 production-quality visual themes that automatically apply across Compositors (Hyprland, Niri, Sway), Waybar, Launchers (Wofi, Rofi), Notification Centers (SwayNC), Terminals (Kitty, Foot), and GTK/Qt toolkits.
 
-## 7 Integrated Themes
+---
 
-1. **Ratana Dark (`ratana-dark`)**: Classic macOS Sequoia obsidian dark with electric blue accent (`#0A84FF`).
-2. **Ratana Light (`ratana-light`)**: Crisp Cupertino light mode with frosted white surfaces and vivid blue highlights (`#007AFF`).
-3. **Ratana Glass (`ratana-glass`)**: Deep translucency with 24px acrylic blur and ethereal cyan glow (`#38BDF8`).
-4. **Ratana Cyber (`ratana-cyber`)**: High-contrast synthwave with neon cyan and magenta borders (`#00F0FF` / `#FF007F`).
-5. **Ratana Anime (`ratana-anime`)**: Soft sakura blossom pink and pastel lavender palette (`#F472B6` / `#C084FC`).
-6. **Ratana Minimal (`ratana-minimal`)**: Ultra-clean monochromatic slate with zero visual noise (`#94A3B8`).
-7. **Ratana Purple (`ratana-purple`)**: Deep royal violet and lilac ambient gradient (`#A855F7`).
+## 1. Available Themes
 
-## Switching Themes
+| Theme ID | Style / Accent | Purpose |
+| :--- | :--- | :--- |
+| `ratana-dark` | Deep Slate / Electric Blue (`#3b82f6`) | macOS Sequoia Dark default |
+| `ratana-light` | Soft Silver / Crisp Azure (`#2563eb`) | High-contrast daytime environment |
+| `ratana-glass` | Translucent Obsidian / Cyan (`#06b6d4`) | Frosted glass blur aesthetic |
+| `ratana-cyber` | Void Black / Neon Pink (`#ec4899`) | Cyberpunk aesthetic with glowing borders |
+| `ratana-anime` | Pastel Midnight / Lavender (`#a855f7`) | Vibrant aesthetic with soft curves |
+| `ratana-minimal`| Pure Monochrome (`#e2e8f0`) | Zero distraction development |
+| `ratana-purple` | Royal Purple (`#8b5cf6`) | Modern luxury dark palette |
 
+---
+
+## 2. Switching Themes
+
+Run the switcher command:
 ```bash
-ratana-theme dark
-ratana-theme light
-ratana-theme glass
+ratana-theme <theme-id>
+# Examples:
 ratana-theme cyber
-ratana-theme anime
-ratana-theme minimal
-ratana-theme purple
+ratana-theme glass
+ratana-theme dark
+```
+To list all installed themes:
+```bash
+ratana-theme list
 ```

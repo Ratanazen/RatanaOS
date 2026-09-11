@@ -1,11 +1,32 @@
-# RatanaOS — Niri Guide
+# RatanaOS Niri Desktop Suite
 
 ## Overview
-Niri is an infinite horizontal scrolling Wayland window manager where windows are arranged in dynamic columns along a continuous ribbon.
+Niri is an infinite horizontal scrollable tiling Wayland compositor. RatanaOS provides a native KDL configuration styled to match the RatanaOS macOS Sequoia visual identity.
 
-## Configuration Structure
-- `config.kdl`: Master KDL file defining inputs, window rules, and module includes.
-- `layout.kdl`: Preset column widths (33%, 50%, 66%, 100%), 12px gaps, and 2px active focus ring.
-- `appearance.kdl`: Theme variables, cursor sizing, and animation slowdown controls.
-- `startup.kdl`: Auto-start for Waybar, SwayNC, and theme engine.
-- `keybinds.kdl`: Mod+Left/Right column navigation, column resizing, and application spawning.
+---
+
+## 1. Directory Structure
+```
+~/.config/niri/
+├── config.kdl      # Master configuration
+├── layout.kdl      # Column gaps, window borders, and focus ring
+├── appearance.kdl  # Active/inactive border colors and radii
+├── startup.kdl     # Auto-start daemons (Waybar, SwayNC, SWWW)
+└── keybinds.kdl    # Scrolling tiling shortcuts
+```
+
+---
+
+## 2. Key Shortcuts
+
+| Key Combination | Action |
+| :--- | :--- |
+| `Super + Return` | Open Kitty Terminal |
+| `Super + Space` | Application Launcher |
+| `Super + Q` | Close window |
+| `Super + Left / Right` | Focus column left / right |
+| `Super + Up / Down` | Focus window up / down in column |
+| `Super + Shift + Left / Right` | Move column left / right |
+| `Super + R` | Switch column preset width |
+| `Super + Shift + F` | Fullscreen column |
+| `Super + L` | Lock screen |

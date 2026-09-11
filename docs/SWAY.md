@@ -1,10 +1,30 @@
-# RatanaOS — Sway Guide
+# RatanaOS Sway Desktop Suite
 
 ## Overview
-Sway provides a rock-solid, lightweight i3-compatible Wayland environment ideal for developers and battery-optimized workflows.
+Sway provides a lightweight, i3-compatible tiling Wayland compositor ideal for battery efficiency, low-RAM machines, and minimalist workflows.
 
-## Features
-- Standard i3 manual tiling with smart gaps (8px inner, 12px outer).
-- Waybar integration with macOS top panel.
-- SwayNC control center integration.
-- Unified keybindings identical to RatanaOS Hyprland and Niri.
+---
+
+## 1. Configuration
+- **Location**: `~/.config/sway/config`
+- **Features**:
+  - Tiling gaps (`gaps inner 8`, `gaps outer 4`)
+  - Waybar top panel integration
+  - SwayNC notification daemon integration
+  - Shared wallpaper daemon (`swww` / `swaybg`)
+  - Dropdown scratchpad terminal
+
+---
+
+## 2. Key Shortcuts
+
+| Key Combination | Action |
+| :--- | :--- |
+| `Super + Return` | Open Terminal |
+| `Super + Space` | App Launcher |
+| `Super + Shift + Q` | Kill focused window |
+| `Super + H/J/K/L` | Move focus (left/down/up/right) |
+| `Super + S` | Stacking layout |
+| `Super + W` | Tabbed layout |
+| `Super + E` | Split layout |
+| `Super + Shift + Space` | Toggle floating |

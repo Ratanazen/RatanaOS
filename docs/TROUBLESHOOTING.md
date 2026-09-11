@@ -1,32 +1,34 @@
-# RatanaOS — Troubleshooting & Diagnostics
+# RatanaOS Troubleshooting & Recovery Guide
 
-## Common Questions and Fixes
+## 1. System Self-Diagnostics with `ratana-doctor`
 
-### 1. Audio or Microphone Not Responding
-PipeWire handles all audio routing. To restart audio services:
+RatanaOS includes an automated diagnostic and self-repair tool:
+
 ```bash
-systemctl --user restart pipewire wireplumber
+# 1. Audit system health:
+ratana-doctor check
+
+# 2. Automatically repair missing configurations and permissions:
+ratana-doctor fix
+
+# 3. Generate and export a full diagnostic report:
+ratana-doctor report
 ```
 
-### 2. Waybar Not Displaying After Screen Reconnect
-Waybar can be reloaded safely without restarting your session:
-```bash
-killall -SIGUSR2 waybar
-```
+---
 
-### 3. Tuning Performance on Low-End Hardware / Virtual Machines
-If running on hardware with limited GPU acceleration or running inside a virtual machine without 3D acceleration, enable the low-end performance profile:
-```bash
-ratana-performance low
-```
-This disables window blur, ambient drop shadows, and high-frequency animations.
+## 2. Boot Issues & Disk Recovery
 
-### 4. Restoring Default Configurations
-If any personal desktop configuration becomes damaged, restore from the automated backup:
-```bash
-ls -la ~/.config/ratana/backups/
-```
-Or reset default themes and styling:
-```bash
-ratana-theme dark
-```
+### Issue: "Initramfs cannot find boot medium"
+- **Cause**: Happens when `live-boot` was not removed from the target disk.
+- **Solution**: Boot the Live USB, open a terminal, and run:
+  ```bash
+  sudo mount /dev/sdX2 /mnt
+  sudo mount /dev/sdX1 /mnt/boot/efi # if UEFI
+  sudo chroot /mnt apt-get purge -y live-boot live-config
+  sudo chroot /mnt update-initramfs -u -k all
+  sudo chroot /mnt update-grub
+  ```
+
+### Issue: NVIDIA Black Screen / Modesetting
+- Add `nvidia-drm.modeset=1` to `GRUB_CMDLINE_LINUX_DEFAULT` in `/etc/default/grub` and run `sudo update-grub`.
