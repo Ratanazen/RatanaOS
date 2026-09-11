@@ -1,9 +1,12 @@
 # ==============================================================================
-# RatanaOS Base Desktop Utilities & Common Applications
+# RatanaOS Base Desktop Utilities, Fonts, & Common Applications
 # ==============================================================================
 network-manager
 network-manager-gnome
 firefox-esr
+thunar
+thunar-archive-plugin
+file-roller
 gparted
 lightdm
 lightdm-gtk-greeter
@@ -12,7 +15,12 @@ fonts-cantarell
 fonts-dejavu-core
 fonts-liberation
 fonts-noto-core
+fonts-noto-cjk
 fonts-noto-color-emoji
+fonts-khmeros
+fonts-khmeros-core
+fonts-font-awesome
+fonts-inter
 papirus-icon-theme
 dconf-cli
 dconf-editor

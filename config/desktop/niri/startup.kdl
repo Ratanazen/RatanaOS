@@ -1,0 +1,9 @@
+// ==============================================================================
+// RatanaOS — Niri Startup Daemons & Background Services
+// ==============================================================================
+
+spawn-at-startup "/usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1"
+spawn-at-startup "waybar"
+spawn-at-startup "swaync"
+spawn-at-startup "ratana-theme" "apply"
+spawn-at-startup "swww-daemon"

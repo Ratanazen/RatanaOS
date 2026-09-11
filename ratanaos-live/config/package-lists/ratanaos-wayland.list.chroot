@@ -1,17 +1,21 @@
 # ==============================================================================
-# RatanaOS Wayland & Hyprland / Sway Suite (macOS Sequoia 2026 Style)
+# RatanaOS Wayland Compositor Suite (Hyprland, Niri, Sway, Waybar, Rice Tools)
 # ==============================================================================
 sway
-waybar
-wofi
-kitty
-foot
 swaybg
 swaylock
+swayidle
+waybar
+wofi
+rofi
+kitty
+foot
 mako-notifier
 grim
 slurp
 wl-clipboard
+cliphist
+wf-recorder
 policykit-1-gnome
 xdg-desktop-portal-wlr
 xdg-desktop-portal-gtk
@@ -19,3 +23,5 @@ brightnessctl
 pamixer
 playerctl
 pavucontrol
+fastfetch
+btop

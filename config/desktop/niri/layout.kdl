@@ -1,0 +1,34 @@
+// ==============================================================================
+// RatanaOS — Niri Layout & Column Scrolling Architecture
+// ==============================================================================
+
+layout {
+    gaps 12
+    center-focused-column "never"
+
+    preset-column-widths {
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+        proportion 1.0
+    }
+
+    default-column-width { proportion 0.5; }
+
+    focus-ring {
+        width 2
+        active-color "#0A84FF"
+        inactive-color "#3B426155"
+    }
+
+    border {
+        off
+    }
+
+    struts {
+        left 0
+        right 0
+        top 38
+        bottom 0
+    }
+}

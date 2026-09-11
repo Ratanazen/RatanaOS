@@ -1,17 +1,29 @@
 # ==============================================================================
-# RatanaOS Secure Boot & Disk Encryption Support (Phase 9)
+# RatanaOS Secure Boot, Bootloader & Disk Support for Real Hardware
 # ==============================================================================
 
-# UEFI Secure Boot chain (Debian-signed shim + GRUB)
+# UEFI Secure Boot & Standard UEFI bootloaders
 shim-signed
+grub-efi-amd64
+grub-efi-amd64-bin
 grub-efi-amd64-signed
+efibootmgr
 
-# BIOS fallback bootloader
+# Legacy BIOS / MBR bootloader
+grub-pc
 grub-pc-bin
+grub2-common
 
-# LUKS disk encryption userspace tooling
+# Dual-boot multi-OS auto-detection (Windows / Linux)
+os-prober
+
+# Partitioning and filesystem utilities for EFI/MBR disks
+dosfstools
+mtools
+parted
+gdisk
+
+# LUKS disk encryption & LVM tooling
 cryptsetup
 cryptsetup-initramfs
-
-# LVM support (commonly paired with LUKS)
 lvm2

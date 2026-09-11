@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# RatanaOS Session Switcher
+# Switch between Hyprland, Niri, Sway, KDE, or GNOME
+# ==============================================================================
+
+set -euo pipefail
+
+SESSION="${1:-}"
+
+if [ -z "$SESSION" ]; then
+    OPTIONS="RatanaOS Hyprland\nRatanaOS Niri\nRatanaOS Sway\nGNOME Desktop\nKDE Plasma"
+    if command -v wofi >/dev/null 2>&1; then
+        SESSION=$(echo -e "$OPTIONS" | wofi --dmenu --prompt "Select Session" --width 300 --height 240)
+    elif command -v rofi >/dev/null 2>&1; then
+        SESSION=$(echo -e "$OPTIONS" | rofi -dmenu -p "Session" -lines 5)
+    fi
+fi
+
+case "$SESSION" in
+    *Hyprland*)
+        exec Hyprland
+        ;;
+    *Niri*)
+        exec niri-session || exec niri
+        ;;
+    *Sway*)
+        exec sway
+        ;;
+    *GNOME*)
+        exec gnome-session
+        ;;
+    *KDE*|*Plasma*)
+        exec startplasma-wayland || exec startplasma-x11
+        ;;
+    *)
+        echo "Unknown session: $SESSION" >&2
+        exit 1
+        ;;
+esac

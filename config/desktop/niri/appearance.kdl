@@ -1,0 +1,16 @@
+// ==============================================================================
+// RatanaOS — Niri Appearance & Visual Identity
+// Synchronized with RatanaOS 7-theme engine
+// ==============================================================================
+
+cursor {
+    xcursor-theme "WhiteSur-cursors"
+    xcursor-size 24
+}
+
+// Visual animations
+animations {
+    slowdown 1.0
+}
+
+prefer-no-csd

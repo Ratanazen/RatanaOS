@@ -1,0 +1,79 @@
+// ==============================================================================
+// RatanaOS — Niri Keybindings Configuration
+// Smooth infinite column navigation & workspace management
+// ==============================================================================
+
+binds {
+    // Applications
+    Mod+Space { spawn "ratana-launcher"; }
+    Mod+Return { spawn "kitty"; }
+    Mod+E { spawn "thunar"; }
+    Mod+B { spawn "firefox-esr"; }
+    Mod+Escape { spawn "ratana-power"; }
+    Mod+L { spawn "ratana-lock"; }
+    Mod+N { spawn "swaync-client" "-t" "-sw"; }
+
+    // Window / Column control
+    Mod+Q { close-window; }
+    Mod+F { maximize-column; }
+    Mod+Shift+F { fullscreen-window; }
+
+    // Column Focus Navigation
+    Mod+Left  { focus-column-left; }
+    Mod+Right { focus-column-right; }
+    Mod+Up    { focus-window-up; }
+    Mod+Down  { focus-window-down; }
+    Mod+H     { focus-column-left; }
+    Mod+L     { focus-column-right; }
+    Mod+K     { focus-window-up; }
+    Mod+J     { focus-window-down; }
+
+    // Move Columns & Windows
+    Mod+Shift+Left  { move-column-left; }
+    Mod+Shift+Right { move-column-right; }
+    Mod+Shift+Up    { move-window-up; }
+    Mod+Shift+Down  { move-window-down; }
+
+    // Column Width Sizing
+    Mod+R { switch-preset-column-width; }
+    Mod+Minus { set-column-width "-10%"; }
+    Mod+Equal { set-column-width "+10%"; }
+
+    // Workspaces
+    Mod+1 { focus-workspace 1; }
+    Mod+2 { focus-workspace 2; }
+    Mod+3 { focus-workspace 3; }
+    Mod+4 { focus-workspace 4; }
+    Mod+5 { focus-workspace 5; }
+    Mod+6 { focus-workspace 6; }
+    Mod+7 { focus-workspace 7; }
+    Mod+8 { focus-workspace 8; }
+    Mod+9 { focus-workspace 9; }
+
+    Mod+Shift+1 { move-column-to-workspace 1; }
+    Mod+Shift+2 { move-column-to-workspace 2; }
+    Mod+Shift+3 { move-column-to-workspace 3; }
+    Mod+Shift+4 { move-column-to-workspace 4; }
+    Mod+Shift+5 { move-column-to-workspace 5; }
+
+    // Screenshots
+    Print { spawn "ratana-screenshot" "full"; }
+    Mod+Shift+S { spawn "ratana-screenshot" "area"; }
+    Mod+Shift+3 { spawn "ratana-screenshot" "full"; }
+    Mod+Shift+4 { spawn "ratana-screenshot" "area"; }
+    Mod+Shift+R { spawn "ratana-screenshot" "record"; }
+
+    // Audio & Brightness
+    XF86AudioRaiseVolume { spawn "pamixer" "-i" "5"; }
+    XF86AudioLowerVolume { spawn "pamixer" "-d" "5"; }
+    XF86AudioMute        { spawn "pamixer" "-t"; }
+    XF86AudioPlay        { spawn "playerctl" "play-pause"; }
+    XF86AudioNext        { spawn "playerctl" "next"; }
+    XF86AudioPrev        { spawn "playerctl" "previous"; }
+
+    XF86MonBrightnessUp   { spawn "brightnessctl" "set" "5%+"; }
+    XF86MonBrightnessDown { spawn "brightnessctl" "set" "5%-"; }
+
+    // System exit
+    Mod+Shift+E { quit; }
+}

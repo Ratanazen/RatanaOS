@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=RatanaOS Sway (Wayland i3)
+Comment=Lightweight i3-compatible Wayland tiling compositor
+Exec=sway
+Type=Application
+DesktopNames=sway
+Keywords=wm;tiling;wayland;sway;ratana;

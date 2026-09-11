@@ -1,53 +1,137 @@
 {
     "layer": "top",
     "position": "top",
-    "height": 30,
-    "spacing": 4,
-    "modules-left": ["custom/apple", "hyprland/window", "sway/window"],
-    "modules-center": ["clock"],
-    "modules-right": ["cpu", "memory", "pulseaudio", "network", "battery", "custom/controlcenter"],
-
-    "custom/apple": {
-        "format": "  RatanaOS",
+    "height": 38,
+    "margin-top": 6,
+    "margin-left": 12,
+    "margin-right": 12,
+    "spacing": 8,
+    "modules-left": [
+        "custom/logo",
+        "hyprland/workspaces",
+        "sway/workspaces",
+        "wlr/workspaces",
+        "hyprland/window",
+        "sway/window"
+    ],
+    "modules-center": [
+        "clock"
+    ],
+    "modules-right": [
+        "mpris",
+        "cpu",
+        "memory",
+        "temperature",
+        "pulseaudio",
+        "network",
+        "battery",
+        "tray",
+        "custom/notification",
+        "custom/power"
+    ],
+    "custom/logo": {
+        "format": "󰀻",
         "tooltip": false,
-        "on-click": "wofi --show drun"
+        "on-click": "ratana-launcher"
+    },
+    "hyprland/workspaces": {
+        "format": "{name}",
+        "on-click": "activate",
+        "all-outputs": true,
+        "sort-by-number": true
+    },
+    "sway/workspaces": {
+        "format": "{name}",
+        "all-outputs": true
+    },
+    "wlr/workspaces": {
+        "format": "{name}",
+        "on-click": "activate"
     },
     "hyprland/window": {
-        "format": "Finder",
+        "format": "{title}",
+        "max-length": 35,
         "separate-outputs": true
     },
     "sway/window": {
-        "format": "Finder"
+        "format": "{title}",
+        "max-length": 35
     },
     "clock": {
-        "format": "{:%a %b %d   %I:%M %p}",
-        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+        "format": "{:%a %b %d  %I:%M %p}",
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+        "calendar": {
+            "mode": "month",
+            "weeks-pos": "right",
+            "on-scroll": 1
+        }
+    },
+    "mpris": {
+        "format": "󰝚 {player_icon} {title} - {artist}",
+        "format-paused": "󰝛 {player_icon} {title}",
+        "player-icons": {
+            "default": "󰐊",
+            "spotify": "󰓇",
+            "firefox": "󰈹"
+        },
+        "max-length": 30,
+        "on-click": "playerctl play-pause"
     },
     "cpu": {
-        "format": "M4 Pro: {usage}%",
-        "interval": 2
+        "format": "󰻠 {usage}%",
+        "interval": 2,
+        "tooltip": true,
+        "on-click": "kitty -e btop || kitty -e htop"
     },
     "memory": {
-        "format": "RAM: {percentage}%",
-        "interval": 2
+        "format": "󰍛 {percentage}%",
+        "interval": 2,
+        "tooltip-format": "Used: {used:0.1f}GiB / Total: {total:0.1f}GiB"
     },
-    "pulseaudio": {
-        "format": "🔊 {volume}%",
-        "format-muted": "🔇 Muted",
-        "on-click": "pavucontrol"
+    "temperature": {
+        "thermal-zone": 2,
+        "hwmon-path": "/sys/class/hwmon/hwmon1/temp1_input",
+        "critical-threshold": 80,
+        "format": "󰔏 {temperatureC}°C",
+        "format-critical": "󰔐 {temperatureC}°C"
     },
     "network": {
-        "format-wifi": "  {essid}",
-        "format-ethernet": "󰈀 Wired",
-        "format-disconnected": "⚠ Offline",
-        "on-click": "gnome-control-center wifi"
+        "format-wifi": "󰤨 {essid}",
+        "format-ethernet": "󰈀 {ifname}",
+        "format-disconnected": "󰤭 Disconnected",
+        "tooltip-format": "{ipaddr} ({signalStrength}%)",
+        "on-click": "nm-connection-editor || kitty -e nmtui"
+    },
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-muted": "󰝟 Muted",
+        "format-icons": {
+            "default": ["󰕿", "󰖀", "󰕾"]
+        },
+        "on-click": "pavucontrol"
     },
     "battery": {
-        "format": "🔋 {capacity}%"
+        "states": {
+            "warning": 30,
+            "critical": 15
+        },
+        "format": "{icon} {capacity}%",
+        "format-charging": "󰂄 {capacity}%",
+        "format-plugged": "󰚥 {capacity}%",
+        "format-icons": ["󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"]
     },
-    "custom/controlcenter": {
-        "format": "⏻",
+    "tray": {
+        "icon-size": 16,
+        "spacing": 10
+    },
+    "custom/notification": {
+        "format": "󰂚",
         "tooltip": false,
-        "on-click": "gnome-session-quit"
+        "on-click": "swaync-client -t -sw"
+    },
+    "custom/power": {
+        "format": "󰐥",
+        "tooltip": false,
+        "on-click": "ratana-power"
     }
 }

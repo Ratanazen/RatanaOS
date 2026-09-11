@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=RatanaOS Hyprland (M4 Pro Rice)
+Comment=Dynamic fluid Wayland compositor with macOS Sequoia aesthetic
+Exec=Hyprland
+Type=Application
+DesktopNames=Hyprland
+Keywords=wm;tiling;wayland;ratana;

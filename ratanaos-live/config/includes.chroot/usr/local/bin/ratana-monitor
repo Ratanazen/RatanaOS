@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# RatanaOS Lightweight Resource & Hardware Monitor
+# Fast, lightweight ASCII monitor suitable for low-spec & high-spec machines
+# ==============================================================================
+
+clear
+echo "============================================================"
+echo " 󰀻 RatanaOS Hardware & Performance Monitor"
+echo "============================================================"
+
+# CPU Usage
+CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{print 100 - $1}')
+echo -e "CPU Usage:      [ \e[34m${CPU_USAGE}%\e[0m ]"
+
+# RAM Usage
+RAM_INFO=$(free -m | awk '/Mem:/ { printf("%.1f / %.1f GiB (%.0f%%)", $3/1024, $2/1024, ($3/$2)*100) }')
+echo -e "Memory (RAM):   [ \e[32m${RAM_INFO}\e[0m ]"
+
+# Swap Usage
+SWAP_INFO=$(free -m | awk '/Swap:/ { if ($2 > 0) printf("%.1f / %.1f GiB", $3/1024, $2/1024); else printf("None"); }')
+echo -e "Swap Space:     [ ${SWAP_INFO} ]"
+
+# Disk Usage
+DISK_INFO=$(df -h / | awk 'NR==2 { print $3 " / " $2 " (" $5 ")" }')
+echo -e "Root Storage:   [ \e[33m${DISK_INFO}\e[0m ]"
+
+# Temperature
+if [ -f /sys/class/thermal/thermal_zone0/temp ]; then
+    TEMP=$(awk '{printf "%.1f°C", $1/1000}' /sys/class/thermal/thermal_zone0/temp)
+    echo -e "Temperature:    [ \e[35m${TEMP}\e[0m ]"
+fi
+
+# Battery
+if [ -d /sys/class/power_supply/BAT0 ]; then
+    BAT_CAP=$(cat /sys/class/power_supply/BAT0/capacity 2>/dev/null || echo "N/A")
+    BAT_STAT=$(cat /sys/class/power_supply/BAT0/status 2>/dev/null || echo "N/A")
+    echo -e "Battery:        [ ${BAT_CAP}% (${BAT_STAT}) ]"
+fi
+
+echo "============================================================"
+echo "Press Ctrl+C or Enter to exit."
+read -r _
