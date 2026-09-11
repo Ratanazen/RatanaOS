@@ -1,0 +1,15 @@
+# ==============================================================================
+# RatanaOS Complete Typography & Font Stack
+# ==============================================================================
+
+fonts-firacode
+fonts-dejavu-core
+fonts-inter
+fonts-noto-core
+fonts-noto-cjk
+fonts-noto-color-emoji
+fonts-khmeros
+fonts-sil-mondulkiri
+fonts-font-awesome
+fonts-cantarell
+fonts-liberation

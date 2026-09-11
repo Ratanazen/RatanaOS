@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=RatanaOS Terminal Installer
+GenericName=CLI Installer
+Comment=Install RatanaOS permanently to your drive via Terminal
+Exec=x-terminal-emulator -e sudo /usr/local/bin/ratana-installer
+Icon=utilities-terminal
+Terminal=true
+Categories=System;
+StartupNotify=true
