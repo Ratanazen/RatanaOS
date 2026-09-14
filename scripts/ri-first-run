@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RiOS First-Run Setup Wizard (Stage B User First Login)
+# RiOS 1.0.0 First-Run Setup Wizard (Stage B User First Login)
 # Safely configures user preferences with automatic backup protection
 # ==============================================================================
 set -euo pipefail
@@ -10,14 +10,14 @@ COMPLETE_FLAG="${CONFIG_DIR}/.first-run-complete"
 BACKUP_DIR="${CONFIG_DIR}/backups/$(date +%Y%m%d_%H%M%S)"
 
 if [ -f "$COMPLETE_FLAG" ]; then
-    echo "RiOS user initialization has already run. Skipping."
+    echo "RiOS 1.0.0 user initialization has already run. Skipping."
     exit 0
 fi
 
 mkdir -p "${BACKUP_DIR}" "${CONFIG_DIR}"
 
 echo "============================================================"
-echo " 󰀻 Welcome to RiOS (macOS Sequoia Edition)"
+echo " 󰀻 Welcome to RiOS 1.0.0 (macOS Sequoia Edition)"
 echo "============================================================"
 
 # Create safety backup of existing configurations if any
@@ -40,7 +40,7 @@ ri-wallpaper set "/usr/share/backgrounds/rios/rios-sequoia-dark.png" 2>/dev/null
 touch "${COMPLETE_FLAG}" "${CONFIG_DIR}/.first-run-done"
 
 echo "============================================================"
-echo " ✅ RiOS initialized successfully!"
+echo " ✅ RiOS 1.0.0 initialized successfully!"
 echo " Use 'ri-theme' to switch visual styles."
 echo " Use 'ri-performance' to tune animations & blur."
 echo " Use Super+Space to launch applications."

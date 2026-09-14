@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RiOS Lightweight Resource & Hardware Monitor
+# RiOS 1.0.0 Lightweight Resource & Hardware Monitor
 # Fast, lightweight ASCII monitor suitable for low-spec & high-spec machines
 # ==============================================================================
 
 clear
 echo "============================================================"
-echo " 󰀻 RiOS Hardware & Performance Monitor"
+echo " 󰀻 RiOS 1.0.0 Hardware & Performance Monitor"
 echo "============================================================"
 
 # CPU Usage

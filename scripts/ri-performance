@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RiOS Performance & Animation Tuning Engine
+# RiOS 1.0.0 Performance & Animation Tuning Engine
 # Modes: low (ultra-light), balanced (smooth), beautiful (full glass blur & 120Hz)
 # ==============================================================================
 
@@ -10,7 +10,7 @@ MODE="${1:-balanced}"
 
 case "$MODE" in
     low|lite|performance)
-        echo "==> Applying RiOS Low-End / Battery Saver Profile..."
+        echo "==> Applying RiOS 1.0.0 Low-End / Battery Saver Profile..."
         if command -v hyprctl >/dev/null 2>&1 && pgrep -x Hyprland >/dev/null 2>&1; then
             hyprctl keyword decoration:blur:enabled false
             hyprctl keyword decoration:drop_shadow false
@@ -20,7 +20,7 @@ case "$MODE" in
         ;;
 
     balanced)
-        echo "==> Applying RiOS Balanced Profile..."
+        echo "==> Applying RiOS 1.0.0 Balanced Profile..."
         if command -v hyprctl >/dev/null 2>&1 && pgrep -x Hyprland >/dev/null 2>&1; then
             hyprctl keyword decoration:blur:enabled true
             hyprctl keyword decoration:blur:passes 1
@@ -33,7 +33,7 @@ case "$MODE" in
         ;;
 
     beautiful|high|full)
-        echo "==> Applying RiOS Beautiful / 120Hz Acrylic Profile..."
+        echo "==> Applying RiOS 1.0.0 Beautiful / 120Hz Acrylic Profile..."
         if command -v hyprctl >/dev/null 2>&1 && pgrep -x Hyprland >/dev/null 2>&1; then
             hyprctl keyword decoration:blur:enabled true
             hyprctl keyword decoration:blur:passes 3

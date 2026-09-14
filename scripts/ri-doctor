@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RiOS Doctor — Diagnostic & Self-Healing Utility
+# RiOS 1.0.0 Doctor — Diagnostic & Self-Healing Utility
 # ==============================================================================
 
 RED='\033[0;31m'
@@ -44,7 +44,7 @@ header() {
 
 doctor_check() {
     echo -e "${BOLD}${PURPLE}======================================================${NC}"
-    echo -e "${BOLD}${PURPLE}          RiOS System Health Audit               ${NC}"
+    echo -e "${BOLD}${PURPLE}          RiOS 1.0.0 System Health Audit               ${NC}"
     echo -e "${BOLD}${PURPLE}======================================================${NC}"
 
     header "1. Desktop Compositors & Display"
@@ -123,7 +123,7 @@ doctor_check() {
         log_check "WARN" "fc-list utility not found (fontconfig missing)"
     fi
 
-    header "6. RiOS Helper Utilities"
+    header "6. RiOS 1.0.0 Helper Utilities"
     local helpers=("ri-theme" "ri-launcher" "ri-wallpaper" "ri-lock" "ri-power" "ri-screenshot" "ri-first-run" "ri-doctor")
     for h in "${helpers[@]}"; do
         if [ -x "/usr/local/bin/$h" ]; then
@@ -151,7 +151,7 @@ doctor_check() {
 }
 
 doctor_fix() {
-    echo -e "${BOLD}${CYAN}[*] Starting RiOS Self-Healing & Configuration Repair...${NC}"
+    echo -e "${BOLD}${CYAN}[*] Starting RiOS 1.0.0 Self-Healing & Configuration Repair...${NC}"
 
     mkdir -p "${TARGET_HOME}/.config/ri"
     mkdir -p "${TARGET_HOME}/.config/ri/wallpapers"
@@ -205,7 +205,7 @@ doctor_report() {
     mkdir -p "$(dirname "$REPORT_FILE")"
     {
         echo "=========================================================="
-        echo " RiOS Diagnostic Report - $(date -u)"
+        echo " RiOS 1.0.0 Diagnostic Report - $(date -u)"
         echo "=========================================================="
         echo "Kernel:        $(uname -r)"
         echo "Architecture:  $(uname -m)"
