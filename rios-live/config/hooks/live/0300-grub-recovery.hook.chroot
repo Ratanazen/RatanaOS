@@ -2,7 +2,7 @@
 set -e
 # Ensure GRUB recovery mode entries are NOT hidden by theme customization.
 # Debian's default GRUB config generates recovery entries automatically
-# via /etc/grub.d/10_linux. RatanaOS's GRUB theme only affects visual
+# via /etc/grub.d/10_linux. RiOS's GRUB theme only affects visual
 # presentation (colors, fonts, background) — it does not modify the
 # menu entry generation scripts.
 #

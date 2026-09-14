@@ -1,0 +1,11 @@
+name: ISO Build
+on:
+  release:
+    types: [created]
+jobs:
+  iso:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build ISO
+        run: echo "ISO build requires privileged Docker which is limited in GH Actions, skipping for now."

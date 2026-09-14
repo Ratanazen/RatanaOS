@@ -1,12 +1,12 @@
 ---
 name: Bug Report
-about: Report a bug in RatanaOS
+about: Report a bug in RiOS
 title: '[BUG] '
 labels: 'bug'
 ---
 
 ## Environment
-- **RatanaOS Variant**: desktop / minimal / server
+- **RiOS Variant**: desktop / minimal / server
 - **Boot Mode**: BIOS / UEFI
 - **Hardware**: Physical machine / QEMU / VirtualBox / VMware
 - **ISO Version / Date**: (e.g., v2.0.1, 2026-09-09)
