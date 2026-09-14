@@ -1,3 +1,4 @@
+!tests/qemu/*.py
 build/
 *.bin
 *.iso

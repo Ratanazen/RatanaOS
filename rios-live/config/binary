@@ -10,7 +10,7 @@ LB_BINARY_FILESYSTEM="fat32"
 LB_APT_INDICES="true"
 
 # Set boot parameters
-LB_BOOTAPPEND_LIVE="boot=live components username=ri hostname=ri user-fullname="Ri" quiet splash"
+LB_BOOTAPPEND_LIVE="boot=live components username=ri hostname=rios user-fullname="Ri" quiet splash"
 
 # Set boot parameters
 LB_BOOTAPPEND_INSTALL=""
@@ -71,13 +71,13 @@ LB_HDD_SIZE="auto"
 LB_HDD_PARTITION_START=""
 
 # Set iso author
-LB_ISO_APPLICATION="RiOS Live (macOS Sequoia Edition)"
+LB_ISO_APPLICATION="RiOS Full Edition (Cyber, Dev, Server, Hyprland, KDE, GNOME)"
 
 # Set iso preparer
 LB_ISO_PREPARER="live-build @LB_VERSION@; https://salsa.debian.org/live-team/live-build"
 
 # Set iso publisher
-LB_ISO_PUBLISHER="Rizen"
+LB_ISO_PUBLISHER="RiOS Project"
 
 # Set iso volume (max 32 chars)
 LB_ISO_VOLUME="RIOS_LIVE"
