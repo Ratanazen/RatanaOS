@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RiOS Master OS Installer (Stage A — Live USB to Real HDD/SSD)
+# RiOS Master OS Installer (1.0.0) (Stage A — Live USB to Real HDD/SSD)
 # ==============================================================================
 set -euo pipefail
 
@@ -38,7 +38,7 @@ DRY_RUN=0
 print_banner() {
     echo -e "${PURPLE}${BOLD}"
     echo "╔══════════════════════════════════════════════════════════╗"
-    echo "║                RiOS Master Installer                 ║"
+    echo "║                RiOS Master Installer (1.0.0)                 ║"
     echo "║       Install RiOS to Real Computer Storage          ║"
     echo "╚══════════════════════════════════════════════════════════╝"
     echo -e "${NC}"
