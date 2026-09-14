@@ -1,6 +1,6 @@
-# 🖥️ RatanaOS Desktop Environment Decision Matrix (Phase 0)
+# 🖥️ RiOS Desktop Environment Decision Matrix (Phase 0)
 
-This document records the architectural evaluation and decision for the desktop environment of the Debian-based RatanaOS distribution.
+This document records the architectural evaluation and decision for the desktop environment of the Debian-based RiOS distribution.
 
 ---
 

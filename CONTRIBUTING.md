@@ -1,6 +1,6 @@
-# 🤝 Contributing to RatanaOS
+# 🤝 Contributing to RiOS
 
-Thank you for your interest in contributing to RatanaOS! This document
+Thank you for your interest in contributing to RiOS! This document
 explains how to build locally, propose changes, and follow project
 conventions.
 
@@ -17,8 +17,8 @@ conventions.
 ### Build & Test Cycle
 ```bash
 # Clone
-git clone https://github.com/Ratanazen/RatanaOS.git
-cd RatanaOS
+git clone https://github.com/Rizen/RiOS.git
+cd RiOS
 
 # Configure live-build
 make live-config
@@ -35,17 +35,17 @@ make live-run
 ## 📋 Proposing Changes
 
 ### Theme / Icon Changes
-1. Modify assets in `ratanaos-live/config/includes.chroot/usr/share/themes/`
+1. Modify assets in `rios-live/config/includes.chroot/usr/share/themes/`
    or `usr/share/icons/`.
 2. Rebuild: `make live-iso`.
 3. Boot-test: `make live-run` and verify visually.
 4. Submit a PR with before/after screenshots.
 
 ### Package List Changes
-1. Edit the appropriate list in `ratanaos-live/config/package-lists/`.
+1. Edit the appropriate list in `rios-live/config/package-lists/`.
 2. Verify the package exists in Debian Bookworm:
    ```bash
-   docker run --rm ratanaos-live-builder apt-cache show <package-name>
+   docker run --rm rios-live-builder apt-cache show <package-name>
    ```
 3. Rebuild and test.
 

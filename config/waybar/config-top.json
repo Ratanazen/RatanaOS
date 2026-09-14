@@ -32,7 +32,7 @@
     "custom/logo": {
         "format": "󰀻",
         "tooltip": false,
-        "on-click": "ratana-launcher"
+        "on-click": "ri-launcher"
     },
     "hyprland/workspaces": {
         "format": "{name}",
@@ -132,6 +132,6 @@
     "custom/power": {
         "format": "󰐥",
         "tooltip": false,
-        "on-click": "ratana-power"
+        "on-click": "ri-power"
     }
 }

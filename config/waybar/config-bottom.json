@@ -45,7 +45,7 @@
     },
     "custom/installer": {
         "format": "󰐥",
-        "tooltip-format": "Install RatanaOS",
+        "tooltip-format": "Install RiOS",
         "on-click": "pkexec calamares"
     },
     "custom/trash": {

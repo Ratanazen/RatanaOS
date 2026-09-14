@@ -1,6 +1,6 @@
-# RatanaOS on VMware Workstation / Player / Fusion Guide
+# RiOS on VMware Workstation / Player / Fusion Guide
 
-Follow this guide to run **RatanaOS 64-bit (macOS Sequoia Edition)** in **VMware Workstation, Player, or Fusion**.
+Follow this guide to run **RiOS 64-bit (macOS Sequoia Edition)** in **VMware Workstation, Player, or Fusion**.
 
 ---
 
@@ -10,12 +10,12 @@ Follow this guide to run **RatanaOS 64-bit (macOS Sequoia Edition)** in **VMware
 2. Select **Custom (advanced)** or **Typical**.
 3. **Guest Operating System Installation**:
    - Choose **Installer disc image file (iso)**.
-   - Browse and select: `build/ratanaos.iso`.
+   - Browse and select: `build/rios.iso`.
 4. **Guest Operating System**:
    - **OS**: `Other`
    - **Version**: `Other 64-bit`
 5. **Name and Location**:
-   - Virtual Machine Name: `RatanaOS 64-bit`
+   - Virtual Machine Name: `RiOS 64-bit`
 6. **Hardware Allocation**:
    - **Memory**: `512 MB` (or `1024 MB`)
    - **Processors**: `1 Core`
@@ -24,13 +24,13 @@ Follow this guide to run **RatanaOS 64-bit (macOS Sequoia Edition)** in **VMware
 
 ---
 
-## 2. Booting RatanaOS in VMware
+## 2. Booting RiOS in VMware
 
 1. Click **Power on this virtual machine**.
-2. When the GRUB menu appears, press **Enter** on **`RatanaOS 64-bit (macOS Sequoia Edition)`**.
+2. When the GRUB menu appears, press **Enter** on **`RiOS 64-bit (macOS Sequoia Edition)`**.
 3. The 64-bit Long Mode kernel will initialize with full VBE framebuffer support.
 4. In the shell, launch the desktop by typing:
    ```bash
-   ratana@os-x86_64 > gui
+   ri@os-x86_64 > gui
    ```
 5. Press **`ESC`** or choose **`Exit to CLI`** from the  Apple Menu to return to the shell.

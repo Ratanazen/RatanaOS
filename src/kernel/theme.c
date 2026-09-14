@@ -24,8 +24,8 @@ static const char* accent_names[ACCENT_COUNT] = {
 };
 
 static const char* preset_names[UI_THEME_COUNT] = {
-    "RatanaOS Dark",
-    "RatanaOS Light",
+    "RiOS Dark",
+    "RiOS Light",
     "macOS Dark",
     "macOS Light",
     "Auto (Day/Night)"
@@ -106,7 +106,7 @@ static void apply_theme_preset(ui_theme_preset_t preset, ui_accent_color_t accen
 
     if (is_dark) {
         if (preset == UI_THEME_RATANA_DARK || preset == UI_THEME_AUTO) {
-            // RatanaOS Dark - Midnight Blue & Obsidian
+            // RiOS Dark - Midnight Blue & Obsidian
             current_theme.wallpaper_top = 0x001C1C2E;
             current_theme.wallpaper_mid = 0x002E2E48;
             current_theme.wallpaper_bot = 0x00141420;
@@ -200,7 +200,7 @@ static void apply_theme_preset(ui_theme_preset_t preset, ui_accent_color_t accen
         }
     } else {
         if (preset == UI_THEME_RATANA_LIGHT) {
-            // RatanaOS Light - Crisp Platinum & Sky Gradient
+            // RiOS Light - Crisp Platinum & Sky Gradient
             current_theme.wallpaper_top = 0x0068A0D8;
             current_theme.wallpaper_mid = 0x0088C0E8;
             current_theme.wallpaper_bot = 0x00A0D8F8;

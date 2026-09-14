@@ -1,7 +1,7 @@
-# RatanaOS Niri Desktop Suite
+# RiOS Niri Desktop Suite
 
 ## Overview
-Niri is an infinite horizontal scrollable tiling Wayland compositor. RatanaOS provides a native KDL configuration styled to match the RatanaOS macOS Sequoia visual identity.
+Niri is an infinite horizontal scrollable tiling Wayland compositor. RiOS provides a native KDL configuration styled to match the RiOS macOS Sequoia visual identity.
 
 ---
 

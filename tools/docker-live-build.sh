@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RatanaOS — Dockerized Debian Live-Build Runner
+# RiOS — Dockerized Debian Live-Build Runner
 # Provides a pure Debian Bookworm environment for live-build on any host.
 # ==============================================================================
 
@@ -8,8 +8,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
-LIVE_DIR="${ROOT_DIR}/ratanaos-live"
-IMAGE_NAME="ratanaos-live-builder"
+LIVE_DIR="${ROOT_DIR}/rios-live"
+IMAGE_NAME="rios-live-builder"
 
 mkdir -p "${LIVE_DIR}"
 mkdir -p "${ROOT_DIR}/build"
@@ -43,7 +43,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /workspace/ratanaos-live
+WORKDIR /workspace/rios-live
 DOCKEREOF
 }
 
@@ -52,7 +52,7 @@ run_in_container() {
         --privileged \
         --net=host \
         -v "${ROOT_DIR}:/workspace" \
-        -w /workspace/ratanaos-live \
+        -w /workspace/rios-live \
         "${IMAGE_NAME}" \
         "$@"
 }
@@ -62,7 +62,7 @@ run_in_container_non_interactive() {
         --privileged \
         --net=host \
         -v "${ROOT_DIR}:/workspace" \
-        -w /workspace/ratanaos-live \
+        -w /workspace/rios-live \
         "${IMAGE_NAME}" \
         "$@"
 }
@@ -80,8 +80,8 @@ case "${ACTION}" in
             --distribution bookworm \
             --archive-areas "main contrib non-free non-free-firmware" \
             --debian-installer none \
-            --iso-application "RatanaOS" \
-            --iso-volume "RatanaOS" \
+            --iso-application "RiOS" \
+            --iso-volume "RiOS" \
             --binary-images iso-hybrid \
             --bootloader syslinux,grub-efi
 
@@ -91,8 +91,8 @@ case "${ACTION}" in
         echo "==> Running live-build inside container..."
         run_in_container_non_interactive lb build
         if ls "${LIVE_DIR}"/*.iso 1>/dev/null 2>&1; then
-            cp "${LIVE_DIR}"/*.iso "${ROOT_DIR}/build/ratanaos-live-amd64.hybrid.iso"
-            echo "==> Live ISO generated at ${ROOT_DIR}/build/ratanaos-live-amd64.hybrid.iso"
+            cp "${LIVE_DIR}"/*.iso "${ROOT_DIR}/build/rios-live-amd64.hybrid.iso"
+            echo "==> Live ISO generated at ${ROOT_DIR}/build/rios-live-amd64.hybrid.iso"
         fi
         ;;
     clean)

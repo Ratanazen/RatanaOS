@@ -1,23 +1,23 @@
-# 📝 RatanaOS Changelog
+# 📝 RiOS Changelog
 
-All notable changes to the RatanaOS project are documented in this file.
+All notable changes to the RiOS project are documented in this file.
 
 ---
 
 ## [2.0.0] - 2026-09-09 — Major Architecture Pivot: Debian Live Remaster
 
 ### 🚀 Architecture Pivot (Supercedes Custom Microkernel)
-- Pivoted RatanaOS from a standalone educational microkernel prototype to a production-usable distribution based on **Debian GNU/Linux 12 ("Bookworm")**, following the architectural approach of Ubuntu, Pop!_OS, and elementary OS.
+- Pivoted RiOS from a standalone educational microkernel prototype to a production-usable distribution based on **Debian GNU/Linux 12 ("Bookworm")**, following the architectural approach of Ubuntu, Pop!_OS, and elementary OS.
 - Maintained `ID_LIKE=debian` in `/etc/os-release` to ensure zero functional gaps and complete compatibility with upstream Debian packages and APT repositories.
 - Preserved all original custom kernel code in `src/` and documented its architecture in `docs/LEGACY_KERNEL.md`.
 
 ### 🖥️ Desktop & Theming Layer (macOS Sequoia Experience)
 - Implemented **Option A**: XFCE4 + LightDM + Plank Dock as evaluated in `docs/DESKTOP_CHOICE.md`.
-- Exported kernel ARGB icon assets into complete multi-resolution FreeDesktop icon suites: `RatanaOS-WhiteSur` (Dark) and `RatanaOS-MacTahoe` (Light) spanning 16x16 up to 256x256.
-- Created `RatanaOS-Dark` and `RatanaOS-Light` XFWM/GTK themes with authentic traffic light window buttons (`#FF5F56`, `#FFBD2E`, `#27C93F`) on top left (`CHM|`).
+- Exported kernel ARGB icon assets into complete multi-resolution FreeDesktop icon suites: `RiOS-WhiteSur` (Dark) and `RiOS-MacTahoe` (Light) spanning 16x16 up to 256x256.
+- Created `RiOS-Dark` and `RiOS-Light` XFWM/GTK themes with authentic traffic light window buttons (`#FF5F56`, `#FFBD2E`, `#27C93F`) on top left (`CHM|`).
 - Configured 24px top panel with Apple menu (``), window title, system status tray, and clock (`MM/DD HH:MM`).
 - Configured floating centered Plank dock with 48px icons and magnification.
-- Created `ratanaos-theme-switch` script for instant dark/light mode toggling.
+- Created `rios-theme-switch` script for instant dark/light mode toggling.
 
 ### 🔌 Hardware Coverage & Drivers
 - Broad hardware support across Intel and AMD CPUs (`intel-microcode`, `amd64-microcode`).
@@ -27,7 +27,7 @@ All notable changes to the RatanaOS project are documented in this file.
 - Full printing support via CUPS and `printer-driver-all`.
 
 ### 📦 Installation & Boot Branding
-- Integrated Calamares Graphical Installer with RatanaOS branding and auto-partitioning.
+- Integrated Calamares Graphical Installer with RiOS branding and auto-partitioning.
 - Custom Plymouth boot splash theme with dark background and emblem.
 - Custom GRUB 2 theme matching system aesthetics.
 - Login screen theming via LightDM GTK Greeter.

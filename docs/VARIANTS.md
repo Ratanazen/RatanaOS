@@ -1,8 +1,8 @@
-# 📀 RatanaOS Image Variants (Phase 10)
+# 📀 RiOS Image Variants (Phase 10)
 
 ## Defined Variants
 
-### 1. `ratanaos-desktop` (Primary — Default Build)
+### 1. `rios-desktop` (Primary — Default Build)
 - **Audience**: End-users, developers, and designers.
 - **Includes**: Full XFCE4 desktop, Plank dock, macOS Sequoia theme layer,
   LightDM, Calamares installer, Firefox ESR, PipeWire audio, full hardware
@@ -11,7 +11,7 @@
 - **Build**: `make iso-desktop` (equivalent to `make live-iso`).
 - **Approximate Size**: ~2.5–3.5 GB (full live hybrid ISO).
 
-### 2. `ratanaos-minimal` (CLI-Only Base)
+### 2. `rios-minimal` (CLI-Only Base)
 - **Audience**: Server operators, container base images, VM appliances, and
   advanced users who want to build their own desktop stack.
 - **Includes**: Debian Bookworm base system, systemd, NetworkManager,
@@ -22,9 +22,9 @@
 - **Build**: `make iso-minimal`.
 - **Approximate Size**: ~600–900 MB.
 
-### 3. `ratanaos-server` (Headless Server)
+### 3. `rios-server` (Headless Server)
 - **Audience**: Web servers, development servers, self-hosted services.
-- **Includes**: Everything in `ratanaos-minimal` plus `openssh-server`
+- **Includes**: Everything in `rios-minimal` plus `openssh-server`
   (enabled by default), `ufw` (with default deny incoming), `nginx-light`,
   `fail2ban`, `unattended-upgrades`.
 - **Excludes**: All GUI packages.
@@ -45,7 +45,7 @@
 ---
 
 ## Current Scope Decision
-**Only `ratanaos-desktop` is actively built and tested.** The `minimal`
+**Only `rios-desktop` is actively built and tested.** The `minimal`
 and `server` variants are defined as future targets. Their build
 infrastructure (separate \`lb config\` profiles under \`config-minimal/\`
 and \`config-server/\`) will be created when explicitly requested.

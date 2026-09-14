@@ -1,4 +1,4 @@
-/* Linker script for RatanaOS 64-bit x86_64 kernel */
+/* Linker script for RiOS 64-bit x86_64 kernel */
 ENTRY(_start)
 
 SECTIONS

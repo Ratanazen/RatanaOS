@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RatanaOS Test Suite: Filesystem Format & Mount Module Validation
+# RiOS Test Suite: Filesystem Format & Mount Module Validation
 # ==============================================================================
 set -euo pipefail
 

@@ -1,4 +1,4 @@
-# RatanaOS Desktop Rice Specifications
+# RiOS Desktop Rice Specifications
 
 ## 1. Visual Identity
 - **Design Language**: Modern, Minimal, Frosted Glass, Rounded Corners, Soft Drop Shadows.

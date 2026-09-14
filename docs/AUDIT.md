@@ -1,4 +1,4 @@
-# RatanaOS Comprehensive System Audit
+# RiOS Comprehensive System Audit
 
 **Date**: September 9, 2026  
 **Target Architecture**: x86_64 (64-bit Long Mode)  
@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-RatanaOS is an independent native 64-bit x86_64 operating system featuring:
+RiOS is an independent native 64-bit x86_64 operating system featuring:
 - **Freestanding 64-bit Kernel**: Multiboot-compliant long-mode bootstrap, physical bitmap frame allocator, 4-level virtual memory manager (PML4/PDPT/PD/PT), preemptive round-robin scheduler, isolated Ring 3 userspace process spaces, and native ELF64 execution.
 - **Polymorphic VFS**: DevFS (`/dev/console`, `/dev/null`, `/dev/zero`, `/dev/random`, `/dev/tty`), ProcFS (`/proc/cpuinfo`, `/proc/meminfo`, `/proc/uptime`, `/proc/version`), in-kernel IPC FIFO pipes, ATA block storage driver, and read-only Ext2 driver.
 - **Hardware Subsystems**: PCI Configuration Space scanner, ACPI table parser (RSDP, RSDT, XSDT, MADT, FADT), Intel 82540EM / e1000 Gigabit Ethernet controller, CMOS RTC, PIT Timer, UART COM1, PS/2 Keyboard/Mouse, and PC Speaker.

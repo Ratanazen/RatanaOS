@@ -1,5 +1,5 @@
-#ifndef RATANAOS_ACPI_H
-#define RATANAOS_ACPI_H
+#ifndef RIOS_ACPI_H
+#define RIOS_ACPI_H
 
 #include "types.h"
 #include <stdbool.h>
@@ -139,4 +139,4 @@ uint8_t acpi_get_cpu_apic_id(int index);
 void acpi_poweroff(void);
 void acpi_reboot(void);
 
-#endif // RATANAOS_ACPI_H
+#endif // RIOS_ACPI_H

@@ -1,4 +1,4 @@
-# 🚀 RatanaOS Release Process (Phase 12)
+# 🚀 RiOS Release Process (Phase 12)
 
 This document specifies the exact steps from code change to tagged,
 checksummed, boot-tested ISO publication.
@@ -11,7 +11,7 @@ checksummed, boot-tested ISO publication.
 2. **Local Build**: Run \`make live-iso\` locally to verify the ISO builds
    without errors.
 3. **Local Boot Test**: Run \`make live-run\` and verify:
-   - Desktop boots to XFCE with RatanaOS theme.
+   - Desktop boots to XFCE with RiOS theme.
    - Network connectivity (DHCP).
    - Audio device visible (\`aplay -l\`).
    - Calamares installer launches.
@@ -46,16 +46,16 @@ Download the CI-built ISO artifact and test:
 \`\`\`bash
 # UEFI boot test
 qemu-system-x86_64 -bios /usr/share/OVMF/OVMF_CODE.fd \\
-  -cdrom ratanaos-live-amd64.hybrid.iso -m 2048 -smp 2
+  -cdrom rios-live-amd64.hybrid.iso -m 2048 -smp 2
 
 # BIOS boot test
 qemu-system-x86_64 \\
-  -cdrom ratanaos-live-amd64.hybrid.iso -m 2048 -smp 2
+  -cdrom rios-live-amd64.hybrid.iso -m 2048 -smp 2
 \`\`\`
 
 ### 4. Tag Release
 \`\`\`bash
-git tag -a v2.0.1 -m "RatanaOS 2.0.1 — Debian Bookworm desktop release"
+git tag -a v2.0.1 -m "RiOS 2.0.1 — Debian Bookworm desktop release"
 git push origin v2.0.1
 \`\`\`
 

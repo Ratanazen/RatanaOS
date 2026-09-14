@@ -1,6 +1,6 @@
 # 🐧 Linux Syscall Compatibility Status (Track C)
 
-This document tracks the implementation status of Linux x86_64 ABI and system call compatibility in the RatanaOS kernel.
+This document tracks the implementation status of Linux x86_64 ABI and system call compatibility in the RiOS kernel.
 
 ---
 
@@ -59,7 +59,7 @@ This document tracks the implementation status of Linux x86_64 ABI and system ca
 
 ## 🧪 Test Ladder Progress
 
-- [x] **Level 0**: Native RatanaOS freestanding kernel, VFS, and GUI.
+- [x] **Level 0**: Native RiOS freestanding kernel, VFS, and GUI.
 - [x] **Level 1**: Debian Dual Boot & ISO integration.
 - [x] **Level 2**: Debian RootFS mounted at `/system/debian` and `/mnt/debian`.
 - [x] **Level 3**: Linux static ELF executable (write + exit) prints and terminates cleanly.

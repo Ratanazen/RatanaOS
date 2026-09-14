@@ -1,6 +1,6 @@
-# RatanaOS Installation Guide (Real PC & Virtual Machines)
+# RiOS Installation Guide (Real PC & Virtual Machines)
 
-This guide covers installing **RatanaOS 2026 (macOS Sequoia Edition)** onto a real computer (NVMe/SATA SSD or HDD) or virtual machine using either the Graphical Installer (Calamares) or the Terminal Installer (`ratana-installer`).
+This guide covers installing **RiOS 2026 (macOS Sequoia Edition)** onto a real computer (NVMe/SATA SSD or HDD) or virtual machine using either the Graphical Installer (Calamares) or the Terminal Installer (`ri-installer`).
 
 ---
 
@@ -20,35 +20,35 @@ This guide covers installing **RatanaOS 2026 (macOS Sequoia Edition)** onto a re
 
 1. Flash the hybrid ISO to a USB flash drive (>= 8GB) using `dd` or Rufus / balenaEtcher:
    ```bash
-   sudo dd if=ratanaos-live-amd64.hybrid.iso of=/dev/sdX bs=4M status=progress oflag=sync
+   sudo dd if=rios-live-amd64.hybrid.iso of=/dev/sdX bs=4M status=progress oflag=sync
    ```
 2. Insert the USB drive into your PC and boot into the Boot Selection menu (F12, F11, F8, or Option on Mac).
-3. Select **RatanaOS 2026 Live (macOS Sequoia Edition)** from the bootloader menu.
+3. Select **RiOS 2026 Live (macOS Sequoia Edition)** from the bootloader menu.
 
 ---
 
 ## 3. Method A: Graphical Installation (Calamares)
 
-1. Once the live desktop loads, click the **Install RatanaOS** icon on the desktop or dock.
+1. Once the live desktop loads, click the **Install RiOS** icon on the desktop or dock.
 2. Select your Language and Timezone.
 3. Choose your keyboard layout.
 4. **Partitions Screen**:
    - **Erase disk**: Automatically partitions the disk with a 512MB FAT32 EFI partition and ext4 root partition.
    - **Manual partitioning**: Allows custom root, home, and swap layouts.
-5. Enter your User Name and Password (default: `ratana`).
+5. Enter your User Name and Password (default: `ri`).
 6. Click **Install Now** and wait for the installer to finish.
 7. Click **Restart Now** and remove the Live USB medium when prompted.
 
 ---
 
-## 4. Method B: Terminal Installation (`ratana-installer`)
+## 4. Method B: Terminal Installation (`ri-installer`)
 
 If installing on headless hardware, serial console, or if you prefer a keyboard-driven TUI flow:
 
 1. Open a terminal (Super+Return or Kitty) or switch to TTY2 (`Ctrl+Alt+F2`).
 2. Execute:
    ```bash
-   sudo ratana-installer
+   sudo ri-installer
    ```
 3. The installer scans all block devices (strictly filtering out the live installer USB).
 4. Select your target disk number.

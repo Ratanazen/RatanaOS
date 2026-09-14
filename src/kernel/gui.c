@@ -214,7 +214,7 @@ static void draw_finder_content(window_t* win) {
     font_draw_text(cx + 14, cy + 90, "> Downloads", theme->text_primary, FONT_SIZE_REGULAR);
 
     font_draw_text(cx + 10, cy + 120, "Locations", theme->text_secondary, FONT_SIZE_SMALL);
-    font_draw_text(cx + 14, cy + 140, "[=] RatanaOS HD", theme->accent, FONT_SIZE_REGULAR);
+    font_draw_text(cx + 14, cy + 140, "[=] RiOS HD", theme->accent, FONT_SIZE_REGULAR);
 
     int rx = cx + sidebar_w + 14;
     gfx_draw_rect(cx + sidebar_w + 1, cy, cw - sidebar_w - 1, ch, theme->panel_bg);
@@ -246,7 +246,7 @@ static void draw_finder_content(window_t* win) {
     font_draw_text(rx + 236, cy + 124, "Settings", theme->text_primary, FONT_SIZE_REGULAR);
 
     gfx_draw_line(cx + sidebar_w, cy + ch - 24, cx + cw, cy + ch - 24, theme->border);
-    font_draw_text(rx, cy + ch - 18, "8 items, 256 MB available on RatanaOS HD", theme->text_secondary, FONT_SIZE_SMALL);
+    font_draw_text(rx, cy + ch - 18, "8 items, 256 MB available on RiOS HD", theme->text_secondary, FONT_SIZE_SMALL);
 }
 
 // -------------------------------------------------------------
@@ -331,14 +331,14 @@ static void draw_safari_content(window_t* win) {
     int url_w = cw - 120;
     gfx_draw_rounded_rect(cx + 50, cy + 6, url_w, 24, 12, theme->control_bg);
     gfx_draw_rounded_rect_outline(cx + 50, cy + 6, url_w, 24, 12, theme->control_border);
-    font_draw_text(cx + 64, cy + 10, "[*] https://ratanaos.org/developer/docs", theme->text_primary, FONT_SIZE_REGULAR);
+    font_draw_text(cx + 64, cy + 10, "[*] https://rios.org/developer/docs", theme->text_primary, FONT_SIZE_REGULAR);
 
     // Page Content Area
     gfx_draw_rect(cx, cy + 37, cw, ch - 37, theme->dark_mode ? 0x00141418 : 0x00FFFFFF);
 
     int px = cx + 24;
     int py = cy + 54;
-    font_draw_text(px, py, "Welcome to RatanaOS Safari", theme->accent, FONT_SIZE_LARGE);
+    font_draw_text(px, py, "Welcome to RiOS Safari", theme->accent, FONT_SIZE_LARGE);
     font_draw_text(px, py + 26, "The Next-Generation 64-bit Operating System Desktop.", theme->text_secondary, FONT_SIZE_REGULAR);
 
     // Feature Cards
@@ -370,14 +370,14 @@ static void draw_terminal_content(window_t* win) {
     int tx = cx + 8;
     int ty = cy + 8;
     font_draw_text(tx, ty, "Last login: Tue Sep 8 2026 on console", 0x008E8E93, FONT_SIZE_REGULAR);
-    font_draw_text(tx, ty + 18, "ratana@os-x86_64:~$ uname -a", 0x0030D158, FONT_SIZE_REGULAR);
-    font_draw_text(tx, ty + 36, "RatanaOS 15.4 x86_64 LongMode SMP 2026", 0x00FFFFFF, FONT_SIZE_REGULAR);
-    font_draw_text(tx, ty + 54, "ratana@os-x86_64:~$ fetch", 0x0030D158, FONT_SIZE_REGULAR);
-    font_draw_text(tx, ty + 72, "OS: RatanaOS 64-bit macOS Sequoia Edition", 0x005AC8FA, FONT_SIZE_REGULAR);
+    font_draw_text(tx, ty + 18, "ri@os-x86_64:~$ uname -a", 0x0030D158, FONT_SIZE_REGULAR);
+    font_draw_text(tx, ty + 36, "RiOS 15.4 x86_64 LongMode SMP 2026", 0x00FFFFFF, FONT_SIZE_REGULAR);
+    font_draw_text(tx, ty + 54, "ri@os-x86_64:~$ fetch", 0x0030D158, FONT_SIZE_REGULAR);
+    font_draw_text(tx, ty + 72, "OS: RiOS 64-bit macOS Sequoia Edition", 0x005AC8FA, FONT_SIZE_REGULAR);
     font_draw_text(tx, ty + 90, "Kernel: 4-Level Paging 2MB Huge Pages", 0x00FFFFFF, FONT_SIZE_REGULAR);
     font_draw_text(tx, ty + 108, "UI: Theme Engine + UI Design System Active", 0x00FFD60A, FONT_SIZE_REGULAR);
 
-    font_draw_text(tx, ty + 130, "ratana@os-x86_64:~$ _", 0x0030D158, FONT_SIZE_REGULAR);
+    font_draw_text(tx, ty + 130, "ri@os-x86_64:~$ _", 0x0030D158, FONT_SIZE_REGULAR);
 }
 
 // -------------------------------------------------------------
@@ -619,7 +619,7 @@ static void draw_notes_content(window_t* win) {
     int rx = cx + sidebar_w + 16;
     gfx_draw_rect(cx + sidebar_w + 1, cy, cw - sidebar_w - 1, ch, theme->panel_bg);
 
-    font_draw_text(rx, cy + 14, "RatanaOS Design System Notes", theme->text_primary, FONT_SIZE_LARGE);
+    font_draw_text(rx, cy + 14, "RiOS Design System Notes", theme->text_primary, FONT_SIZE_LARGE);
     font_draw_text(rx, cy + 42, "1. Centralized Theme Engine with Light/Dark/Auto presets.", theme->text_primary, FONT_SIZE_REGULAR);
     font_draw_text(rx, cy + 62, "2. Multi-scale Typography Subsystem (Small, Regular, Large, Title).", theme->text_primary, FONT_SIZE_REGULAR);
     font_draw_text(rx, cy + 82, "3. Global Integer UI Scaling (80%, 100%, 125%, 150%).", theme->text_primary, FONT_SIZE_REGULAR);
@@ -647,7 +647,7 @@ static void draw_music_content(window_t* win) {
 
     // Track Metadata
     int mx = ax + 140;
-    font_draw_text(mx, ay + 20, "RatanaOS Symphony in C", theme->text_primary, FONT_SIZE_LARGE);
+    font_draw_text(mx, ay + 20, "RiOS Symphony in C", theme->text_primary, FONT_SIZE_LARGE);
     font_draw_text(mx, ay + 48, "Developer Soundtrack - 64-bit Long Mode", theme->text_secondary, FONT_SIZE_REGULAR);
     font_draw_text(mx, ay + 68, "High-Resolution Audio Engine (44.1 kHz)", theme->accent, FONT_SIZE_SMALL);
 
@@ -790,7 +790,7 @@ static void draw_settings_content(window_t* win) {
         ui_segmented_draw(rx, cy + 90, 200, 22, fscale_btns, 4, fsc_idx, -1);
 
         font_draw_text(rx, cy + 122, "Live Typography Hierarchy Preview:", theme->text_secondary, FONT_SIZE_SMALL);
-        font_draw_text(rx, cy + 138, "Aa RatanaOS macOS Typography", theme->text_primary, font_get_active_size());
+        font_draw_text(rx, cy + 138, "Aa RiOS macOS Typography", theme->text_primary, font_get_active_size());
 
     } else if (settings_active_tab == 4) {
         // Tab 4: Windows (Window Style Engine)
@@ -830,7 +830,7 @@ static void draw_settings_content(window_t* win) {
         gfx_draw_circle(pw_x + 10, pw_y + 10, 4, COLOR_MAC_CLOSE);
         gfx_draw_circle(pw_x + 22, pw_y + 10, 4, COLOR_MAC_MIN);
         gfx_draw_circle(pw_x + 34, pw_y + 10, 4, COLOR_MAC_ZOOM);
-        font_draw_text(pw_x + 50, pw_y + 4, "RatanaOS Preview Window", theme->window_title_active, FONT_SIZE_SMALL);
+        font_draw_text(pw_x + 50, pw_y + 4, "RiOS Preview Window", theme->window_title_active, FONT_SIZE_SMALL);
 
     } else if (settings_active_tab == 5) {
         // Tab 5: Dock (Dock Style Engine)
@@ -922,14 +922,14 @@ static void draw_settings_content(window_t* win) {
 
     } else if (settings_active_tab == 8) {
         // Tab 8: About
-        ui_label_draw_header(rx, cy + 8, "About RatanaOS macOS Edition");
+        ui_label_draw_header(rx, cy + 8, "About RiOS macOS Edition");
         gfx_draw_line(rx, cy + 26, cx + cw - 16, cy + 26, theme->border);
 
-        font_draw_text(rx, cy + 34, "RatanaOS 64-bit Desktop Edition", theme->text_primary, FONT_SIZE_REGULAR);
+        font_draw_text(rx, cy + 34, "RiOS 64-bit Desktop Edition", theme->text_primary, FONT_SIZE_REGULAR);
         font_draw_text(rx, cy + 52, "Architecture: x86_64 Long Mode (4-Level PML4 Paging)", theme->text_secondary, FONT_SIZE_REGULAR);
         font_draw_text(rx, cy + 70, "Desktop:      macOS Sequoia Glass Theme Engine", theme->text_secondary, FONT_SIZE_REGULAR);
         font_draw_text(rx, cy + 88, "Icon Suite:   WhiteSur & MacTahoe 32-bit ARGB", theme->text_secondary, FONT_SIZE_REGULAR);
-        font_draw_text(rx, cy + 106, "Storage:      Persistent VFS (/etc/ratana/settings.conf)", theme->text_secondary, FONT_SIZE_REGULAR);
+        font_draw_text(rx, cy + 106, "Storage:      Persistent VFS (/etc/ri/settings.conf)", theme->text_secondary, FONT_SIZE_REGULAR);
         font_draw_text(rx, cy + 124, "Shell Tools:  theme, icons, settings, scale, font", theme->text_secondary, FONT_SIZE_REGULAR);
     }
 
@@ -1155,7 +1155,7 @@ static void draw_appstore_content(window_t* win) {
 
     gfx_draw_rect(cx, cy, cw, ch, theme->panel_bg);
 
-    font_draw_text(cx + 16, cy + 12, "Featured Applications for RatanaOS", theme->text_primary, FONT_SIZE_REGULAR);
+    font_draw_text(cx + 16, cy + 12, "Featured Applications for RiOS", theme->text_primary, FONT_SIZE_REGULAR);
 
     // 2 App Store Cards
     int card_w = (cw - 48) / 2;
@@ -1193,7 +1193,7 @@ static void draw_about_content(window_t* win) {
 
     // System Information Details
     int tx = cx + 86;
-    font_draw_text(tx, cy + 4, "RatanaOS Sequoia (2026 64-bit Edition)", theme->text_primary, FONT_SIZE_REGULAR);
+    font_draw_text(tx, cy + 4, "RiOS Sequoia (2026 64-bit Edition)", theme->text_primary, FONT_SIZE_REGULAR);
     font_draw_text(tx, cy + 22, "Version 15.4 (Build 2026.09)", theme->text_secondary, FONT_SIZE_SMALL);
 
     cpu_info_t cpu = cpuid_get_info();
@@ -1212,7 +1212,7 @@ static void draw_about_content(window_t* win) {
     strcpy(mem_line, "Memory:   256 MB RAM (16 MB Dynamic Heap)");
     font_draw_text(tx, ly + line_h * 2, mem_line, theme->text_primary, FONT_SIZE_SMALL);
 
-    font_draw_text(tx, ly + line_h * 3, "Startup:  RatanaOS HD (1024 MB Boot Volume)", theme->text_primary, FONT_SIZE_SMALL);
+    font_draw_text(tx, ly + line_h * 3, "Startup:  RiOS HD (1024 MB Boot Volume)", theme->text_primary, FONT_SIZE_SMALL);
     font_draw_text(tx, ly + line_h * 4, "Graphics: VBE 32-bit Linear Framebuffer (1024x768)", theme->text_primary, FONT_SIZE_SMALL);
     font_draw_text(tx, ly + line_h * 5, "Serial:   C02RTM2026X86", theme->text_secondary, FONT_SIZE_SMALL);
 
@@ -1232,14 +1232,14 @@ static void draw_telegram_content(window_t* win) {
     gfx_draw_rect(cx, cy, sidebar_w, ch, theme->sidebar_bg);
     font_draw_text(cx + 14, cy + 14, "Telegram", theme->text_primary, FONT_SIZE_LARGE);
     font_draw_text(cx + 14, cy + 48, "Saved Messages", theme->accent, FONT_SIZE_REGULAR);
-    font_draw_text(cx + 14, cy + 72, "RatanaOS Team", theme->text_primary, FONT_SIZE_REGULAR);
+    font_draw_text(cx + 14, cy + 72, "RiOS Team", theme->text_primary, FONT_SIZE_REGULAR);
     gfx_draw_rect(cx + sidebar_w, cy, cw - sidebar_w, ch, theme->panel_bg);
 
     int px = cx + sidebar_w + 18;
     font_draw_text(px, cy + 16, "Saved Messages", theme->text_primary, FONT_SIZE_LARGE);
     font_draw_text(px, cy + 42, "Telegram Demo — local-only preview", theme->text_secondary, FONT_SIZE_SMALL);
     gfx_draw_rounded_rect(px, cy + 76, cw - sidebar_w - 36, 44, 10, theme->control_bg);
-    font_draw_text(px + 12, cy + 88, "Welcome to Telegram on RatanaOS.", theme->text_primary, FONT_SIZE_REGULAR);
+    font_draw_text(px + 12, cy + 88, "Welcome to Telegram on RiOS.", theme->text_primary, FONT_SIZE_REGULAR);
     gfx_draw_rounded_rect(px + 64, cy + 132, cw - sidebar_w - 100, 44, 10, theme->accent);
     font_draw_text(px + 76, cy + 144, "This is a built-in demo app.", theme->text_on_accent, FONT_SIZE_REGULAR);
     gfx_draw_rounded_rect(px, cy + ch - 42, cw - sidebar_w - 36, 28, 10, theme->control_bg);
@@ -1264,10 +1264,10 @@ static void draw_macos_desktop(void) {
         int d_x = sw - d_size - 26;
         int step_y = d_size + (s->show_icon_labels ? 42 : 16);
 
-        // 2a. Drive Icon (RatanaOS HD)
+        // 2a. Drive Icon (RiOS HD)
         icon_draw_scaled(ICON_ID_DRIVE, d_x, 40, d_size);
         if (s->show_icon_labels) {
-            font_draw_text(sw - 88, 40 + d_size + 4, "RatanaOS HD", dt_col, FONT_SIZE_REGULAR);
+            font_draw_text(sw - 88, 40 + d_size + 4, "RiOS HD", dt_col, FONT_SIZE_REGULAR);
         }
 
         // 2b. Applications Folder
@@ -1378,7 +1378,7 @@ static void process_gui_events(void) {
         }
 
         // 3. Desktop Icons Click Testing
-        // 3a. RatanaOS HD
+        // 3a. RiOS HD
         if (mx >= sw - 88 && mx <= sw - 20 && my >= 40 && my <= 110) {
             show_window(0); // Finder
             prev_left_click = left_click;

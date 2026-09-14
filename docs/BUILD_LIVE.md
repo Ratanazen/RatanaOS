@@ -1,12 +1,12 @@
-# 🛠️ RatanaOS Live Distribution Build Guide
+# 🛠️ RiOS Live Distribution Build Guide
 
-This document explains the official **RatanaOS Debian Live Distribution** build system, its architecture, and configuration choices.
+This document explains the official **RiOS Debian Live Distribution** build system, its architecture, and configuration choices.
 
 ---
 
 ## 🏛️ System Architecture
 
-RatanaOS is built using Debian's standard `live-build` framework targeting **Debian 12 "Bookworm"** (64-bit amd64) with native Linux kernel 6.x and macOS Sequoia visual styling:
+RiOS is built using Debian's standard `live-build` framework targeting **Debian 12 "Bookworm"** (64-bit amd64) with native Linux kernel 6.x and macOS Sequoia visual styling:
 
 - **Upstream Base**: Debian GNU/Linux 12 (Bookworm)
 - **Init & Service Manager**: systemd
@@ -23,7 +23,7 @@ RatanaOS is built using Debian's standard `live-build` framework targeting **Deb
 ## 📂 Live-Build Tree Structure
 
 ```text
-ratanaos-live/
+rios-live/
 ├── auto/
 │   └── config                       # lb config automated parameters
 ├── config/
@@ -32,20 +32,20 @@ ratanaos-live/
 │   ├── chroot                       # Target chroot environment settings
 │   ├── common                       # Architecture and project metadata
 │   ├── package-lists/
-│   │   └── ratanaos.list.chroot     # Desktop, firmware, drivers, apps
+│   │   └── rios.list.chroot     # Desktop, firmware, drivers, apps
 │   ├── includes.chroot/             # Root filesystem overlay
 │   │   ├── etc/
-│   │   │   ├── os-release           # ID=ratanaos, ID_LIKE=debian
+│   │   │   ├── os-release           # ID=rios, ID_LIKE=debian
 │   │   │   ├── lightdm/             # Autologin configuration
 │   │   │   ├── calamares/           # Calamares installer configuration
 │   │   │   └── skel/.config/        # XFCE4, Plank, window manager presets
 │   │   └── usr/
-│   │       ├── local/bin/           # ratanaos-theme-switch script
+│   │       ├── local/bin/           # rios-theme-switch script
 │   │       ├── share/icons/         # WhiteSur and MacTahoe icon suites
-│   │       ├── share/themes/        # RatanaOS-Dark and RatanaOS-Light
+│   │       ├── share/themes/        # RiOS-Dark and RiOS-Light
 │   │       └── share/plymouth/      # Boot splash theme
 │   └── includes.binary/
-│       └── boot/grub/themes/        # RatanaOS GRUB theme
+│       └── boot/grub/themes/        # RiOS GRUB theme
 ```
 
 ---
@@ -60,7 +60,7 @@ ratanaos-live/
 3. **PipeWire & WirePlumber**:
    - Replaces legacy PulseAudio with PipeWire and WirePlumber for low-latency modern audio and screen sharing.
 4. **Reproducible Containerized Build**:
-   - Uses `tools/docker-live-build.sh` to run `live-build` inside a pristine Debian Bookworm container (`ratanaos-live-builder`), avoiding host distribution contamination and sudo password requirements.
+   - Uses `tools/docker-live-build.sh` to run `live-build` inside a pristine Debian Bookworm container (`rios-live-builder`), avoiding host distribution contamination and sudo password requirements.
 
 ---
 
@@ -79,13 +79,13 @@ ratanaos-live/
 ```bash
 ./tools/docker-live-build.sh build
 ```
-The output hybrid ISO image will be generated at `build/ratanaos-live-amd64.hybrid.iso`.
+The output hybrid ISO image will be generated at `build/rios-live-amd64.hybrid.iso`.
 
 ### Step 3: Run & Test in QEMU
 ```bash
 make live-run
 # Or manually:
-qemu-system-x86_64 -cdrom build/ratanaos-live-amd64.hybrid.iso \
+qemu-system-x86_64 -cdrom build/rios-live-amd64.hybrid.iso \
   -m 2G -smp 2 -enable-kvm -net nic,model=virtio \
   -net user -vga virtio
 ```

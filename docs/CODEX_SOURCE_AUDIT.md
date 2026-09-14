@@ -1,11 +1,11 @@
-# RatanaOS Source Audit
+# RiOS Source Audit
 
 Audit date: 2026-09-09. This report is based on a read-only inspection of the
 repository before GUI feature changes.
 
 ## Repository structure
 
-RatanaOS is a freestanding C and NASM x86-64 kernel. `src/boot` contains the
+RiOS is a freestanding C and NASM x86-64 kernel. `src/boot` contains the
 Multiboot/long-mode entry and linker script; `src/kernel` contains kernel
 services and the desktop; `src/drivers` contains hardware and framebuffer
 drivers; `src/lib` supplies freestanding string/stdio routines. `build` holds
@@ -88,8 +88,8 @@ theme, icon, scale, font, dock, and settings commands.
 ## Build and linker architecture
 
 The Makefile compiles freestanding `-m64` C and ELF64 NASM objects, links with
-`ld -m elf_x86_64 -T src/boot/linker.ld`, and creates `build/ratanaos.bin`.
-It additionally creates `ratanaos32.bin` for QEMU's direct kernel loader.
+`ld -m elf_x86_64 -T src/boot/linker.ld`, and creates `build/rios.bin`.
+It additionally creates `rios32.bin` for QEMU's direct kernel loader.
 `make test` validates the Multiboot header, ELF metadata, sections, and key
 symbols. The linker places the Multiboot header in `.text` at 1 MiB and aligns
 major sections to 4 KiB. GRUB boots the ELF64 kernel via `multiboot`.

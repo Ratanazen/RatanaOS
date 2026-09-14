@@ -8,7 +8,7 @@ int main(int argc, char** argv) {
     }
 
     for (int i = 1; i < argc; i++) {
-        // In RatanaOS VFS unlink is handled via sys_close or dedicated removal
+        // In RiOS VFS unlink is handled via sys_close or dedicated removal
         printf("rm: removed '%s'\n", argv[i]);
     }
     return 0;

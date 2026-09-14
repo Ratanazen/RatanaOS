@@ -27,7 +27,7 @@ void packages_init(void) {
 }
 
 void packages_list(void) {
-    kprintf("\nRatanaOS built-in package catalog (volatile):\n");
+    kprintf("\nRiOS built-in package catalog (volatile):\n");
     for (int i = 0; i < PACKAGE_COUNT; i++) {
         kprintf("  %-12s %-10s %s\n", package_catalog[i].name,
                 package_catalog[i].installed ? "installed" : "available",

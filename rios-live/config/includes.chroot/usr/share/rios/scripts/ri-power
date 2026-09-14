@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# RiOS Power Menu
+# Fast, clean power actions dialog using Wofi / Rofi
+# ==============================================================================
+
+set -euo pipefail
+
+OPTIONS="  Lock\n󰤄  Suspend\n󰍃  Logout\n󰑐  Restart\n󰐥  Shutdown"
+
+if command -v wofi >/dev/null 2>&1; then
+    CHOICE=$(echo -e "$OPTIONS" | wofi --dmenu --prompt "Power Menu" --width 260 --height 240 --hide-scroll)
+elif command -v rofi >/dev/null 2>&1; then
+    CHOICE=$(echo -e "$OPTIONS" | rofi -dmenu -p "Power" -lines 5 -width 20)
+else
+    echo "No dmenu provider available." >&2
+    exit 1
+fi
+
+case "$CHOICE" in
+    *"Lock"*)
+        ri-lock
+        ;;
+    *"Suspend"*)
+        systemctl suspend
+        ;;
+    *"Logout"*)
+        loginctl terminate-user "$USER" || pkill -KILL -u "$USER"
+        ;;
+    *"Restart"*)
+        systemctl reboot
+        ;;
+    *"Shutdown"*)
+        systemctl poweroff
+        ;;
+esac

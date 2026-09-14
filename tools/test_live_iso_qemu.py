@@ -15,8 +15,8 @@ def send_qmp_command(sock, cmd):
     return res.decode()
 
 def main():
-    iso_path = '/home/reny/Documents/OS/build/ratanaos-live-amd64.hybrid.iso'
-    disk_path = '/tmp/ratanaos-target-disk.qcow2'
+    iso_path = '/home/reny/Documents/OS/build/rios-live-amd64.hybrid.iso'
+    disk_path = '/tmp/rios-target-disk.qcow2'
     qmp_sock = '/tmp/qmp_iso_test.sock'
     artifact_dir = '/home/reny/.gemini/antigravity/brain/8eabf34f-253b-46fe-aaeb-da6e420486c1'
 
@@ -37,7 +37,7 @@ def main():
         '-no-reboot'
     ]
 
-    print("[*] Launching QEMU with RatanaOS Live ISO...")
+    print("[*] Launching QEMU with RiOS Live ISO...")
     proc = subprocess.Popen(cmd)
     time.sleep(2)
 
@@ -61,7 +61,7 @@ def main():
         send_qmp_command(sock, {"execute": "human-monitor-command", "arguments": {"command-line": "sendkey meta_l"}})
         time.sleep(2)
 
-        send_qmp_command(sock, {"execute": "human-monitor-command", "arguments": {"command-line": "screendump /tmp/ratana_desktop_sequoia.ppm"}})
+        send_qmp_command(sock, {"execute": "human-monitor-command", "arguments": {"command-line": "screendump /tmp/ri_desktop_sequoia.ppm"}})
         print("[+] Captured active desktop screen.")
 
         sock.close()
@@ -73,8 +73,8 @@ def main():
         except:
             proc.kill()
 
-    ppm = '/tmp/ratana_desktop_sequoia.ppm'
-    png = f'{artifact_dir}/ratana_desktop_sequoia.png'
+    ppm = '/tmp/ri_desktop_sequoia.ppm'
+    png = f'{artifact_dir}/ri_desktop_sequoia.png'
     if os.path.exists(ppm):
         subprocess.run(['ffmpeg', '-y', '-i', ppm, png], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         if os.path.exists(png):

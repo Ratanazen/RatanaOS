@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=RiOS Terminal Installer
+GenericName=CLI Installer
+Comment=Install RiOS permanently to your drive via Terminal
+Exec=x-terminal-emulator -e sudo /usr/local/bin/ri-installer
+Icon=utilities-terminal
+Terminal=true
+Categories=System;
+StartupNotify=true

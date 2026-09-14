@@ -21,7 +21,7 @@ def test_themes():
 
     qemu_cmd = [
         'qemu-system-x86_64',
-        '-kernel', 'build/ratanaos32.bin',
+        '-kernel', 'build/rios32.bin',
         '-serial', 'pipe:/tmp/qemu_serial',
         '-vga', 'std',
         '-vnc', ':99',

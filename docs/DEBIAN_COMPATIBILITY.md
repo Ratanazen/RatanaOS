@@ -1,8 +1,8 @@
-# 📦 RatanaOS Debian Compatibility & Package Ecosystem
+# 📦 RiOS Debian Compatibility & Package Ecosystem
 
-RatanaOS provides dual packaging and compatibility pathways:
-1. **Native RatanaOS Packages (`.rpk`)**: Lightweight native binary archives managed by `ratapkg`.
-2. **Debian Package Import & Compatibility Layer (`.deb`)**: Static and dynamic binary analysis via `debimport` evaluating Debian packages against RatanaOS POSIX ABI shims.
+RiOS provides dual packaging and compatibility pathways:
+1. **Native RiOS Packages (`.rpk`)**: Lightweight native binary archives managed by `ratapkg`.
+2. **Debian Package Import & Compatibility Layer (`.deb`)**: Static and dynamic binary analysis via `debimport` evaluating Debian packages against RiOS POSIX ABI shims.
 
 ---
 
@@ -28,7 +28,7 @@ RatanaOS provides dual packaging and compatibility pathways:
 ratapkg list
 ratapkg install textedit.rpk
 ratapkg search editor
-ratapkg info ratana-gui
+ratapkg info ri-gui
 ```
 
 ### Debian Package Analyzer (`/bin/debimport`)

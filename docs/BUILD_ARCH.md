@@ -1,13 +1,13 @@
-# RatanaOS — Arch Linux Build and Setup Guide
+# RiOS — Arch Linux Build and Setup Guide
 
 ## 1. Overview
-This guide provides the official instructions for building, testing, and debugging **RatanaOS x86_64** on **Arch Linux** and Arch-based distributions (EndeavourOS, Garuda Linux, Manjaro).
+This guide provides the official instructions for building, testing, and debugging **RiOS x86_64** on **Arch Linux** and Arch-based distributions (EndeavourOS, Garuda Linux, Manjaro).
 
 ---
 
 ## 2. Arch Linux Dependencies
 
-RatanaOS requires a standard freestanding x86_64 toolchain, the NASM assembler, GRUB boot utilities, xorriso for ISO creation, and QEMU for execution.
+RiOS requires a standard freestanding x86_64 toolchain, the NASM assembler, GRUB boot utilities, xorriso for ISO creation, and QEMU for execution.
 
 Install all required packages via `pacman`:
 
@@ -47,7 +47,7 @@ gdb --version
 
 ## 3. Toolchain & Compiler Requirements
 
-RatanaOS is compiled as a 64-bit freestanding OS (`-ffreestanding`).
+RiOS is compiled as a 64-bit freestanding OS (`-ffreestanding`).
 
 ### Compiler Configuration
 - **Native Host Toolchain**: The project is designed to build with standard Arch Linux `gcc` and `binutils` using the following architectural flags:
@@ -81,8 +81,8 @@ make clean
 make -j$(nproc)
 ```
 Outputs:
-- `build/ratanaos.bin` (Native 64-bit ELF kernel image)
-- `build/ratanaos32.bin` (32-bit Multiboot conversion for legacy loaders)
+- `build/rios.bin` (Native 64-bit ELF kernel image)
+- `build/rios32.bin` (32-bit Multiboot conversion for legacy loaders)
 - `build/*.elf` (27 freestanding userland binaries)
 
 ### Build Bootable ISO
@@ -90,7 +90,7 @@ Outputs:
 make iso
 ```
 Output:
-- `build/ratanaos.iso` (Hybrid bootable ISO with GRUB Multiboot2/BIOS boot)
+- `build/rios.iso` (Hybrid bootable ISO with GRUB Multiboot2/BIOS boot)
 
 ### Run Unit Tests
 ```bash
@@ -107,17 +107,17 @@ Validates:
 
 ### Graphical Desktop Mode
 ```bash
-qemu-system-x86_64 -cdrom build/ratanaos.iso -hda disk.img -m 512M -vga std
+qemu-system-x86_64 -cdrom build/rios.iso -hda disk.img -m 512M -vga std
 ```
 
 ### Headless / Serial Console Mode
 ```bash
-qemu-system-x86_64 -cdrom build/ratanaos.iso -hda disk.img -m 512M -serial stdio -display none
+qemu-system-x86_64 -cdrom build/rios.iso -hda disk.img -m 512M -serial stdio -display none
 ```
 
 ### Networking Emulation (Intel e1000 NIC)
 ```bash
-qemu-system-x86_64 -cdrom build/ratanaos.iso -hda disk.img -m 512M -vga std \
+qemu-system-x86_64 -cdrom build/rios.iso -hda disk.img -m 512M -vga std \
     -net nic,model=e1000 -net user
 ```
 
@@ -129,11 +129,11 @@ To debug kernel startup or panic states using GDB:
 
 1. **Launch QEMU with GDB stub frozen at boot**:
    ```bash
-   qemu-system-x86_64 -cdrom build/ratanaos.iso -hda disk.img -m 512M -S -s
+   qemu-system-x86_64 -cdrom build/rios.iso -hda disk.img -m 512M -S -s
    ```
 2. **In a separate terminal, attach GDB**:
    ```bash
-   gdb build/ratanaos.bin
+   gdb build/rios.bin
    (gdb) target remote localhost:1234
    (gdb) break kernel_main
    (gdb) continue

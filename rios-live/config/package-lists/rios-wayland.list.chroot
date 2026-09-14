@@ -1,0 +1,23 @@
+# ==============================================================================
+# RiOS — Wayland Compositors (Hyprland + Sway)
+# ==============================================================================
+sway
+swaybg
+swaylock
+swayidle
+waybar
+wofi
+kitty
+foot
+mako-notifier
+grim
+slurp
+wl-clipboard
+wf-recorder
+policykit-1-gnome
+xdg-desktop-portal-wlr
+xdg-desktop-portal-gtk
+brightnessctl
+pamixer
+playerctl
+pavucontrol

@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RatanaOS Test Suite: Font Definitions & Configuration Validation
+# RiOS Test Suite: Font Definitions & Configuration Validation
 # ==============================================================================
 
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PKG_LIST="${ROOT_DIR}/ratanaos-live/config/package-lists/ratanaos-desktop.list.chroot"
+PKG_LIST="${ROOT_DIR}/rios-live/config/package-lists/rios-desktop.list.chroot"
 PKG_DESK="${ROOT_DIR}/packages/desktop.list"
 
 echo "==> Running Test: test-fonts.sh..."

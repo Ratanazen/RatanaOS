@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# RiOS Universal Lockscreen Wrapper
+# Intelligently uses hyprlock, swaylock-effects, or swaylock
+# ==============================================================================
+
+set -euo pipefail
+
+WALLPAPER="${HOME}/.config/ri/theme.conf"
+IMG="/usr/share/backgrounds/rios/rios-sequoia-dark.png"
+
+if [ -f "$WALLPAPER" ]; then
+    # shellcheck disable=SC1090
+    source "$WALLPAPER"
+    IMG="${RATANA_WALLPAPER:-$IMG}"
+fi
+
+if command -v hyprlock >/dev/null 2>&1 && pgrep -x Hyprland >/dev/null 2>&1; then
+    exec hyprlock
+elif command -v swaylock >/dev/null 2>&1; then
+    exec swaylock \
+        --screenshots \
+        --clock \
+        --indicator \
+        --indicator-radius 100 \
+        --indicator-thickness 7 \
+        --effect-blur 7x5 \
+        --effect-vignette 0.5:0.5 \
+        --ring-color 0a84ffff \
+        --key-hl-color 5ac8faff \
+        --line-color 00000000 \
+        --inside-color 16161ecc \
+        --separator-color 00000000 \
+        --grace 2 \
+        --fade-in 0.2
+else
+    loginctl lock-session
+fi

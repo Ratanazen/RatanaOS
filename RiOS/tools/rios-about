@@ -1,0 +1,39 @@
+#!/bin/bash
+# rios-about — About RiOS
+CYAN='\033[0;36m'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BOLD='\033[1m'
+DIM='\033[2m'
+NC='\033[0m'
+
+echo ""
+echo -e "${RED}  ██████╗  █████╗ ████████╗ █████╗ ███╗   ██╗ █████╗  ██████╗ ███████╗${NC}"
+echo -e "${RED}  ██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗████╗  ██║██╔══██╗██╔═══██╗██╔════╝${NC}"
+echo -e "${RED}  ██████╔╝███████║   ██║   ███████║██╔██╗ ██║███████║██║   ██║███████╗${NC}"
+echo -e "${RED}  ██╔══██╗██╔══██║   ██║   ██╔══██║██║╚██╗██║██╔══██║██║   ██║╚════██║${NC}"
+echo -e "${RED}  ██║  ██║██║  ██║   ██║   ██║  ██║██║ ╚████║██║  ██║╚██████╔╝███████║${NC}"
+echo -e "${RED}  ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝ ╚═════╝ ╚══════╝${NC}"
+echo ""
+echo -e "  ${BOLD}RiOS — Security & Server Operating System${NC}"
+echo -e "  ${DIM}Based on Debian GNU/Linux${NC}"
+echo ""
+echo -e "  ${CYAN}Version:${NC}      ${RIOS_VERSION:-1.0.0} (${RIOS_CODENAME:-Angkor})"
+echo -e "  ${CYAN}Edition:${NC}      Security & Server"
+echo -e "  ${CYAN}Architecture:${NC} $(uname -m)"
+echo -e "  ${CYAN}Kernel:${NC}       $(uname -r)"
+echo -e "  ${CYAN}Built on:${NC}     Debian $(cat /etc/debian_version 2>/dev/null || echo 'Bookworm')"
+echo ""
+echo -e "  ${BOLD}Built-in Security Arsenal:${NC}"
+echo -e "  ${GREEN}•${NC} rios-scan      Network scanner & port analysis"
+echo -e "  ${GREEN}•${NC} rios-exploit    Exploit framework & payload generator"
+echo -e "  ${GREEN}•${NC} rios-recon      OSINT & reconnaissance"
+echo -e "  ${GREEN}•${NC} rios-harden     Server hardening & audit"
+echo -e "  ${GREEN}•${NC} rios-forensics  Digital forensics toolkit"
+echo -e "  ${GREEN}•${NC} rios-crypto     Cryptography & steganography"
+echo -e "  ${GREEN}•${NC} rios-network    Network analysis & monitoring"
+echo -e "  ${GREEN}•${NC} ratapkg             Package manager with arsenal"
+echo ""
+echo -e "  ${CYAN}Website:${NC}  https://rios.org"
+echo -e "  ${CYAN}License:${NC}  GPL-3.0"
+echo ""

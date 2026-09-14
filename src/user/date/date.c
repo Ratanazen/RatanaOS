@@ -9,7 +9,7 @@ int main(void) {
         close(fd);
         if (n > 0) {
             buf[n] = '\0';
-            printf("RatanaOS System Time: 2026-09-09 (uptime: %s)", buf);
+            printf("RiOS System Time: 2026-09-09 (uptime: %s)", buf);
             return 0;
         }
     }

@@ -1,0 +1,9 @@
+# RiOS GRUB Configuration for Installed System
+GRUB_DEFAULT=0
+GRUB_TIMEOUT=5
+GRUB_DISTRIBUTOR="RiOS"
+GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
+GRUB_CMDLINE_LINUX=""
+GRUB_DISABLE_OS_PROBER=false
+GRUB_THEME="/boot/grub/themes/rios/theme.txt"
+GRUB_GFXMODE="auto"

@@ -1,6 +1,6 @@
-# RatanaOS — Build Troubleshooting Guide
+# RiOS — Build Troubleshooting Guide
 
-This guide covers common compilation, linking, ISO generation, and virtualization issues encountered when building **RatanaOS** on Linux host systems.
+This guide covers common compilation, linking, ISO generation, and virtualization issues encountered when building **RiOS** on Linux host systems.
 
 ---
 
@@ -59,7 +59,7 @@ This guide covers common compilation, linking, ISO generation, and virtualizatio
 - **Cause**: QEMU started without a graphical display driver that supports VESA/VBE modes.
 - **Solution**: Run QEMU with `-vga std` (standard VESA BIOS Extensions):
   ```bash
-  qemu-system-x86_64 -cdrom build/ratanaos.iso -m 512M -vga std
+  qemu-system-x86_64 -cdrom build/rios.iso -m 512M -vga std
   ```
 
 ### Mouse Cursor Out of Sync

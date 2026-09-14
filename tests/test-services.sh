@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RatanaOS Test Suite: Wayland Sessions & Desktop Services Validation
+# RiOS Test Suite: Wayland Sessions & Desktop Services Validation
 # ==============================================================================
 
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SESSIONS_DIR="${ROOT_DIR}/ratanaos-live/config/includes.chroot/usr/share/wayland-sessions"
+SESSIONS_DIR="${ROOT_DIR}/rios-live/config/includes.chroot/usr/share/wayland-sessions"
 
 echo "==> Running Test: test-services.sh..."
 
@@ -15,7 +15,7 @@ if [ ! -d "$SESSIONS_DIR" ]; then
     exit 1
 fi
 
-REQUIRED_SESSIONS=("ratanaos-hyprland.desktop" "ratanaos-niri.desktop" "ratanaos-sway.desktop")
+REQUIRED_SESSIONS=("rios-hyprland.desktop" "rios-sway.desktop")
 
 for session in "${REQUIRED_SESSIONS[@]}"; do
     FILE="${SESSIONS_DIR}/${session}"
@@ -31,16 +31,14 @@ done
 
 # Verify helper tools are present and executable in scripts/
 REQUIRED_SCRIPTS=(
-    "ratana-theme"
-    "ratana-launcher"
-    "ratana-wallpaper"
-    "ratana-lock"
-    "ratana-power"
-    "ratana-screenshot"
-    "ratana-performance"
-    "ratana-monitor"
-    "ratana-first-run"
-    "ratana-doctor"
+    "ri-launcher"
+    "ri-lock"
+    "ri-power"
+    "ri-screenshot"
+    "ri-performance"
+    "ri-monitor"
+    "ri-first-run"
+    "ri-doctor"
 )
 
 for s in "${REQUIRED_SCRIPTS[@]}"; do

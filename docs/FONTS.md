@@ -1,8 +1,8 @@
-# RatanaOS — Typography and Font System Specification
+# RiOS — Typography and Font System Specification
 
 ## 1. Overview
 
-RatanaOS implements an Apple-inspired typography engine (`src/kernel/font.c`, `src/include/font.h`) designed for high legibility across varying display densities. The system defines semantic typographical roles, multi-factor scaling (80% to 150%), and sub-pixel glyph alignment.
+RiOS implements an Apple-inspired typography engine (`src/kernel/font.c`, `src/include/font.h`) designed for high legibility across varying display densities. The system defines semantic typographical roles, multi-factor scaling (80% to 150%), and sub-pixel glyph alignment.
 
 ---
 

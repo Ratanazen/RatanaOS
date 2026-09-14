@@ -1,0 +1,63 @@
+# ==============================================================================
+# RiOS Cybersecurity & Hacking Suite
+# ==============================================================================
+
+# Network scanning & enumeration
+nmap
+masscan
+netcat-openbsd
+dnsutils
+whois
+traceroute
+tcpdump
+tshark
+wireshark
+net-tools
+arp-scan
+nbtscan
+hping3
+
+# Wireless / Wi-Fi
+aircrack-ng
+reaver
+kismet
+
+# Password cracking
+john
+hydra
+medusa
+crunch
+
+# Web security
+nikto
+dirb
+sqlmap
+
+# Forensics & reversing
+binwalk
+foremost
+radare2
+gdb
+strace
+ltrace
+hexedit
+
+# Sniffing & MITM
+ettercap-text-only
+dsniff
+mitmproxy
+
+# Vulnerability assessment
+lynis
+
+# Enumeration
+smbclient
+ldap-utils
+
+# Crypto & steganography
+steghide
+
+# Tunneling & pivoting
+proxychains4
+socat
+stunnel4

@@ -1,8 +1,8 @@
-# RatanaOS — Window Decoration and Styling Specification
+# RiOS — Window Decoration and Styling Specification
 
 ## 1. Overview
 
-The RatanaOS Window Manager supports configurable window decoration styles, edge curvature, drop shadow depth, and surface opacity. Users can choose between authentic macOS Sequoia rounded glass, classic boxed frames, borderless minimal windows, and translucent acrylic panes.
+The RiOS Window Manager supports configurable window decoration styles, edge curvature, drop shadow depth, and surface opacity. Users can choose between authentic macOS Sequoia rounded glass, classic boxed frames, borderless minimal windows, and translucent acrylic panes.
 
 ---
 

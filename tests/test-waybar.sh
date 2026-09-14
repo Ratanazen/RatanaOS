@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RatanaOS Test Suite: Waybar Layouts Validation
+# RiOS Test Suite: Waybar Layouts Validation
 # ==============================================================================
 
 set -euo pipefail

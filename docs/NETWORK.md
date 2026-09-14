@@ -1,6 +1,6 @@
-# 🌐 RatanaOS Network Stack & Driver Architecture
+# 🌐 RiOS Network Stack & Driver Architecture
 
-RatanaOS includes a native networking subsystem and hardware driver for Intel Gigabit Ethernet (e1000) PCI network adapters.
+RiOS includes a native networking subsystem and hardware driver for Intel Gigabit Ethernet (e1000) PCI network adapters.
 
 ---
 

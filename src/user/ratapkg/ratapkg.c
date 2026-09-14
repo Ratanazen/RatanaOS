@@ -4,10 +4,10 @@
 #include <unistd.h>
 
 static void print_usage(void) {
-    printf("RatanaOS Native Package Manager (ratapkg) v1.0.0\n");
+    printf("RiOS Native Package Manager (ratapkg) v1.0.0\n");
     printf("Usage: ratapkg <command> [arguments]\n\n");
     printf("Commands:\n");
-    printf("  install <pkg.rpk>   Install a native RatanaOS package\n");
+    printf("  install <pkg.rpk>   Install a native RiOS package\n");
     printf("  remove  <name>      Remove an installed package\n");
     printf("  list                List all installed packages\n");
     printf("  search  <query>     Search available repositories\n");
@@ -24,9 +24,9 @@ int main(int argc, char** argv) {
     const char* cmd = argv[1];
 
     if (strcmp(cmd, "list") == 0) {
-        printf("Installed RatanaOS Packages (.rpk):\n");
+        printf("Installed RiOS Packages (.rpk):\n");
         printf("  [RPK] base-system      v1.0.0-macos-sequoia  (Native x86_64 Core System)\n");
-        printf("  [RPK] ratana-gui       v1.0.0-sequoia        (macOS Sequoia Desktop & Dock)\n");
+        printf("  [RPK] ri-gui       v1.0.0-sequoia        (macOS Sequoia Desktop & Dock)\n");
         printf("  [RPK] coreutils        v1.0.0-native         (Basic UNIX-like Utilities)\n");
         printf("  [RPK] ratapkg          v1.0.0                (Package Management Subsystem)\n");
         printf("  [RPK] net-tools        v0.8.0                (Networking & Socket Stack)\n");
@@ -73,14 +73,14 @@ int main(int argc, char** argv) {
         }
         printf("Package: %s\n", argv[2]);
         printf("Architecture: x86_64\n");
-        printf("Format: Native RatanaOS Package (.rpk)\n");
-        printf("Maintainer: RatanaOS Core Team <support@ratanaos.org>\n");
+        printf("Format: Native RiOS Package (.rpk)\n");
+        printf("Maintainer: RiOS Core Team <support@rios.org>\n");
         printf("Status: Verified & Signed\n");
         return 0;
     }
 
     if (strcmp(cmd, "update") == 0) {
-        printf("[ratapkg] Fetching package index from pkg.ratanaos.org...\n");
+        printf("[ratapkg] Fetching package index from pkg.rios.org...\n");
         printf("[ratapkg] 148 packages indexed. Cache updated.\n");
         return 0;
     }

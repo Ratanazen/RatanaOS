@@ -1,6 +1,6 @@
-# 🗺️ RatanaOS Development Roadmap
+# 🗺️ RiOS Development Roadmap
 
-RatanaOS is an independent, standalone 64-bit desktop operating system developed for x86-64 hardware with host builds on Debian Linux.
+RiOS is an independent, standalone 64-bit desktop operating system developed for x86-64 hardware with host builds on Debian Linux.
 
 ---
 
@@ -67,11 +67,11 @@ RatanaOS is an independent, standalone 64-bit desktop operating system developed
 
 ### Phase 8: System Settings & Config Persistence
 - Tabbed System Settings application (Appearance, Desktop, System, Security, About).
-- Persistent configuration storage (`/etc/ratana/settings.conf`).
+- Persistent configuration storage (`/etc/ri/settings.conf`).
 
 ### Phase 9: Shell & Core Services
 - Interactive shell (`/bin/sh`) with builtins (`cd`, `pwd`, `ls`, `cat`, `echo`, `ps`, `mem`, `uname`, `theme`, `icons`).
-- System services daemon suite (`ratanaos-health`, `ratanaos-firstboot`).
+- System services daemon suite (`rios-health`, `rios-firstboot`).
 
 ### Phase 10: Built-in Desktop Applications
 - Terminal emulator (`/bin/sh`).
@@ -84,5 +84,5 @@ RatanaOS is an independent, standalone 64-bit desktop operating system developed
 
 ### Phase 12: Performance, Hardening & Security
 - Kernel panic diagnostics with register dump (RIP, RSP, CR2, Exception code).
-- System security hardening tools (`ratanaos-harden`, `ratanaos-forensics`, `ratanaos-recon`).
+- System security hardening tools (`rios-harden`, `rios-forensics`, `rios-recon`).
 - Full automated test suite (`make test-all`).

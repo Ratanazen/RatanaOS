@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# RiOS Master First-Boot System Provisioner (Stage B — Internal Disk First Boot)
+# Runs once on the installed machine to configure hardware, performance, and services.
+# ==============================================================================
+set -euo pipefail
+
+FLAG_FILE="/var/lib/rios/.first-boot-done"
+LOG_FILE="/var/log/rios/first-boot.log"
+
+mkdir -p /var/lib/rios /var/log/rios
+exec >> "$LOG_FILE" 2>&1
+
+echo "=========================================================="
+echo " RiOS First-Boot Hardware & System Provisioning"
+echo " Timestamp: $(date -u)"
+echo "=========================================================="
+
+if [ -f "$FLAG_FILE" ]; then
+    echo "First boot has already been completed. Exiting."
+    exit 0
+fi
+
+# 1. Detect Hardware & GPU
+echo "[1/5] Detecting hardware components..."
+TOTAL_RAM_MB=$(free -m | awk '/^Mem:/ {print $2}')
+GPU_VENDOR="generic"
+if command -v lspci >/dev/null 2>&1; then
+    if lspci | grep -iE 'vga|3d' | grep -iq nvidia; then
+        GPU_VENDOR="nvidia"
+    elif lspci | grep -iE 'vga|3d' | grep -iq amd; then
+        GPU_VENDOR="amd"
+    elif lspci | grep -iE 'vga|3d' | grep -iq intel; then
+        GPU_VENDOR="intel"
+    fi
+fi
+echo "Hardware detected: GPU=${GPU_VENDOR}, RAM=${TOTAL_RAM_MB}MB"
+
+# 2. Configure Performance Profile
+echo "[2/5] Applying hardware-tailored performance profile..."
+if [ "$TOTAL_RAM_MB" -lt 4000 ]; then
+    /usr/local/bin/ri-performance low || true
+elif [ "$TOTAL_RAM_MB" -gt 15000 ] && [ "$GPU_VENDOR" != "generic" ]; then
+    /usr/local/bin/ri-performance beautiful || true
+else
+    /usr/local/bin/ri-performance balanced || true
+fi
+
+# 3. Apply System Default Theme
+echo "[3/5] Applying default system theme (ri-dark)..."
+/usr/local/bin/ri-theme dark || true
+
+# 4. Refresh Font Cache
+echo "[4/5] Refreshing typography caches..."
+fc-cache -f >/dev/null 2>&1 || true
+
+# 5. Fix permissions for users in /home
+echo "[5/5] Ensuring user skeleton permissions..."
+for user_dir in /home/*; do
+    if [ -d "$user_dir" ]; then
+        user_name=$(basename "$user_dir")
+        if id "$user_name" >/dev/null 2>&1; then
+            chown -R "${user_name}:${user_name}" "$user_dir" 2>/dev/null || true
+        fi
+    fi
+done
+
+# Mark complete and self-disable
+touch "$FLAG_FILE"
+echo "First-boot setup successfully finished."
+systemctl disable ri-first-boot.service >/dev/null 2>&1 || true

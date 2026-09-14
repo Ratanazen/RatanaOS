@@ -1,8 +1,8 @@
-# RatanaOS — Global UI Scaling Engine Specification
+# RiOS — Global UI Scaling Engine Specification
 
 ## 1. Overview & Architecture
 
-RatanaOS provides a centralized UI scaling engine designed for HiDPI displays (4K/Retina panels) and accessibility zoom. The scaling engine bridges **logical coordinates** (developer coordinates) with **physical framebuffer pixels** seamlessly.
+RiOS provides a centralized UI scaling engine designed for HiDPI displays (4K/Retina panels) and accessibility zoom. The scaling engine bridges **logical coordinates** (developer coordinates) with **physical framebuffer pixels** seamlessly.
 
 ```text
 Logical Layout (e.g., 1024x768 @ 1.0x)

@@ -11,18 +11,18 @@ hello_dyn
 debian-test-rootfs/
 *.py
 !tools/*.py
-iso/ratana/
+iso/ri/
 iso/system/
 iso/debian/
-ratanaos-live/.build/
-ratanaos-live/chroot/
-ratanaos-live/binary/
-ratanaos-live/cache/
-ratanaos-live/local/
-ratanaos-live/*.iso
-ratanaos-live/live-image-amd64.*
-ratanaos-live/binary.*
-ratanaos-live/chroot.*
+rios-live/.build/
+rios-live/chroot/
+rios-live/binary/
+rios-live/cache/
+rios-live/local/
+rios-live/*.iso
+rios-live/live-image-amd64.*
+rios-live/binary.*
+rios-live/chroot.*
 *.zsync
 
 

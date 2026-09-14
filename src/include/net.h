@@ -1,5 +1,5 @@
-#ifndef RATANAOS_NET_H
-#define RATANAOS_NET_H
+#ifndef RIOS_NET_H
+#define RIOS_NET_H
 
 #include "types.h"
 #include <stdbool.h>
@@ -118,4 +118,4 @@ const uint8_t* e1000_get_mac(void);
 void e1000_send_packet(const uint8_t* data, uint16_t len);
 void e1000_poll_rx(void);
 
-#endif // RATANAOS_NET_H
+#endif // RIOS_NET_H

@@ -1,4 +1,4 @@
-# RatanaOS Sway Desktop Suite
+# RiOS Sway Desktop Suite
 
 ## Overview
 Sway provides a lightweight, i3-compatible tiling Wayland compositor ideal for battery efficiency, low-RAM machines, and minimalist workflows.

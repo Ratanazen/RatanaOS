@@ -177,7 +177,7 @@ static int proc_uptime_read(vfs_node_t* node, uint32_t offset, uint32_t size, ui
 static int proc_version_read(vfs_node_t* node, uint32_t offset, uint32_t size, uint8_t* buffer) {
     (void)node;
     if (!buffer) return -1;
-    const char* ver = "RatanaOS version 1.0.0-macos-sequoia (x86_64 freestanding kernel, build 2026.09)\n";
+    const char* ver = "RiOS version 1.0.0-macos-sequoia (x86_64 freestanding kernel, build 2026.09)\n";
     uint32_t len = strlen(ver);
     if (offset >= len) return 0;
     uint32_t to_copy = size;

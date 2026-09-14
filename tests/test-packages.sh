@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RatanaOS Test Suite: Package Lists Validation
+# RiOS Test Suite: Package Lists Validation
 # ==============================================================================
 
 set -euo pipefail
@@ -10,7 +10,7 @@ PKG_DIR="${ROOT_DIR}/packages"
 
 echo "==> Running Test: test-packages.sh..."
 
-REQUIRED_LISTS=("common.list" "hyprland.list" "niri.list" "sway.list" "desktop.list" "optional.list")
+REQUIRED_LISTS=("cyber.list" "dev.list" "server.list" "hyprland.list" "sway.list" "desktop.list" "common.list" "installer.list" "fonts.list")
 
 for list in "${REQUIRED_LISTS[@]}"; do
     FILE="${PKG_DIR}/${list}"
@@ -28,3 +28,4 @@ for list in "${REQUIRED_LISTS[@]}"; do
 done
 
 echo "✅ All Package List tests PASSED."
+

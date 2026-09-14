@@ -1,0 +1,13 @@
+[Unit]
+Description=RiOS First Boot Configuration
+ConditionPathExists=!/var/lib/rios/firstboot-done
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/rios-firstboot
+ExecStartPost=/bin/touch /var/lib/rios/firstboot-done
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

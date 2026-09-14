@@ -1,0 +1,29 @@
+---
+componentName:  rios
+welcomeStyleCalamares:   false
+welcomeExpandingLogo:    true
+windowExpanding:    normal
+windowSize: 800px,520px
+windowPlacement: center
+
+strings:
+    productName:         "RiOS"
+    shortProductName:    "RiOS"
+    version:             "1.0 (macOS Sequoia 2026 Edition)"
+    shortVersion:        "1.0"
+    versionedName:       "RiOS 1.0 (macOS Sequoia 2026 Edition)"
+    shortVersionedName:  "RiOS 1.0"
+    bootloaderEntryName: "RiOS"
+    productUrl:          "https://github.com/Rizen/RiOS"
+    supportUrl:          "https://github.com/Rizen/RiOS/issues"
+    releaseNotesUrl:     "https://github.com/Rizen/RiOS"
+
+images:
+    productLogo:         "squid.png"
+    productIcon:         "squid.png"
+    productWelcome:      "squid.png"
+
+style:
+   SidebarBackground:    "#1E1E1E"
+   SidebarText:          "#FFFFFF"
+   SidebarTextSelect:    "#007AFF"

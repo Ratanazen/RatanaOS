@@ -7,7 +7,7 @@
 int main(int argc, char* argv[]) {
     (void)argc; (void)argv;
     printf("\n=========================================\n");
-    printf("   [INIT] RatanaOS Userspace /sbin/init  \n");
+    printf("   [INIT] RiOS Userspace /sbin/init  \n");
     printf("=========================================\n");
 
     struct utsname u;

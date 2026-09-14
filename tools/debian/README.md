@@ -1,6 +1,6 @@
-# 🐧 RatanaOS Debian Live-Build Environment
+# 🐧 RiOS Debian Live-Build Environment
 
-This directory contains the Debian tooling and configuration used to build a clean **Debian GNU/Linux 13 "Trixie" (amd64)** root filesystem and live image for RatanaOS integration.
+This directory contains the Debian tooling and configuration used to build a clean **Debian GNU/Linux 13 "Trixie" (amd64)** root filesystem and live image for RiOS integration.
 
 ---
 
@@ -20,9 +20,9 @@ tools/debian/
 
 ## 🛠️ Build Pipeline
 
-The Debian userspace build process is managed by `tools/ratana-debian-build.sh`:
+The Debian userspace build process is managed by `tools/ri-debian-build.sh`:
 
 1. **Verify Tooling**: Probes for `live-build` (`lb`) or `debootstrap`.
 2. **Build RootFS**: Generates minimal Debian 13 "Trixie" userspace files.
-3. **Package for RatanaOS**: Passes the filesystem tree to `tools/bake_debian_rootfs.py`.
+3. **Package for RiOS**: Passes the filesystem tree to `tools/bake_debian_rootfs.py`.
 4. **VFS Integration**: Compiles into `build/debian.img` and `src/kernel/fs/debian_data.c`, mounted at `/system/debian`.

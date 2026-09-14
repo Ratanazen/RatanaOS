@@ -356,9 +356,9 @@ static registers_t* do_syscall_dispatch(registers_t* regs) {
                 break;
             }
             strcpy(u->sysname, "Linux");
-            strcpy(u->nodename, "ratanaos");
-            strcpy(u->release, "6.6.0-ratana-x86_64");
-            strcpy(u->version, "#1 SMP RatanaOS 2026");
+            strcpy(u->nodename, "rios");
+            strcpy(u->release, "6.6.0-ri-x86_64");
+            strcpy(u->version, "#1 SMP RiOS 2026");
             strcpy(u->machine, "x86_64");
             regs->rax = 0;
             break;
@@ -565,7 +565,7 @@ extern uint64_t current_kernel_stack;
 
 void syscall_init(void) {
     register_interrupt_handler(0x80, syscall_handler_int80);
-    serial_printf("SYSCALL: Full RatanaOS ABI dispatcher registered on int 0x80\n");
+    serial_printf("SYSCALL: Full RiOS ABI dispatcher registered on int 0x80\n");
     
     // Setup x86_64 SYSCALL/SYSRET
     uint32_t eax, edx;

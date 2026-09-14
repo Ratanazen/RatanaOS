@@ -1,6 +1,6 @@
 # 📁 Track B — Embedded Debian Rootfs Architecture
 
-RatanaOS provides read-only VFS mounting for embedded **Debian GNU/Linux 12 (bookworm)** rootfs images under `/mnt/debian/`.
+RiOS provides read-only VFS mounting for embedded **Debian GNU/Linux 12 (bookworm)** rootfs images under `/mnt/debian/`.
 
 ---
 

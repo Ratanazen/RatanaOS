@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RatanaOS Test Suite: Bootloader & GRUB Configuration Validation
+# RiOS Test Suite: Bootloader & GRUB Configuration Validation
 # ==============================================================================
 set -euo pipefail
 
@@ -19,8 +19,8 @@ if ! bash -n "$BOOT_SCRIPT"; then
     exit 1
 fi
 
-if ! grep -q "RatanaOS" "$BOOT_SCRIPT" || ! grep -q "grub-install" "$BOOT_SCRIPT"; then
-    echo "FAIL: bootloader.sh does not reference RatanaOS or grub-install!" >&2
+if ! grep -q "RiOS" "$BOOT_SCRIPT" || ! grep -q "grub-install" "$BOOT_SCRIPT"; then
+    echo "FAIL: bootloader.sh does not reference RiOS or grub-install!" >&2
     exit 1
 fi
 

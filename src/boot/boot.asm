@@ -1,4 +1,4 @@
-; RatanaOS 64-bit (x86_64 Long Mode) Bootloader & Multiboot Entry
+; RiOS 64-bit (x86_64 Long Mode) Bootloader & Multiboot Entry
 [bits 32]
 
 MBALIGN     equ  1 << 0             ; align loaded modules on page boundaries

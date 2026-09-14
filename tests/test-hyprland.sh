@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RatanaOS Test Suite: Hyprland Modular Configuration Validation
+# RiOS Test Suite: Hyprland Modular Configuration Validation
 # ==============================================================================
 
 set -euo pipefail

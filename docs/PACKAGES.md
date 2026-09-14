@@ -1,6 +1,6 @@
 # Built-in Packages
 
-RatanaOS now has a small package-manager foundation for built-in applications.
+RiOS now has a small package-manager foundation for built-in applications.
 It is not compatible with Arch `pacman`, Debian `apt`, `.deb`, APK, Flatpak, or
 Linux binaries. Packages are compiled into the kernel and their installed state
 exists only for the current boot session.

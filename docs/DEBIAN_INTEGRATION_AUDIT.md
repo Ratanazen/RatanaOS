@@ -1,7 +1,7 @@
-# RatanaOS Debian Integration Audit
+# RiOS Debian Integration Audit
 
 ## 1. Overview
-This document serves as the architecture gap report for transforming RatanaOS into a Debian-compatible ecosystem while retaining its native x86_64 kernel.
+This document serves as the architecture gap report for transforming RiOS into a Debian-compatible ecosystem while retaining its native x86_64 kernel.
 
 ## 2. Component Audit
 
@@ -20,10 +20,10 @@ This document serves as the architecture gap report for transforming RatanaOS in
 | **Process Model** | Monolithic kernel thread | **NOT_IMPLEMENTED** | Create `process.c`, PID management, Context Switching, and Scheduler. |
 | **Syscalls** | None | **NOT_IMPLEMENTED** | Implement `syscall.c` (Ring 3 to Ring 0 ABI) starting with `fork`, `exec`, `write`. |
 | **Userspace** | None | **NOT_IMPLEMENTED** | Create `libc`, ELF Loader, and compile applications as standalone binaries. |
-| **Build System** | `Makefile` (Single binary `ratanaos.bin`) | **EXTEND** | Split into `make kernel`, `make libc`, `make userspace`, `make initramfs`. |
+| **Build System** | `Makefile` (Single binary `rios.bin`) | **EXTEND** | Split into `make kernel`, `make libc`, `make userspace`, `make initramfs`. |
 
 ## 3. Architecture Gap Summary
-Currently, RatanaOS is a "monolithic unikernel" where the GUI, Shell, and Applications run in Ring 0 along with the hardware drivers. To achieve Debian ecosystem compatibility, we must introduce a strict User/Kernel boundary (Ring 3 vs Ring 0).
+Currently, RiOS is a "monolithic unikernel" where the GUI, Shell, and Applications run in Ring 0 along with the hardware drivers. To achieve Debian ecosystem compatibility, we must introduce a strict User/Kernel boundary (Ring 3 vs Ring 0).
 
 **The immediate missing foundations are:**
 1. **Virtual Memory (Paging)**: To isolate processes.

@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-# RatanaOS Debian 13 (Trixie) Live-Build Auto Configuration
+# RiOS Debian 13 (Trixie) Live-Build Auto Configuration
 lb config noauto \
     --mode debian \
     --distribution trixie \

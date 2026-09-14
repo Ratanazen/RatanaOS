@@ -1,7 +1,0 @@
-[Desktop Entry]
-Name=RatanaOS Niri (Scrollable Rice)
-Comment=Infinite horizontal scrolling Wayland tiling compositor
-Exec=niri-session
-Type=Application
-DesktopNames=niri
-Keywords=wm;tiling;wayland;scrolling;ratana;

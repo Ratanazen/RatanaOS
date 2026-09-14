@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RatanaOS Fast Live-Build Engine (<10 Minutes Full Build)
+# RiOS Fast Live-Build Engine (<10 Minutes Full Build)
 # Features:
 #   - Zstandard (zstd -3) multi-threaded fast compression (10x faster than XZ)
 #   - Persistent local package & bootstrap caching
@@ -12,12 +12,12 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
-LIVE_DIR="${ROOT_DIR}/ratanaos-live"
-IMAGE_NAME="ratanaos-live-builder"
+LIVE_DIR="${ROOT_DIR}/rios-live"
+IMAGE_NAME="rios-live-builder"
 
 START_TIME=$(date +%s)
 echo "============================================================"
-echo " ⚡ RatanaOS Fast ISO Build Engine (Target: < 10 Minutes)"
+echo " ⚡ RiOS Fast ISO Build Engine (Target: < 10 Minutes)"
 echo "============================================================"
 
 # Ensure builder container exists
@@ -28,16 +28,16 @@ docker run --rm \
     --privileged \
     --net=host \
     -v "${ROOT_DIR}:/workspace" \
-    -w /workspace/ratanaos-live \
+    -w /workspace/rios-live \
     "${IMAGE_NAME}" \
     lb config noauto \
         --distribution bookworm \
         --archive-areas "main contrib non-free non-free-firmware" \
         --debian-installer none \
-        --iso-application "RatanaOS Live (macOS Sequoia Edition)" \
-        --iso-publisher "Ratanazen" \
-        --iso-volume "RATANAOS_LIVE" \
-        --bootappend-live "boot=live components username=ratana hostname=ratana user-fullname=\"Ratana\" quiet splash" \
+        --iso-application "RiOS Live (macOS Sequoia Edition)" \
+        --iso-publisher "Rizen" \
+        --iso-volume "RIOS_LIVE" \
+        --bootappend-live "boot=live components username=ri hostname=ri user-fullname=\"Ri\" quiet splash" \
         --linux-packages linux-image \
         --memtest none \
         --binary-images iso-hybrid \
@@ -54,7 +54,7 @@ docker run --rm \
 
 # Fix permissions
 docker run --rm -v "${ROOT_DIR}:/workspace" debian:bookworm-slim \
-    chown -R "$(id -u):$(id -g)" /workspace/ratanaos-live 2>/dev/null || true
+    chown -R "$(id -u):$(id -g)" /workspace/rios-live 2>/dev/null || true
 
 # Remove stale lock, binary output and stale binary markers if any
 rm -f "${LIVE_DIR}/.lock" "${LIVE_DIR}/chroot/.lock" "${LIVE_DIR}/binary/.lock" 2>/dev/null || true
@@ -66,19 +66,19 @@ docker run --rm \
     --privileged \
     --net=host \
     -v "${ROOT_DIR}:/workspace" \
-    -w /workspace/ratanaos-live \
+    -w /workspace/rios-live \
     "${IMAGE_NAME}" \
     lb build
 
 if ls "${LIVE_DIR}"/*.iso 1>/dev/null 2>&1; then
     mkdir -p "${ROOT_DIR}/build"
-    cp "${LIVE_DIR}"/*.iso "${ROOT_DIR}/build/ratanaos-live-amd64.hybrid.iso"
-    sha256sum "${ROOT_DIR}/build/ratanaos-live-amd64.hybrid.iso" > "${ROOT_DIR}/build/RatanaOS.iso.sha256"
+    cp "${LIVE_DIR}"/*.iso "${ROOT_DIR}/build/rios-live-amd64.hybrid.iso"
+    sha256sum "${ROOT_DIR}/build/rios-live-amd64.hybrid.iso" > "${ROOT_DIR}/build/RiOS.iso.sha256"
     END_TIME=$(date +%s)
     DIFF_TIME=$((END_TIME - START_TIME))
     echo "============================================================"
     echo " ✅ Full ISO Build Complete in ${DIFF_TIME} seconds ($((DIFF_TIME / 60)) min $((DIFF_TIME % 60)) sec)!"
-    echo " 📀 ISO:   ${ROOT_DIR}/build/ratanaos-live-amd64.hybrid.iso"
-    echo " 🔒 SHA:   $(cat ${ROOT_DIR}/build/RatanaOS.iso.sha256)"
+    echo " 📀 ISO:   ${ROOT_DIR}/build/rios-live-amd64.hybrid.iso"
+    echo " 🔒 SHA:   $(cat ${ROOT_DIR}/build/RiOS.iso.sha256)"
     echo "============================================================"
 fi

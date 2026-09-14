@@ -1,7 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=RatanaOS GNOME Setup
-Exec=/usr/local/bin/ratana-gnome-setup
-OnlyShowIn=GNOME;
-NoDisplay=true
-X-GNOME-Autostart-Phase=Initialization

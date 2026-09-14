@@ -1,4 +1,4 @@
-# RatanaOS — Production Debian-Based macOS Remaster
+# RiOS — Production Debian-Based macOS Remaster
 
 <div align="center">
 
@@ -17,14 +17,14 @@
 
 > [!NOTE]
 > **Architecture Transition (v2.0)**:
-> RatanaOS's earlier prototype was a custom x86_64 microkernel with a hand-built macOS-style GUI. That work is fully preserved in the repository as an educational/reference project and documented in [`docs/LEGACY_KERNEL.md`](docs/LEGACY_KERNEL.md).
+> RiOS's earlier prototype was a custom x86_64 microkernel with a hand-built macOS-style GUI. That work is fully preserved in the repository as an educational/reference project and documented in [`docs/LEGACY_KERNEL.md`](docs/LEGACY_KERNEL.md).
 >
 > The shipping distribution described in this README is built on the **Debian GNU/Linux 12 Bookworm** foundation (following the architectural model of Ubuntu, Pop!_OS, and elementary OS), delivering zero functional gaps vs stock Linux, full application compatibility, and rock-solid stability.
 
 ---
 
 ## 🧭 Table of Contents
-- [What is RatanaOS?](#-what-is-ratanaos)
+- [What is RiOS?](#-what-is-rios)
 - [Key Features](#-key-features)
 - [Getting Started](#-getting-started)
 - [Building from Source](#-building-from-source)
@@ -36,18 +36,18 @@
 
 ---
 
-## 🌟 What is RatanaOS?
+## 🌟 What is RiOS?
 
-RatanaOS is a refined Linux distribution crafted for developers, designers, and enthusiasts who appreciate the aesthetic elegance and desktop workflow of macOS, combined with the power, privacy, and extensive software ecosystem of Debian.
+RiOS is a refined Linux distribution crafted for developers, designers, and enthusiasts who appreciate the aesthetic elegance and desktop workflow of macOS, combined with the power, privacy, and extensive software ecosystem of Debian.
 
 ### Architectural Model
-Like Ubuntu, Pop!_OS, and Linux Mint, RatanaOS does not reimplement the Linux kernel or low-level userspace from scratch. Instead, it inherits:
+Like Ubuntu, Pop!_OS, and Linux Mint, RiOS does not reimplement the Linux kernel or low-level userspace from scratch. Instead, it inherits:
 - **Upstream Kernel**: Genuine Debian Bookworm Linux kernel 6.1 (x86_64)
 - **Service Management**: systemd & udev
 - **Package Management**: APT / dpkg (`ID_LIKE=debian` in `/etc/os-release`)
 - **Software Repository**: Over 60,000 official Debian packages (`main`, `contrib`, `non-free`, `non-free-firmware`)
 
-On top of this robust foundation, RatanaOS integrates a heavily customized desktop layer delivering macOS Sequoia aesthetics, traffic-light window controls, a floating bottom dock, and standard FreeDesktop icon suites.
+On top of this robust foundation, RiOS integrates a heavily customized desktop layer delivering macOS Sequoia aesthetics, traffic-light window controls, a floating bottom dock, and standard FreeDesktop icon suites.
 
 ---
 
@@ -57,7 +57,7 @@ On top of this robust foundation, RatanaOS integrates a heavily customized deskt
   - Top 24px global panel with Apple menu (``), window title, system indicators, and `MM/DD HH:MM` clock.
   - Floating centered bottom Plank dock with translucent glass effect and icon magnification on hover.
   - Traffic-light window controls (`#FF5F56` close, `#FFBD2E` minimize, `#27C93F` maximize) positioned on the top left (`CHM|`).
-  - Native `RatanaOS-WhiteSur` (Dark) and `RatanaOS-MacTahoe` (Light) FreeDesktop icon themes across all standard resolutions (16x16 up to 256x256).
+  - Native `RiOS-WhiteSur` (Dark) and `RiOS-MacTahoe` (Light) FreeDesktop icon themes across all standard resolutions (16x16 up to 256x256).
 - **Out-of-the-box Hardware Support**:
   - Full wireless & wired network firmware (`firmware-linux`, `firmware-realtek`, `firmware-iwlwifi`, `firmware-atheros`).
   - Intel, AMD, and Nouveau graphics with Mesa Vulkan and OpenGL acceleration.
@@ -73,16 +73,16 @@ On top of this robust foundation, RatanaOS integrates a heavily customized deskt
 ## 🚀 Getting Started
 
 ### 1. Download & Verify
-Download the latest `ratanaos-live-amd64.hybrid.iso` and verify its integrity:
+Download the latest `rios-live-amd64.hybrid.iso` and verify its integrity:
 ```bash
-sha256sum -c RatanaOS.iso.sha256
+sha256sum -c RiOS.iso.sha256
 ```
 
 ### 2. Boot in QEMU Virtual Machine
-To test RatanaOS immediately without touching physical storage:
+To test RiOS immediately without touching physical storage:
 ```bash
 qemu-system-x86_64 -m 2048 -smp 2 -enable-kvm \
-  -cdrom build/ratanaos-live-amd64.hybrid.iso \
+  -cdrom build/rios-live-amd64.hybrid.iso \
   -netdev user,id=net0 -device virtio-net-pci,netdev=net0 \
   -device virtio-vga -device intel-hda -device hda-duplex
 ```
@@ -94,14 +94,14 @@ make live-run
 ### 3. Flash to USB Drive
 Write the hybrid ISO directly to your USB thumb drive (replace `/dev/sdX` with your target drive):
 ```bash
-sudo dd if=build/ratanaos-live-amd64.hybrid.iso of=/dev/sdX bs=4M status=progress oflag=sync
+sudo dd if=build/rios-live-amd64.hybrid.iso of=/dev/sdX bs=4M status=progress oflag=sync
 ```
 
 ---
 
 ## 🛠️ Building from Source
 
-RatanaOS uses Debian's official `live-build` framework inside a reproducible container environment:
+RiOS uses Debian's official `live-build` framework inside a reproducible container environment:
 
 ### Prerequisites
 - Docker Engine or Docker Desktop
@@ -110,8 +110,8 @@ RatanaOS uses Debian's official `live-build` framework inside a reproducible con
 ### Build Steps
 ```bash
 # 1. Clone repository
-git clone https://github.com/Ratanazen/RatanaOS.git
-cd RatanaOS
+git clone https://github.com/Rizen/RiOS.git
+cd RiOS
 
 # 2. Configure live-build
 make live-config
@@ -122,19 +122,19 @@ make live-iso
 # 4. Generate SHA256 checksum
 make live-checksum
 ```
-The resulting hybrid bootable ISO will be generated at `build/ratanaos-live-amd64.hybrid.iso`.
+The resulting hybrid bootable ISO will be generated at `build/rios-live-amd64.hybrid.iso`.
 
 ---
 
 ## 🖥️ Desktop Layout & Theming
 
-RatanaOS includes an instant dark/light mode toggle:
+RiOS includes an instant dark/light mode toggle:
 ```bash
 # Switch to Dark Mode (WhiteSur icons + dark GTK)
-ratanaos-theme-switch dark
+rios-theme-switch dark
 
 # Switch to Light Mode (MacTahoe icons + light GTK)
-ratanaos-theme-switch light
+rios-theme-switch light
 ```
 
 ---
@@ -172,6 +172,6 @@ make run
 
 ## 📜 License & Credits
 
-- **RatanaOS**: Licensed under the [MIT License](LICENSE).
+- **RiOS**: Licensed under the [MIT License](LICENSE).
 - **Debian Base**: Debian GNU/Linux is a registered trademark of Software in the Public Interest, Inc.
 - **Icons & Theme Assets**: Ported and adapted under their respective open-source licenses.

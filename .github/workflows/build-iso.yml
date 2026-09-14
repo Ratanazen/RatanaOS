@@ -1,4 +1,4 @@
-name: Build RatanaOS Desktop ISO
+name: Build RiOS Desktop ISO
 
 on:
   push:
@@ -37,27 +37,27 @@ jobs:
             mtools dosfstools ca-certificates git rsync cpio
 
       - name: Configure live-build
-        working-directory: ratanaos-live
+        working-directory: rios-live
         run: |
           lb config \
             --distribution bookworm \
             --archive-areas "main contrib non-free non-free-firmware" \
             --debian-installer live \
-            --iso-application "RatanaOS" \
+            --iso-application "RiOS" \
             --iso-publisher "Ratanazen" \
-            --iso-volume "RatanaOS $(date +%Y%m%d)" \
+            --iso-volume "RiOS $(date +%Y%m%d)" \
             --linux-packages linux-image \
             --memtest none \
             --binary-images iso-hybrid \
             --bootloader syslinux,grub-efi
 
       - name: Build live ISO
-        working-directory: ratanaos-live
+        working-directory: rios-live
         run: lb build 2>&1 | tee ../build.log
 
       - name: Compute SHA-256 checksum
         run: |
-          ISO_FILE=$(find ratanaos-live -name "*.iso" -type f | head -1)
+          ISO_FILE=$(find rios-live -name "*.iso" -type f | head -1)
           if [ -n "$ISO_FILE" ]; then
             sha256sum "$ISO_FILE" > "${ISO_FILE}.sha256"
             echo "ISO_PATH=$ISO_FILE" >> $GITHUB_ENV
@@ -68,7 +68,7 @@ jobs:
         if: env.ISO_PATH != ''
         uses: actions/upload-artifact@v4
         with:
-          name: ratanaos-desktop-iso
+          name: rios-desktop-iso
           path: |
             ${{ env.ISO_PATH }}
             ${{ env.SHA_PATH }}

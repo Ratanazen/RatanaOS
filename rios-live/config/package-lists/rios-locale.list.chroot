@@ -1,0 +1,27 @@
+# ==============================================================================
+# RiOS Localization Package List (Khmer + Multilingual)
+# Phase 8: Khmer language support with IBus input method framework
+# ==============================================================================
+
+# Locale infrastructure
+locales
+locales-all
+
+# Khmer Unicode fonts (KhmerOS — standard Cambodian Unicode typefaces)
+fonts-khmeros
+fonts-sil-mondulkiri
+
+
+# Additional international font coverage
+fonts-noto
+fonts-noto-cjk
+fonts-noto-color-emoji
+
+# IBus input method framework + M17N backend (provides Khmer NIDA layout)
+ibus
+ibus-m17n
+m17n-db
+im-config
+
+# Debian Khmer task metapackage (pulls in Khmer-specific tooling)
+task-khmer

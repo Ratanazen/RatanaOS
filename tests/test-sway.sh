@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RatanaOS Test Suite: Sway Configuration Validation
+# RiOS Test Suite: Sway Configuration Validation
 # ==============================================================================
 
 set -euo pipefail
@@ -21,7 +21,7 @@ REQUIRED_DIRECTIVES=(
     "bindsym \$mod+space"
     "exec_always waybar"
     "exec swaync"
-    "ratana-theme apply"
+    "ri-theme apply"
 )
 
 for dir in "${REQUIRED_DIRECTIVES[@]}"; do

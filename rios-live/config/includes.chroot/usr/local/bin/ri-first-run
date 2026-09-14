@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# RiOS First-Run Setup Wizard (Stage B User First Login)
+# Safely configures user preferences with automatic backup protection
+# ==============================================================================
+set -euo pipefail
+
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/ri"
+COMPLETE_FLAG="${CONFIG_DIR}/.first-run-complete"
+BACKUP_DIR="${CONFIG_DIR}/backups/$(date +%Y%m%d_%H%M%S)"
+
+if [ -f "$COMPLETE_FLAG" ]; then
+    echo "RiOS user initialization has already run. Skipping."
+    exit 0
+fi
+
+mkdir -p "${BACKUP_DIR}" "${CONFIG_DIR}"
+
+echo "============================================================"
+echo " 󰀻 Welcome to RiOS (macOS Sequoia Edition)"
+echo "============================================================"
+
+# Create safety backup of existing configurations if any
+if [ -d "${HOME}/.config/hypr" ] || [ -d "${HOME}/.config/waybar" ] || [ -d "${HOME}/.config/niri" ] || [ -d "${HOME}/.config/sway" ]; then
+    echo "==> Creating safety backup in ${BACKUP_DIR}..."
+    for c in hypr niri sway waybar rofi wofi swaync kitty foot; do
+        if [ -d "${HOME}/.config/${c}" ]; then
+            cp -rf "${HOME}/.config/${c}" "${BACKUP_DIR}/" 2>/dev/null || true
+        fi
+    done
+fi
+
+# 1. Apply default theme
+ri-theme dark || true
+
+# 2. Set default wallpaper
+ri-wallpaper set "/usr/share/backgrounds/rios/rios-sequoia-dark.png" 2>/dev/null || true
+
+# 3. Mark first-run completed
+touch "${COMPLETE_FLAG}" "${CONFIG_DIR}/.first-run-done"
+
+echo "============================================================"
+echo " ✅ RiOS initialized successfully!"
+echo " Use 'ri-theme' to switch visual styles."
+echo " Use 'ri-performance' to tune animations & blur."
+echo " Use Super+Space to launch applications."
+echo "============================================================"

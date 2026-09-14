@@ -1,4 +1,4 @@
-# RatanaOS macOS Theme Engine & UI Customization Architecture Audit Report
+# RiOS macOS Theme Engine & UI Customization Architecture Audit Report
 
 ## 1. Existing Rendering Architecture
 - **Pipeline**: Double-buffered 32-bit ARGB (TrueColor 8888) rasterizer implemented in `src/drivers/gfx.c` and declared in `src/include/gfx.h`.
@@ -78,7 +78,7 @@
 - **Interactive Controls**: `src/kernel/ui_controls.c` (Buttons, segmented controls, toggles, checkboxes, sliders, sidebars).
 
 ## 9. Existing Configuration System
-- **File**: `/etc/ratana/settings.conf` stored on VFS.
+- **File**: `/etc/ri/settings.conf` stored on VFS.
 - **Format**: Simple key=value plain text parser with checksum protection and automatic fallback to defaults (`settings_reset_defaults()`).
 
 ## 10. Files to be Modified
@@ -102,7 +102,7 @@
   - *Mitigation*: Leverage the existing precomputed wallpaper buffer and dirty rect / clipping optimizations.
 - **Scale Overflow**: Integer rounding when computing UI scale could produce 0px elements or divide-by-zero.
   - *Mitigation*: Clamp all scaling factors to valid bounds (`scaled(v) = (v * scale + 50) / 100` with minimum size of 1px).
-- **Configuration Corruption**: Truncated or malformed `/etc/ratana/settings.conf`.
+- **Configuration Corruption**: Truncated or malformed `/etc/ri/settings.conf`.
   - *Mitigation*: Checksum validation already in place; fall back gracefully to factory defaults if checksum fails or values are out-of-range.
 
 ## 13. Implementation Order
@@ -115,10 +115,10 @@
 - **Phase 7**: Dock Style Engine (Positions, Styles, Magnification, Auto-Hide).
 - **Phase 8**: Menu Bar Theming (Height, Background, Transparency).
 - **Phase 9**: System Settings UI Expansion (All categories with live previews).
-- **Phase 10**: Configuration Persistence (`/etc/ratana/settings.conf`).
+- **Phase 10**: Configuration Persistence (`/etc/ri/settings.conf`).
 - **Phase 11**: Build, QEMU Validation & Documentation.
 
 ## 14. Build & Test Plan
-- `make clean && make`: Build RatanaOS kernel binary and ELF32 container.
+- `make clean && make`: Build RiOS kernel binary and ELF32 container.
 - `make test`: Run native 64-bit ELF layout and kernel symbol verification.
 - `qemu-system-x86_64`: Boot graphical desktop in QEMU, launch System Settings, cycle themes, switch icon themes, adjust UI scale and font sizes, verify persistence across reboot.

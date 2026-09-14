@@ -1,7 +1,7 @@
-# RatanaOS Hyprland Desktop Suite
+# RiOS Hyprland Desktop Suite
 
 ## Overview
-RatanaOS features a modular, riced Hyprland setup with dynamic tiling, rounded corners, drop shadows, Gaussian blur, and fluid gestures.
+RiOS features a modular, riced Hyprland setup with dynamic tiling, rounded corners, drop shadows, Gaussian blur, and fluid gestures.
 
 ---
 
@@ -31,7 +31,7 @@ RatanaOS features a modular, riced Hyprland setup with dynamic tiling, rounded c
 | `Super + V` | Clipboard history manager |
 | `Super + F` | Toggle fullscreen |
 | `Super + T` | Toggle floating mode |
-| `Super + L` | Lock screen (`ratana-lock`) |
+| `Super + L` | Lock screen (`ri-lock`) |
 | `Super + Shift + S` | Interactive area screenshot (`grim` + `slurp`) |
 | `Print` | Full screen capture |
 | `Super + Shift + R` | Screen recording toggle (`wf-recorder`) |

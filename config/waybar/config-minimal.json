@@ -23,7 +23,7 @@
     ],
     "custom/logo": {
         "format": "󰀻",
-        "on-click": "ratana-launcher"
+        "on-click": "ri-launcher"
     },
     "clock": {
         "format": "{:%I:%M %p}"
@@ -43,6 +43,6 @@
     },
     "custom/power": {
         "format": "󰐥",
-        "on-click": "ratana-power"
+        "on-click": "ri-power"
     }
 }

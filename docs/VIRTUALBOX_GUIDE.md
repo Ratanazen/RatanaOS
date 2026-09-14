@@ -1,6 +1,6 @@
-# RatanaOS on Oracle VirtualBox: Setup & Execution Guide
+# RiOS on Oracle VirtualBox: Setup & Execution Guide
 
-Follow this guide to run **RatanaOS 64-bit (macOS Sequoia Edition)** in **VirtualBox** with 100% error-free performance.
+Follow this guide to run **RiOS 64-bit (macOS Sequoia Edition)** in **VirtualBox** with 100% error-free performance.
 
 ---
 
@@ -8,7 +8,7 @@ Follow this guide to run **RatanaOS 64-bit (macOS Sequoia Edition)** in **Virtua
 
 1. Open VirtualBox and click **New** (`Ctrl + N`).
 2. **Name and Operating System**:
-   - **Name**: `RatanaOS 64-bit`
+   - **Name**: `RiOS 64-bit`
    - **Type**: `Other`
    - **Version**: `Other/Unknown (64-bit)`
 3. **Hardware Configuration**:
@@ -40,7 +40,7 @@ Click on your VM and open **Settings** (`Ctrl + S`):
 ### 3. Storage:
 - Under **Storage Devices**, select the empty optical drive.
 - Click the disc icon on the right and select **Choose a disk file...**
-- Browse and attach: `build/ratanaos.iso`.
+- Browse and attach: `build/rios.iso`.
 
 ### 4. Audio & Network:
 - Audio Controller: `ICH AC97` or `SoundBlaster 16`.
@@ -48,14 +48,14 @@ Click on your VM and open **Settings** (`Ctrl + S`):
 
 ---
 
-## 3. Starting RatanaOS in VirtualBox
+## 3. Starting RiOS in VirtualBox
 
 1. Click **Start** (`Normal Start`).
 2. The GRUB bootloader menu will appear automatically:
-   - Select **`RatanaOS 64-bit (macOS Sequoia Edition)`** (default).
+   - Select **`RiOS 64-bit (macOS Sequoia Edition)`** (default).
 3. The system will boot immediately into the 64-bit kernel.
 4. Type `gui` in the shell to enter the **macOS Sequoia Desktop Environment**:
    ```bash
-   ratana@os-x86_64 > gui
+   ri@os-x86_64 > gui
    ```
 5. Use your mouse to interact with windows, the Top Menu Bar, and the Floating Dock!

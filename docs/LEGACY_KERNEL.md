@@ -1,6 +1,6 @@
-# 📖 RatanaOS Custom Kernel & Architecture Reference (Legacy Core)
+# 📖 RiOS Custom Kernel & Architecture Reference (Legacy Core)
 
-This document preserves the comprehensive architecture and implementation details of the custom 64-bit microkernel / hybrid kernel developed for RatanaOS. All source files in `src/`, `build/ratanaos.bin`, and associated unit tests remain fully intact in the repository.
+This document preserves the comprehensive architecture and implementation details of the custom 64-bit microkernel / hybrid kernel developed for RiOS. All source files in `src/`, `build/rios.bin`, and associated unit tests remain fully intact in the repository.
 
 ---
 
@@ -73,7 +73,7 @@ src/
 To build and run the freestanding custom kernel without affecting the Debian Live distribution:
 
 ```bash
-# Compile custom kernel binary (build/ratanaos.bin)
+# Compile custom kernel binary (build/rios.bin)
 make
 
 # Run all 19 subsystem unit tests

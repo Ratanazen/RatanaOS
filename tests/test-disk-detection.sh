@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RatanaOS Test Suite: Safe Disk Detection Validation
+# RiOS Test Suite: Safe Disk Detection Validation
 # ==============================================================================
 set -euo pipefail
 

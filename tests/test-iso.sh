@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RatanaOS Test Suite: ISO Structure & Artifact Validation
+# RiOS Test Suite: ISO Structure & Artifact Validation
 # ==============================================================================
 
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BUILD_DIR="${ROOT_DIR}/build"
-ISO_FILE="${BUILD_DIR}/ratanaos-live-amd64.hybrid.iso"
+ISO_FILE="${BUILD_DIR}/rios-live-amd64.hybrid.iso"
 
 echo "==> Running Test: test-iso.sh..."
 
@@ -28,8 +28,8 @@ if [ "$SIZE" -lt 2684354560 ]; then
     exit 1
 fi
 
-if [ -f "${BUILD_DIR}/RatanaOS.iso.sha256" ]; then
-    echo "  [PASS] Checksum file exists: $(cat "${BUILD_DIR}/RatanaOS.iso.sha256")"
+if [ -f "${BUILD_DIR}/RiOS.iso.sha256" ]; then
+    echo "  [PASS] Checksum file exists: $(cat "${BUILD_DIR}/RiOS.iso.sha256")"
 fi
 
 echo "✅ All ISO structure tests PASSED."

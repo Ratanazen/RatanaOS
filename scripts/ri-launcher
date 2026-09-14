@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# RiOS Master Spotlight Launcher
+# Automatically adapts between Rofi, Wofi, or fallback menu
+# Supports Applications, Calculator, Clipboard history, and Power menu
+# ==============================================================================
+
+set -euo pipefail
+
+MODE="${1:-drun}"
+
+run_wofi() {
+    local prompt="$1"
+    local mode="$2"
+    shift 2
+    wofi --show "$mode" --prompt "$prompt" "$@"
+}
+
+run_rofi() {
+    local prompt="$1"
+    local mode="$2"
+    shift 2
+    rofi -show "$mode" -p "$prompt" "$@"
+}
+
+case "$MODE" in
+    calc|calculator)
+        if command -v rofi >/dev/null 2>&1 && rofi -h | grep -q calc; then
+            rofi -show calc -modi calc -no-show-match -no-sort
+        elif command -v gnome-calculator >/dev/null 2>&1; then
+            gnome-calculator &
+        elif command -v kcalc >/dev/null 2>&1; then
+            kcalc &
+        fi
+        ;;
+
+    clipboard|clip)
+        if command -v cliphist >/dev/null 2>&1; then
+            if command -v rofi >/dev/null 2>&1; then
+                cliphist list | rofi -dmenu -p "Clipboard" | cliphist decode | wl-copy
+            elif command -v wofi >/dev/null 2>&1; then
+                cliphist list | wofi --dmenu --prompt "Clipboard" | cliphist decode | wl-copy
+            fi
+        fi
+        ;;
+
+    power)
+        ri-power
+        ;;
+
+    files)
+        if command -v rofi >/dev/null 2>&1; then
+            rofi -show filebrowser -p "Browse Files"
+        elif command -v thunar >/dev/null 2>&1; then
+            thunar &
+        elif command -v nautilus >/dev/null 2>&1; then
+            nautilus &
+        fi
+        ;;
+
+    drun|apps|*)
+        if command -v wofi >/dev/null 2>&1; then
+            if pgrep -x wofi >/dev/null 2>&1; then
+                pkill -x wofi
+            else
+                wofi --show drun
+            fi
+        elif command -v rofi >/dev/null 2>&1; then
+            if pgrep -x rofi >/dev/null 2>&1; then
+                pkill -x rofi
+            else
+                rofi -show drun
+            fi
+        fi
+        ;;
+esac

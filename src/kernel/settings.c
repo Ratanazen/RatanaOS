@@ -7,7 +7,7 @@
 #include "../include/string.h"
 #include "../include/vfs.h"
 
-#define SETTINGS_CONF_PATH "/etc/ratana/settings.conf"
+#define SETTINGS_CONF_PATH "/etc/ri/settings.conf"
 
 static settings_t active_settings;
 static settings_t saved_settings;
@@ -222,7 +222,7 @@ void settings_load(void) {
 }
 
 void settings_print(void) {
-    kprintf("\n--- RatanaOS System Configuration ---\n");
+    kprintf("\n--- RiOS System Configuration ---\n");
     kprintf("UI Theme:           %s\n", theme_get_preset_name(active_settings.ui_theme));
     kprintf("Theme Mode:         %s\n", theme_get_mode_name(active_settings.theme_mode));
     kprintf("Icon Theme:         %s\n", icon_get_theme_name());
@@ -254,7 +254,7 @@ settings_backend_t settings_get_backend(void) {
 }
 
 const char* settings_get_backend_name(void) {
-    return "VFS Configuration Storage (/etc/ratana/settings.conf)";
+    return "VFS Configuration Storage (/etc/ri/settings.conf)";
 }
 
 bool settings_is_persistent(void) {

@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RatanaOS Test Suite: Universal Desktop Installer Validation
+# RiOS Test Suite: Universal Desktop Installer Validation
 # ==============================================================================
 
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-INSTALLER="${ROOT_DIR}/installer/ratana-desktop-install.sh"
+INSTALLER="${ROOT_DIR}/installer/ri-desktop-install.sh"
 
 echo "==> Running Test: test-installer.sh..."
 
@@ -46,7 +46,7 @@ for pat in "${REQUIRED_PATTERNS[@]}"; do
 done
 
 # 3. Test dry-run execution
-DRY_OUTPUT=$("$INSTALLER" --dry-run --profile hyprland --theme ratana-dark 2>&1 || true)
+DRY_OUTPUT=$("$INSTALLER" --dry-run --profile hyprland --theme ri-dark 2>&1 || true)
 if ! echo "$DRY_OUTPUT" | grep -qi "Dry run enabled"; then
     echo "FAIL: Installer dry run did not indicate dry run mode!" >&2
     exit 1

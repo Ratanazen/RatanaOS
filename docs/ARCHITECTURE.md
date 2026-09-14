@@ -1,13 +1,13 @@
-# 🏛️ RatanaOS System Architecture
+# 🏛️ RiOS System Architecture
 
-**RatanaOS** is a native, freestanding 64-bit (x86_64) operating system featuring a high-performance modular kernel, polymorphic Virtual File System (VFS), POSIX userspace runtime (`libc`), interactive shell and coreutils, Intel e1000 networking stack, and macOS Sequoia-inspired GUI.
+**RiOS** is a native, freestanding 64-bit (x86_64) operating system featuring a high-performance modular kernel, polymorphic Virtual File System (VFS), POSIX userspace runtime (`libc`), interactive shell and coreutils, Intel e1000 networking stack, and macOS Sequoia-inspired GUI.
 
 ---
 
 ## High-Level Architecture Diagram
 
 ```text
-                                 RATANAOS
+                                 RIOS
                                     │
                ┌────────────────────┴────────────────────┐
                │                                         │
@@ -81,9 +81,9 @@
 - **Dynamic Typography**: 7 semantic font roles with multi-scale percentage adjustments ($80\%$ to $150\%$).
 - **Dock Customization**: 3-edge anchoring (Bottom, Left, Right), 4 styles (Glass, Classic, Transparent, Compact), and cursor proximity auto-hide.
 - **Window Decorations**: 4 styles (macOS Sequoia, Classic 2D, Minimalist, Acrylic Glass) with soft blur drop shadows and rounded corners.
-- **Configuration Persistence**: Automatic serialization/deserialization to `/etc/ratana/settings.conf` with 16-bit additive checksum protection.
+- **Configuration Persistence**: Automatic serialization/deserialization to `/etc/ri/settings.conf` with 16-bit additive checksum protection.
 
 ### 9. Build System & Host Environment
 - **Host System**: Arch Linux x86_64 (freestanding GCC, NASM, GNU LD, xorriso, GRUB).
-- **Artifacts**: 64-bit ELF kernel (`ratanaos.bin`), 32-bit Multiboot wrapper (`ratanaos32.bin`), Hybrid bootable ISO (`ratanaos.iso`), Ext2 disk image (`disk.img`).
+- **Artifacts**: 64-bit ELF kernel (`rios.bin`), 32-bit Multiboot wrapper (`rios32.bin`), Hybrid bootable ISO (`rios.iso`), Ext2 disk image (`disk.img`).
 

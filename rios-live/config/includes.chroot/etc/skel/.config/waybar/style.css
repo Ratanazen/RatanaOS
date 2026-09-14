@@ -1,0 +1,37 @@
+/* RiOS Waybar — Clean Dark Theme */
+* {
+    font-family: "FiraCode Nerd Font", "Font Awesome 6 Free", monospace;
+    font-size: 13px;
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+}
+
+window#waybar {
+    background-color: rgba(30, 30, 46, 0.9);
+    color: #cdd6f4;
+}
+
+#workspaces button {
+    padding: 0 8px;
+    color: #6c7086;
+    background: transparent;
+}
+
+#workspaces button.active {
+    color: #89b4fa;
+    border-bottom: 2px solid #89b4fa;
+}
+
+#clock, #cpu, #memory, #network, #pulseaudio, #battery, #tray {
+    padding: 0 10px;
+}
+
+#cpu { color: #f38ba8; }
+#memory { color: #fab387; }
+#network { color: #89b4fa; }
+#pulseaudio { color: #a6e3a1; }
+#battery { color: #f9e2af; }
+
+#battery.warning { color: #fab387; }
+#battery.critical { color: #f38ba8; }

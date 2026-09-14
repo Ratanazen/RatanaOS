@@ -1,0 +1,10 @@
+NAME="RiOS"
+VERSION="1.0 (macOS Sequoia Edition)"
+ID=rios
+ID_LIKE=debian
+PRETTY_NAME="RiOS 1.0 (macOS Sequoia 2026 Edition)"
+VERSION_ID="1.0"
+VERSION_CODENAME=sequoia
+HOME_URL="https://github.com/Rizen/RiOS"
+SUPPORT_URL="https://github.com/Rizen/RiOS/issues"
+BUG_REPORT_URL="https://github.com/Rizen/RiOS/issues"

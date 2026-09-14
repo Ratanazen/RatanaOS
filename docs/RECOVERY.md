@@ -1,8 +1,8 @@
-# 🔧 RatanaOS Backup & Recovery Guide (Phase 15)
+# 🔧 RiOS Backup & Recovery Guide (Phase 15)
 
 ## System Snapshots with Timeshift
 
-RatanaOS includes **Timeshift** for filesystem snapshot and restore
+RiOS includes **Timeshift** for filesystem snapshot and restore
 functionality, pre-installed in the desktop variant.
 
 ### Taking a Snapshot
@@ -43,7 +43,7 @@ via the Timeshift GUI Settings tab. This matches standard Debian behavior
 - Restore Timeshift snapshot from CLI: \`timeshift --restore\`
 
 ### Verification
-RatanaOS's custom GRUB theme does NOT suppress recovery mode entries.
+RiOS's custom GRUB theme does NOT suppress recovery mode entries.
 The \`0300-grub-recovery.hook.chroot\` hook explicitly ensures
 \`GRUB_DISABLE_RECOVERY\` is never set to "true", guaranteeing recovery
 entries always appear in the GRUB menu alongside normal boot entries.

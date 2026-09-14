@@ -17,7 +17,7 @@ def pack_debian_rootfs(src_dir, tarball, output_bin, output_c):
     
     if tarball and os.path.exists(tarball):
         print(f"[BAKE-DEBIAN-ROOTFS] Extracting rootfs tarball from {tarball}...")
-        tmp_extract = '/tmp/ratana_debian_tarball_extract'
+        tmp_extract = '/tmp/ri_debian_tarball_extract'
         os.makedirs(tmp_extract, exist_ok=True)
         with tarfile.open(tarball, 'r:*') as tar:
             tar.extractall(path=tmp_extract)
@@ -36,7 +36,7 @@ def pack_debian_rootfs(src_dir, tarball, output_bin, output_c):
     
     if not files:
         print("[BAKE-DEBIAN-ROOTFS] Creating default minimal embedded Debian 12 rootfs structure...")
-        tmp_default = '/tmp/ratana_debian_rootfs'
+        tmp_default = '/tmp/ri_debian_rootfs'
         os.makedirs(os.path.join(tmp_default, 'etc'), exist_ok=True)
         os.makedirs(os.path.join(tmp_default, 'bin'), exist_ok=True)
         os.makedirs(os.path.join(tmp_default, 'lib64'), exist_ok=True)
@@ -108,7 +108,7 @@ def pack_debian_rootfs(src_dir, tarball, output_bin, output_c):
         print(f"[BAKE-DEBIAN-ROOTFS] Saved C array header to {output_c}.")
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="RatanaOS Debian Rootfs Container Builder")
+    parser = argparse.ArgumentParser(description="RiOS Debian Rootfs Container Builder")
     parser.add_argument('--rootfs', '-r', default='debian-rootfs', help="Path to unpacked rootfs directory")
     parser.add_argument('--tarball', '-t', default=None, help="Path to rootfs tarball (.tar.xz, .tar.gz)")
     parser.add_argument('--output', '-o', default='build/debian.img', help="Output container path (.img or .rpk)")

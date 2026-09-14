@@ -1,0 +1,29 @@
+# ==============================================================================
+# RiOS Server & Infrastructure
+# ==============================================================================
+
+# Remote access
+openssh-server
+openssh-client
+
+# Web servers
+nginx
+
+# Firewall
+iptables
+nftables
+ufw
+fail2ban
+
+# VPN
+wireguard-tools
+openvpn
+
+# SSL
+certbot
+
+# Monitoring
+vnstat
+iotop
+sysstat
+lsof

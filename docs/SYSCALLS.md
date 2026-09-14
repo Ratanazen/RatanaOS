@@ -1,6 +1,6 @@
-# 📜 RatanaOS Syscall ABI Specification
+# 📜 RiOS Syscall ABI Specification
 
-The RatanaOS kernel implements a custom 64-bit System Call Application Binary Interface (ABI) invoked via software interrupt `int $0x80`.
+The RiOS kernel implements a custom 64-bit System Call Application Binary Interface (ABI) invoked via software interrupt `int $0x80`.
 
 ---
 

@@ -1,6 +1,6 @@
-# RatanaOS — Universal Keybindings Reference
+# RiOS — Universal Keybindings Reference
 
-RatanaOS provides a unified keyboard shortcut map across Hyprland, Niri, and Sway.
+RiOS provides a unified keyboard shortcut map across Hyprland, Niri, and Sway.
 
 | Shortcut | Action | Scope |
 | :--- | :--- | :--- |

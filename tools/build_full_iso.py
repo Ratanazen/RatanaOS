@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-RatanaOS — Full 500 MB Distribution ISO Generator
+RiOS — Full 500 MB Distribution ISO Generator
 Builds a complete, production-grade 500 MB bootable ISO containing:
 - 64-bit Multiboot Kernel & Trampoline
 - Full macOS Sequoia GUI Icon Suites (WhiteSur, MacTahoe, Vector across 7 resolutions)
@@ -18,8 +18,8 @@ import struct
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 BUILD_DIR = os.path.join(ROOT_DIR, "build")
 ISO_DIR = os.path.join(ROOT_DIR, "iso")
-TARGET_ISO = os.path.join(BUILD_DIR, "ratanaos_full.iso")
-SYMLINK_ISO = os.path.join(BUILD_DIR, "ratanaos.iso")
+TARGET_ISO = os.path.join(BUILD_DIR, "rios_full.iso")
+SYMLINK_ISO = os.path.join(BUILD_DIR, "rios.iso")
 
 TARGET_SIZE_BYTES = 500 * 1024 * 1024  # 500 MB
 
@@ -38,14 +38,14 @@ def setup_iso_structure():
     log("Setting up ISO directory structure...")
     dirs = [
         os.path.join(ISO_DIR, "boot", "grub"),
-        os.path.join(ISO_DIR, "ratana", "icons", "whitesur"),
-        os.path.join(ISO_DIR, "ratana", "icons", "mactahoe"),
-        os.path.join(ISO_DIR, "ratana", "icons", "vector"),
-        os.path.join(ISO_DIR, "ratana", "wallpapers"),
-        os.path.join(ISO_DIR, "ratana", "apps", "telegram"),
-        os.path.join(ISO_DIR, "ratana", "apps", "safari", "portal"),
-        os.path.join(ISO_DIR, "ratana", "apps", "studio"),
-        os.path.join(ISO_DIR, "ratana", "packages"),
+        os.path.join(ISO_DIR, "ri", "icons", "whitesur"),
+        os.path.join(ISO_DIR, "ri", "icons", "mactahoe"),
+        os.path.join(ISO_DIR, "ri", "icons", "vector"),
+        os.path.join(ISO_DIR, "ri", "wallpapers"),
+        os.path.join(ISO_DIR, "ri", "apps", "telegram"),
+        os.path.join(ISO_DIR, "ri", "apps", "safari", "portal"),
+        os.path.join(ISO_DIR, "ri", "apps", "studio"),
+        os.path.join(ISO_DIR, "ri", "packages"),
         os.path.join(ISO_DIR, "debian"),
         os.path.join(ISO_DIR, "system"),
     ]
@@ -53,8 +53,8 @@ def setup_iso_structure():
         os.makedirs(d, exist_ok=True)
 
     # Copy kernel binaries
-    shutil.copy2(os.path.join(BUILD_DIR, "ratanaos.bin"), os.path.join(ISO_DIR, "boot", "ratanaos.bin"))
-    shutil.copy2(os.path.join(BUILD_DIR, "ratanaos32.bin"), os.path.join(ISO_DIR, "boot", "ratanaos32.bin"))
+    shutil.copy2(os.path.join(BUILD_DIR, "rios.bin"), os.path.join(ISO_DIR, "boot", "rios.bin"))
+    shutil.copy2(os.path.join(BUILD_DIR, "rios32.bin"), os.path.join(ISO_DIR, "boot", "rios32.bin"))
 
 def populate_icon_suites():
     log("Populating high-resolution GUI icon suites (WhiteSur, MacTahoe, Vector)...")
@@ -68,7 +68,7 @@ def populate_icon_suites():
 
     for suite in suites:
         for res in resolutions:
-            res_dir = os.path.join(ISO_DIR, "ratana", "icons", suite, f"{res}x{res}")
+            res_dir = os.path.join(ISO_DIR, "ri", "icons", suite, f"{res}x{res}")
             os.makedirs(res_dir, exist_ok=True)
             for icon in icon_names:
                 icon_path = os.path.join(res_dir, f"{icon}.rgba")
@@ -92,7 +92,7 @@ def populate_wallpapers():
         ("tahoe_slate_4k.raw", (30, 30, 36), (80, 80, 95)),
         ("dynamic_solar_4k.raw", (50, 80, 140), (240, 180, 80))
     ]
-    wp_dir = os.path.join(ISO_DIR, "ratana", "wallpapers")
+    wp_dir = os.path.join(ISO_DIR, "ri", "wallpapers")
     w, h = 3840, 2160
     # Generate sampled gradient chunk (each 8MB raw)
     for name, c1, c2 in wallpapers:
@@ -107,29 +107,29 @@ def populate_wallpapers():
 def populate_app_resources():
     log("Populating application suites (Telegram, Safari portal, Studio)...")
     # 1. Telegram Client Assets
-    tg_dir = os.path.join(ISO_DIR, "ratana", "apps", "telegram")
+    tg_dir = os.path.join(ISO_DIR, "ri", "apps", "telegram")
     with open(os.path.join(tg_dir, "client.conf"), "w") as f:
         f.write("[Telegram]\nversion=1.0.0-macos\nauto_download=true\nnotifications=true\ntheme=sequoia_dark\n")
     with open(os.path.join(tg_dir, "messages_store.db"), "wb") as f:
         f.write(b"RATANA_TG_DB_V1\x00" + os.urandom(1024 * 512))
 
     # 2. Safari Portal Documentation
-    safari_dir = os.path.join(ISO_DIR, "ratana", "apps", "safari", "portal")
+    safari_dir = os.path.join(ISO_DIR, "ri", "apps", "safari", "portal")
     with open(os.path.join(safari_dir, "index.html"), "w") as f:
         f.write("""<!DOCTYPE html>
 <html>
-<head><title>Welcome to RatanaOS Safari</title>
+<head><title>Welcome to RiOS Safari</title>
 <style>body { font-family: -apple-system, sans-serif; background: #1c1c1e; color: #fff; text-align: center; padding-top: 50px; }</style>
 </head>
 <body>
-<h1>Welcome to RatanaOS</h1>
+<h1>Welcome to RiOS</h1>
 <p>macOS Sequoia-inspired 64-bit Operating System</p>
 <p>Featuring Native Desktop Compositor, WhiteSur & MacTahoe Themes, and Full Multitasking.</p>
 </body>
 </html>""")
 
-    # 3. RatanaOS Native Packages
-    pkg_dir = os.path.join(ISO_DIR, "ratana", "packages")
+    # 3. RiOS Native Packages
+    pkg_dir = os.path.join(ISO_DIR, "ri", "packages")
     pkgs = ["coreutils.rpk", "telegram-suite.rpk", "safari-portal.rpk", "games-pack.rpk", "developer-tools.rpk"]
     for p in pkgs:
         p_path = os.path.join(pkg_dir, p)
@@ -151,15 +151,15 @@ insmod video_bochs
 insmod video_cirrus
 insmod all_video
 
-menuentry "RatanaOS 64-bit (macOS Sequoia Edition - Full 500MB)" {
+menuentry "RiOS 64-bit (macOS Sequoia Edition - Full 500MB)" {
     set gfxpayload=1024x768x32,1024x768,auto
-    multiboot /boot/ratanaos.bin
+    multiboot /boot/rios.bin
     boot
 }
 
-menuentry "RatanaOS 64-bit (Safe Text Mode / Minimal)" {
+menuentry "RiOS 64-bit (Safe Text Mode / Minimal)" {
     set gfxpayload=text
-    multiboot /boot/ratanaos.bin
+    multiboot /boot/rios.bin
     boot
 }
 
@@ -200,7 +200,7 @@ fi
         subprocess.run(cmd, timeout=60)
 
     # Size adjustment to hit exactly ~500 MB total ISO size
-    sys_img = os.path.join(ISO_DIR, "system", "ratana_system.img")
+    sys_img = os.path.join(ISO_DIR, "system", "ri_system.img")
     if os.path.exists(sys_img):
         os.remove(sys_img)
     current_iso_dir_size = get_dir_size(ISO_DIR)
@@ -239,7 +239,7 @@ def build_iso():
     log(f"Updated primary {SYMLINK_ISO} link.")
 
 def main():
-    log("Starting RatanaOS Full 500 MB Distribution ISO build...")
+    log("Starting RiOS Full 500 MB Distribution ISO build...")
     ensure_binaries()
     setup_iso_structure()
     populate_icon_suites()

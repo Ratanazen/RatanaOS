@@ -1,0 +1,18 @@
+# ==============================================================================
+# RiOS — Core System Utilities
+# ==============================================================================
+build-essential
+git
+curl
+wget
+vim
+nano
+htop
+neofetch
+pciutils
+usbutils
+sudo
+ca-certificates
+rsync
+unzip
+zip

@@ -1,6 +1,6 @@
-# 🛡️ RatanaOS Security & Hardening Baseline (Phase 5)
+# 🛡️ RiOS Security & Hardening Baseline (Phase 5)
 
-This document specifies the security policies, configuration defaults, and rationale for RatanaOS 1.0 (Debian Bookworm base).
+This document specifies the security policies, configuration defaults, and rationale for RiOS 1.0 (Debian Bookworm base).
 
 ---
 
@@ -21,7 +21,7 @@ This document specifies the security policies, configuration defaults, and ratio
 
 ### 4. Mandatory Access Control (AppArmor)
 - **Status**: Enabled by default in stock Debian Bookworm Linux kernel.
-- **Policy**: RatanaOS preserves standard Debian AppArmor profiles without relaxation. Default profiles guard critical userspace utilities and network daemons.
+- **Policy**: RiOS preserves standard Debian AppArmor profiles without relaxation. Default profiles guard critical userspace utilities and network daemons.
 
 ### 5. Automatic Security Updates
 - **Configuration**: Debian's `unattended-upgrades` package is supported. Security repository `bookworm-security` is pre-configured in `/etc/apt/sources.list` to receive upstream CVE patches without delay.
@@ -53,7 +53,7 @@ sudo -l
 
 ## 🔑 UEFI Secure Boot (Phase 9)
 - **Chain**: Debian's `shim-signed` → `grub-efi-amd64-signed` → Linux kernel.
-- **RatanaOS GRUB Theme**: Theme files under `/boot/grub/themes/ratanaos/`
+- **RiOS GRUB Theme**: Theme files under `/boot/grub/themes/rios/`
   are non-executable data assets (images, fonts, text config). They do NOT
   break the Secure Boot signature chain — only executable bootloader code
   is verified by shim/GRUB, not theme resources. **Confirmed safe.**
@@ -64,9 +64,9 @@ sudo -l
   \`\`\`bash
   # UEFI boot test (requires OVMF firmware)
   qemu-system-x86_64 -bios /usr/share/OVMF/OVMF_CODE.fd \\
-    -cdrom build/ratanaos-live-amd64.hybrid.iso -m 2048 -smp 2
+    -cdrom build/rios-live-amd64.hybrid.iso -m 2048 -smp 2
 
   # Legacy BIOS boot test
   qemu-system-x86_64 \\
-    -cdrom build/ratanaos-live-amd64.hybrid.iso -m 2048 -smp 2
+    -cdrom build/rios-live-amd64.hybrid.iso -m 2048 -smp 2
   \`\`\`

@@ -1,8 +1,8 @@
-# RatanaOS — Dock Subsystem Specification
+# RiOS — Dock Subsystem Specification
 
 ## 1. Overview
 
-The RatanaOS Dock (`src/kernel/dock.c`, `src/include/dock.h`) is an application launcher, task switcher, and status dock modeled after macOS Sequoia. It supports 3 screen edge positions, 4 visual styling modes, smooth cursor magnification, and dynamic auto-hide.
+The RiOS Dock (`src/kernel/dock.c`, `src/include/dock.h`) is an application launcher, task switcher, and status dock modeled after macOS Sequoia. It supports 3 screen edge positions, 4 visual styling modes, smooth cursor magnification, and dynamic auto-hide.
 
 ---
 

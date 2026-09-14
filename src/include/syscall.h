@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-// RatanaOS Syscall ABI Numbers
+// RiOS Syscall ABI Numbers
 #define SYS_READ      0
 #define SYS_WRITE     1
 #define SYS_OPEN      2

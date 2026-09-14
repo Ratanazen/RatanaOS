@@ -9,6 +9,6 @@ int main(int argc, char* argv[]) {
         printf("%s %s %s %s %s\n", u.sysname, u.nodename, u.release, u.version, u.machine);
         return 0;
     }
-    printf("RatanaOS x86_64\n");
+    printf("RiOS x86_64\n");
     return 1;
 }

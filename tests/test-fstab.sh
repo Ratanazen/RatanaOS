@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RatanaOS Test Suite: fstab Generation Logic Validation
+# RiOS Test Suite: fstab Generation Logic Validation
 # ==============================================================================
 set -euo pipefail
 

@@ -5,11 +5,11 @@
 
 int main(int argc, char** argv) {
     if (argc < 2) {
-        printf("RatanaOS Debian Package Importer (debimport) v1.0.0\n");
+        printf("RiOS Debian Package Importer (debimport) v1.0.0\n");
         printf("Usage: debimport <package.deb> [--check-compat | --install]\n\n");
         printf("Description:\n");
         printf("  Extracts Debian .deb AR packages, evaluates ELF64 symbol\n");
-        printf("  dependencies against RatanaOS POSIX ABI and libc shims.\n");
+        printf("  dependencies against RiOS POSIX ABI and libc shims.\n");
         return 1;
     }
 
@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
     printf("  [PARTIAL] Libc dynamic loader resolution (PT_INTERP / ld-linux-x86-64.so.2)\n");
     printf("  [PORT REQUIRED] libncursesw6 terminal capabilities\n\n");
 
-    printf("Result: Package '%s' requires static linkage or RatanaOS libc shim.\n", filename);
+    printf("Result: Package '%s' requires static linkage or RiOS libc shim.\n", filename);
     printf("Refer to docs/DEBIAN_COMPATIBILITY.md for supported ABI surfaces.\n");
     return 0;
 }

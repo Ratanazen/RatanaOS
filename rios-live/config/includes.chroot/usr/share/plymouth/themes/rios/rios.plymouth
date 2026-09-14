@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=RiOS Splash
+Description=macOS Sequoia Boot Splash for RiOS
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/rios
+ScriptFile=/usr/share/plymouth/themes/rios/rios.script

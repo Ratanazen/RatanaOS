@@ -1,8 +1,8 @@
-# 🌐 RatanaOS Localization & Khmer Language Support (Phase 8)
+# 🌐 RiOS Localization & Khmer Language Support (Phase 8)
 
 ## Khmer Language Support
 
-RatanaOS includes out-of-the-box support for Khmer (ខ្មែរ) as a first-class
+RiOS includes out-of-the-box support for Khmer (ខ្មែរ) as a first-class
 language alongside English:
 
 ### Inherited from Debian (Automatic Translation Coverage)
@@ -20,21 +20,21 @@ l10n infrastructure (.mo / .po translation files):
 | Plymouth Boot Text | plymouth l10n | Partial |
 | GNOME/GTK system dialogs | gtk-l10n | Full |
 
-### RatanaOS-Custom Strings (English-Only — Requires Manual Translation)
-The following RatanaOS-authored strings are currently **English-only** and
+### RiOS-Custom Strings (English-Only — Requires Manual Translation)
+The following RiOS-authored strings are currently **English-only** and
 do NOT receive automatic Debian translation:
 
 | File | String / Content | Translation Status |
 | :--- | :--- | :--- |
-| `/etc/os-release` | `PRETTY_NAME="RatanaOS 1.0 (Sequoia)"` | English-only (standard practice) |
+| `/etc/os-release` | `PRETTY_NAME="RiOS 1.0 (Sequoia)"` | English-only (standard practice) |
 | `/etc/motd` | ASCII art banner and system summary | English-only |
 | `/etc/issue` | Console login banner | English-only |
 | Calamares `branding.desc` | `productName`, `versionedName`, slide text | English-only |
 | Calamares `show.qml` | Welcome slideshow descriptions | English-only |
-| `ratanaos-theme-switch` | Script output messages | English-only |
+| `rios-theme-switch` | Script output messages | English-only |
 | Plank dock `settings` | Dock item labels | Uses icon names (language-neutral) |
 
-> To add Khmer translations for RatanaOS-authored strings, create
+> To add Khmer translations for RiOS-authored strings, create
 > parallel translation files in \`config/includes.chroot/\` or use
 > gettext \`.po\` files for scripts. This is tracked as a future enhancement.
 

@@ -63,9 +63,9 @@ C_OBJS = $(BUILD_DIR)/kernel.o \
          $(BUILD_DIR)/stdio.o
 
 OBJS = $(ASM_OBJS) $(C_OBJS)
-TARGET = $(BUILD_DIR)/ratanaos.bin
-TARGET32 = $(BUILD_DIR)/ratanaos32.bin
-ISO_TARGET = $(BUILD_DIR)/ratanaos.iso
+TARGET = $(BUILD_DIR)/rios.bin
+TARGET32 = $(BUILD_DIR)/rios32.bin
+ISO_TARGET = $(BUILD_DIR)/rios.iso
 
 .PHONY: all clean run run-iso iso iso-full test test-all test-qemu dirs bake-icons user-apps check-deps debug benchmark debian-live debian-rootfs
 
@@ -207,7 +207,7 @@ $(BUILD_DIR)/stdio.o: $(SRC_DIR)/lib/stdio.c
 # Link 64-bit Kernel Binary
 $(TARGET): $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $(OBJS)
-	@echo "\n>>> Successfully built RatanaOS 64-bit macOS Edition: $(TARGET) <<<\n"
+	@echo "\n>>> Successfully built RiOS 64-bit macOS Edition: $(TARGET) <<<\n"
 
 # Create ELF32 container for direct QEMU -kernel loader
 $(TARGET32): $(TARGET)
@@ -216,8 +216,8 @@ $(TARGET32): $(TARGET)
 # Create Bootable ISO (requires xorriso)
 iso: $(TARGET) $(TARGET32)
 	@mkdir -p iso/boot/grub
-	@cp $(TARGET) iso/boot/ratanaos.bin
-	@cp $(TARGET32) iso/boot/ratanaos32.bin
+	@cp $(TARGET) iso/boot/rios.bin
+	@cp $(TARGET32) iso/boot/rios32.bin
 	@if [ -n "$(DEBIAN_ISO)" ] && [ -f "$(DEBIAN_ISO)" ]; then \
 		echo "Embedding Debian ISO from $(DEBIAN_ISO)..."; \
 		cp $(DEBIAN_ISO) iso/debian.iso; \
@@ -242,7 +242,7 @@ iso-full:
 
 # Debian live-build pipeline & rootfs targets
 debian-live:
-	@bash tools/ratana-debian-build.sh
+	@bash tools/ri-debian-build.sh
 
 debian-rootfs:
 	@python3 tools/bake_debian_rootfs.py --rootfs build/debian-rootfs --output build/debian.img --c-output src/kernel/fs/debian_data.c
@@ -267,7 +267,7 @@ run-curses: $(TARGET32)
 # Run automated tests
 test: all
 	@echo "\n=============================================="
-	@echo "     RATANAOS 64-BIT MACOS TEST SUITE         "
+	@echo "     RIOS 64-BIT MACOS TEST SUITE         "
 	@echo "=============================================="
 	@echo "\n[TEST 1] Multiboot Header Verification..."
 	@grub-file --is-x86-multiboot $(TARGET32) && echo "  [PASS] Multiboot header is valid and compliant." || (echo "  [FAIL] Invalid Multiboot header."; exit 1)
@@ -287,7 +287,7 @@ bake-icons:
 
 # Clean
 clean:
-	rm -rf $(BUILD_DIR)/* iso/boot/ratanaos.bin
+	rm -rf $(BUILD_DIR)/* iso/boot/rios.bin
 
 $(BUILD_DIR)/virtual.o: $(SRC_DIR)/kernel/mm/virtual.c
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -327,7 +327,7 @@ $(BUILD_DIR)/net.o: $(SRC_DIR)/kernel/net/net.c
 
 # Check Dependencies
 check-deps:
-	@echo "Checking RatanaOS build dependencies..."
+	@echo "Checking RiOS build dependencies..."
 	@which gcc >/dev/null 2>&1 && echo "  [OK] GCC x86_64 compiler found" || echo "  [FAIL] GCC missing"
 	@which nasm >/dev/null 2>&1 && echo "  [OK] NASM assembler found" || echo "  [FAIL] NASM missing"
 	@which ld >/dev/null 2>&1 && echo "  [OK] GNU ld linker found" || echo "  [FAIL] GNU ld missing"
@@ -344,7 +344,7 @@ debug: $(TARGET32)
 # Full automated subsystem test suite
 test-all: test
 	@echo "\n=============================================="
-	@echo "     RATANAOS FULL SUBSYSTEM AUDIT TEST       "
+	@echo "     RIOS FULL SUBSYSTEM AUDIT TEST       "
 	@echo "=============================================="
 	@echo "[PASS] CPU long mode & GDT/IDT/TSS setup"
 	@echo "[PASS] Paging & 4GB Physical/Virtual MM"
@@ -371,7 +371,7 @@ test-all: test
 # Performance Benchmarking Suite
 benchmark: all
 	@echo "\n=============================================="
-	@echo "     RATANAOS PERFORMANCE BENCHMARK SUITE      "
+	@echo "     RIOS PERFORMANCE BENCHMARK SUITE      "
 	@echo "=============================================="
 	@echo "[BENCHMARK 1] Null Syscall Overhead:      48.2 ns/call (int 0x80 gate)"
 	@echo "[BENCHMARK 2] Dynamic Memory Allocation:  18.4 ns/op (kmalloc/kfree 64B)"
@@ -384,34 +384,34 @@ benchmark: all
 # ==============================================================================
 # Debian Live-Build Integration Targets (v4.0)
 # ==============================================================================
-LIVE_ISO = $(BUILD_DIR)/ratanaos-live-amd64.hybrid.iso
+LIVE_ISO = $(BUILD_DIR)/rios-live-amd64.hybrid.iso
 
 live-config:
-	@echo "==> Configuring RatanaOS Debian live-build..."
+	@echo "==> Configuring RiOS Debian live-build..."
 	./tools/docker-live-build.sh config
 
 live-iso: live-config
-	@echo "==> Building RatanaOS Debian Live Hybrid ISO..."
+	@echo "==> Building RiOS Debian Live Hybrid ISO..."
 	./tools/docker-live-build.sh build
 
 live-run:
 	@if [ -f "$(LIVE_ISO)" ]; then \
-		echo "==> Booting RatanaOS Live ISO in QEMU (4GB RAM, 4 Cores, KVM, Intel HDA Audio)..."; \
+		echo "==> Booting RiOS Live ISO in QEMU (4GB RAM, 4 Cores, KVM, Intel HDA Audio)..."; \
 		qemu-system-x86_64 -m 4096 -smp 4 -enable-kvm \
 			-cdrom $(LIVE_ISO) \
 			-vga std \
 			-netdev user,id=net0 -device virtio-net-pci,netdev=net0 \
 			-device intel-hda -device hda-duplex; \
-	elif [ -f "$(BUILD_DIR)/ratanaos_full.iso" ]; then \
-		echo "==> Booting RatanaOS Full ISO in QEMU..."; \
-		qemu-system-x86_64 -cdrom $(BUILD_DIR)/ratanaos_full.iso -m 4096 -smp 4 -enable-kvm -vga std; \
+	elif [ -f "$(BUILD_DIR)/rios_full.iso" ]; then \
+		echo "==> Booting RiOS Full ISO in QEMU..."; \
+		qemu-system-x86_64 -cdrom $(BUILD_DIR)/rios_full.iso -m 4096 -smp 4 -enable-kvm -vga std; \
 	else \
 		echo "Error: No Live ISO found. Run 'make live-iso' first."; \
 		exit 1; \
 	fi
 
 live-run-full:
-	@echo "==> Booting RatanaOS Live ISO in Full-Screen mode (4GB RAM, 4 Cores, KVM)..."
+	@echo "==> Booting RiOS Live ISO in Full-Screen mode (4GB RAM, 4 Cores, KVM)..."
 	qemu-system-x86_64 -m 4096 -smp 4 -enable-kvm \
 		-cdrom $(LIVE_ISO) \
 		-vga std \
@@ -422,13 +422,13 @@ live-run-full:
 
 live-checksum:
 	@if [ -f "$(LIVE_ISO)" ]; then \
-		sha256sum $(LIVE_ISO) > $(BUILD_DIR)/RatanaOS.iso.sha256; \
-		echo "==> Checksum written to $(BUILD_DIR)/RatanaOS.iso.sha256:"; \
-		cat $(BUILD_DIR)/RatanaOS.iso.sha256; \
-	elif [ -f "$(BUILD_DIR)/ratanaos_full.iso" ]; then \
-		sha256sum $(BUILD_DIR)/ratanaos_full.iso > $(BUILD_DIR)/RatanaOS.iso.sha256; \
-		echo "==> Checksum written to $(BUILD_DIR)/RatanaOS.iso.sha256:"; \
-		cat $(BUILD_DIR)/RatanaOS.iso.sha256; \
+		sha256sum $(LIVE_ISO) > $(BUILD_DIR)/RiOS.iso.sha256; \
+		echo "==> Checksum written to $(BUILD_DIR)/RiOS.iso.sha256:"; \
+		cat $(BUILD_DIR)/RiOS.iso.sha256; \
+	elif [ -f "$(BUILD_DIR)/rios_full.iso" ]; then \
+		sha256sum $(BUILD_DIR)/rios_full.iso > $(BUILD_DIR)/RiOS.iso.sha256; \
+		echo "==> Checksum written to $(BUILD_DIR)/RiOS.iso.sha256:"; \
+		cat $(BUILD_DIR)/RiOS.iso.sha256; \
 	else \
 		echo "Error: No ISO found to checksum."; \
 		exit 1; \
@@ -444,7 +444,7 @@ live-clean:
 # Fast Live-Build (<10 Minutes Full Build)
 # ==============================================================================
 live-iso-fast:
-	@echo "==> Running RatanaOS Fast ISO Build Engine (<10 minutes)..."
+	@echo "==> Running RiOS Fast ISO Build Engine (<10 minutes)..."
 	./tools/fast-live-build.sh
 
 iso-fast: live-iso-fast

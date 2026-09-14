@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# RiOS Dynamic Theme Switcher
+CURRENT=$(xfconf-query -c xsettings -p /Net/ThemeName 2>/dev/null || echo "RiOS-Dark")
+
+if [ "$1" = "dark" ] || [ "$CURRENT" = "RiOS-Light" ]; then
+    echo "Switching to RiOS Dark Mode..."
+    xfconf-query -c xsettings -p /Net/ThemeName -s "RiOS-Dark"
+    xfconf-query -c xfwm4 -p /general/theme -s "RiOS-Dark"
+    xfconf-query -c xsettings -p /Net/IconThemeName -s "WhiteSur"
+elif [ "$1" = "light" ] || [ "$CURRENT" = "RiOS-Dark" ]; then
+    echo "Switching to RiOS Light Mode..."
+    xfconf-query -c xsettings -p /Net/ThemeName -s "RiOS-Light"
+    xfconf-query -c xfwm4 -p /general/theme -s "RiOS-Light"
+    xfconf-query -c xsettings -p /Net/IconThemeName -s "MacTahoe"
+fi

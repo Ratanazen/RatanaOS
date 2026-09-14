@@ -1,18 +1,18 @@
-# RatanaOS Troubleshooting & Recovery Guide
+# RiOS Troubleshooting & Recovery Guide
 
-## 1. System Self-Diagnostics with `ratana-doctor`
+## 1. System Self-Diagnostics with `ri-doctor`
 
-RatanaOS includes an automated diagnostic and self-repair tool:
+RiOS includes an automated diagnostic and self-repair tool:
 
 ```bash
 # 1. Audit system health:
-ratana-doctor check
+ri-doctor check
 
 # 2. Automatically repair missing configurations and permissions:
-ratana-doctor fix
+ri-doctor fix
 
 # 3. Generate and export a full diagnostic report:
-ratana-doctor report
+ri-doctor report
 ```
 
 ---

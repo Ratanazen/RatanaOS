@@ -7,6 +7,6 @@ int main(void) {
     printf("USER=root\n");
     printf("HOME=/root\n");
     printf("TERM=xterm-256color\n");
-    printf("OS=RatanaOS-x86_64\n");
+    printf("OS=RiOS-x86_64\n");
     return 0;
 }
