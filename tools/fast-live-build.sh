@@ -34,10 +34,10 @@ docker run --rm \
         --distribution bookworm \
         --archive-areas "main contrib non-free non-free-firmware" \
         --debian-installer none \
-        --iso-application "RiOS Live (macOS Sequoia Edition)" \
-        --iso-publisher "Rizen" \
+        --iso-application "RiOS Full Edition (Cyber, Dev, Server, Hyprland, KDE, GNOME)" \
+        --iso-publisher "RiOS Project" \
         --iso-volume "RIOS_LIVE" \
-        --bootappend-live "boot=live components username=ri hostname=ri user-fullname=\"Ri\" quiet splash" \
+        --bootappend-live "boot=live components username=ri hostname=rios user-fullname=\"Ri\" quiet splash" \
         --linux-packages linux-image \
         --memtest none \
         --binary-images iso-hybrid \
