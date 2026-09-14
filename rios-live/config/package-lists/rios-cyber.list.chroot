@@ -1,8 +1,8 @@
 # ==============================================================================
-# RiOS Cybersecurity & Hacking Suite
+# RiOS — Full Debian Cybersecurity & Penetration Testing Suite
 # ==============================================================================
 
-# Network scanning & enumeration
+# Network Scanning, Sniffing & Enumeration
 nmap
 masscan
 netcat-openbsd
@@ -16,24 +16,32 @@ net-tools
 arp-scan
 nbtscan
 hping3
+ettercap-text-only
+dsniff
+mitmproxy
 
-# Wireless / Wi-Fi
+# Wireless / RF Security
 aircrack-ng
 reaver
 kismet
+macchanger
 
-# Password cracking
+# Password Auditing & Cracking
 john
 hydra
 medusa
 crunch
 
-# Web security
+# Web Application Security & Discovery
 nikto
 dirb
 sqlmap
+gobuster
+wfuzz
+curl
+wget
 
-# Forensics & reversing
+# Forensics, Binary Analysis & Reverse Engineering
 binwalk
 foremost
 radare2
@@ -41,23 +49,25 @@ gdb
 strace
 ltrace
 hexedit
+volatility3
 
-# Sniffing & MITM
-ettercap-text-only
-dsniff
-mitmproxy
-
-# Vulnerability assessment
+# Security Auditing & Compliance
 lynis
+chkrootkit
+rkhunter
 
-# Enumeration
+# Infrastructure & Network Enumeration
 smbclient
 ldap-utils
+enum4linux
+snmp
 
-# Crypto & steganography
+# Cryptography & Steganography
 steghide
+gnupg
+cryptsetup
 
-# Tunneling & pivoting
+# Tunneling, Pivoting & Proxies
 proxychains4
 socat
 stunnel4

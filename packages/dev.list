@@ -1,32 +1,22 @@
 # ==============================================================================
-# RiOS Development Suite
+# RiOS — Complete Software Development & Engineering Suite
 # ==============================================================================
 
-# Core build tools
+# Compilers & Toolchains
 build-essential
-git
-git-lfs
-curl
-wget
-vim
-nano
-htop
-btop
-neofetch
-pciutils
-usbutils
-sudo
-ca-certificates
-rsync
-unzip
-zip
-jq
-tree
-tmux
-screen
-stow
+clang
+llvm
+cmake
+meson
+ninja-build
+gdb
+valgrind
+pkg-config
+autoconf
+automake
+libtool
 
-# Languages & runtimes
+# Core Languages & Runtimes
 python3
 python3-pip
 python3-venv
@@ -39,22 +29,45 @@ cargo
 ruby
 ruby-dev
 default-jdk
+lua5.4
 
-# Containers
+# Version Control & Collaboration
+git
+git-lfs
+gh
+
+# Containers & Virtualization
 docker.io
 podman
 
-# Database clients
-mariadb-client
-postgresql-client
-redis-tools
-sqlite3
-
-# Editor
+# Modern Text Editors & IDE Tools
 neovim
+vim
+nano
+tmux
+screen
 
-# Shell
+# Modern CLI Power Utilities
+htop
+btop
+neofetch
+pciutils
+usbutils
+sudo
+ca-certificates
+rsync
+unzip
+zip
+jq
+tree
+stow
 zsh
 fzf
 ripgrep
 fd-find
+
+# Database Clients
+mariadb-client
+postgresql-client
+redis-tools
+sqlite3

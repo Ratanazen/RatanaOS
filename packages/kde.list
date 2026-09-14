@@ -1,0 +1,17 @@
+# ==============================================================================
+# RiOS — Debian KDE Plasma Desktop Environment
+# ==============================================================================
+kde-plasma-desktop
+plasma-workspace
+kwin-x11
+kwin-wayland
+dolphin
+konsole
+systemsettings
+kwrite
+plasma-widgets-addons
+gwenview
+ark
+kcalc
+plasma-systemmonitor
+xdg-desktop-portal-kde

@@ -1,0 +1,18 @@
+# ==============================================================================
+# RiOS — Debian GNOME Desktop Environment
+# ==============================================================================
+gnome-core
+gnome-shell
+gnome-session
+nautilus
+gnome-terminal
+gnome-control-center
+gnome-tweaks
+gnome-system-monitor
+gnome-disk-utility
+gnome-calculator
+eog
+evince
+file-roller
+network-manager-gnome
+xdg-desktop-portal-gnome

@@ -1,29 +1,34 @@
 # ==============================================================================
-# RiOS Server & Infrastructure
+# RiOS — Enterprise Server & Infrastructure Suite
 # ==============================================================================
 
-# Remote access
+# Remote Access & Secure Shell
 openssh-server
 openssh-client
 
-# Web servers
+# Web Servers & Proxies
 nginx
+apache2
 
-# Firewall
+# Network Security & Firewalls
 iptables
 nftables
 ufw
 fail2ban
 
-# VPN
+# VPN & Secure Networking
 wireguard-tools
 openvpn
 
-# SSL
+# SSL/TLS Certificate Management
 certbot
 
-# Monitoring
+# Monitoring & Diagnostics
 vnstat
 iotop
 sysstat
 lsof
+iftop
+nload
+bmon
+netstat-nat

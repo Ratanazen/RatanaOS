@@ -10,7 +10,7 @@ PKG_DIR="${ROOT_DIR}/packages"
 
 echo "==> Running Test: test-packages.sh..."
 
-REQUIRED_LISTS=("cyber.list" "dev.list" "server.list" "hyprland.list" "sway.list" "desktop.list" "common.list" "installer.list" "fonts.list")
+REQUIRED_LISTS=("cyber.list" "dev.list" "server.list" "gnome.list" "kde.list" "hyprland.list" "sway.list" "desktop.list" "common.list" "installer.list" "fonts.list")
 
 for list in "${REQUIRED_LISTS[@]}"; do
     FILE="${PKG_DIR}/${list}"
