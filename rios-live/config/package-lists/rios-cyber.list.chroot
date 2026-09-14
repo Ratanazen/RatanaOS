@@ -23,7 +23,6 @@ mitmproxy
 # Wireless / RF Security
 aircrack-ng
 reaver
-kismet
 macchanger
 
 # Password Auditing & Cracking
@@ -33,7 +32,6 @@ medusa
 crunch
 
 # Web Application Security & Discovery
-nikto
 dirb
 sqlmap
 gobuster
@@ -44,12 +42,10 @@ wget
 # Forensics, Binary Analysis & Reverse Engineering
 binwalk
 foremost
-radare2
 gdb
 strace
 ltrace
 hexedit
-volatility3
 
 # Security Auditing & Compliance
 lynis
@@ -59,7 +55,6 @@ rkhunter
 # Infrastructure & Network Enumeration
 smbclient
 ldap-utils
-enum4linux
 snmp
 
 # Cryptography & Steganography
