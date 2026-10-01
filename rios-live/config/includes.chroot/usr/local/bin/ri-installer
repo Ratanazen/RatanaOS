@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RiOS Master OS Installer (Stage A — Live USB to Real HDD/SSD)
+# RiOS Master OS Installer (1.0.0) (Stage A — Live USB to Real HDD/SSD)
 # ==============================================================================
 set -euo pipefail
 
@@ -38,7 +38,7 @@ DRY_RUN=0
 print_banner() {
     echo -e "${PURPLE}${BOLD}"
     echo "╔══════════════════════════════════════════════════════════╗"
-    echo "║                RiOS Master Installer                 ║"
+    echo "║                RiOS Master Installer (1.0.0)                 ║"
     echo "║       Install RiOS to Real Computer Storage          ║"
     echo "╚══════════════════════════════════════════════════════════╝"
     echo -e "${NC}"
@@ -52,7 +52,8 @@ usage() {
     echo "  --user <name>        Primary username (default: ri)"
     echo "  --password <pass>    User and root password (default: ri)"
     echo "  --hostname <host>    Machine hostname (default: rios)"
-    echo "  --session <session>  Default session (rios-hyprland, rios-niri, rios-sway)"
+    echo "  --session <session>  Default session/profile (rios-hyprland, rios-sway, gnome, plasma, server)"
+    echo "  --profile <profile>  Alias for --session"
     echo "  --mode <uefi|bios>   Force boot mode (default: auto)"
     echo "  --dry-run            Simulate installation without touching any disk"
     echo "  -y, --yes            Skip interactive confirmation (for automated testing)"
@@ -67,7 +68,7 @@ while [[ $# -gt 0 ]]; do
         --user)       USERNAME="$2"; shift 2 ;;
         --password)   PASSWORD="$2"; shift 2 ;;
         --hostname)   HOSTNAME="$2"; shift 2 ;;
-        --session)    DESKTOP_SESSION="$2"; shift 2 ;;
+        --session|--profile) DESKTOP_SESSION="$2"; shift 2 ;;
         --mode)       BOOT_MODE="$2"; shift 2 ;;
         --dry-run)    DRY_RUN=1; shift ;;
         -y|--yes)     NON_INTERACTIVE=1; shift ;;

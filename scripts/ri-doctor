@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # ==============================================================================
 # RiOS 1.0.0 Doctor — Diagnostic & Self-Healing Utility
+# Performs full audit of Desktop, Server, Cyber, Dev, and Core system configs
 # ==============================================================================
 
 RED='\033[0;31m'
@@ -47,17 +48,17 @@ doctor_check() {
     echo -e "${BOLD}${PURPLE}          RiOS 1.0.0 System Health Audit               ${NC}"
     echo -e "${BOLD}${PURPLE}======================================================${NC}"
 
-    header "1. Desktop Compositors & Display"
-    for comp in hyprland niri sway; do
+    header "1. Desktop Compositors & Display Sessions"
+    for comp in hyprland sway gnome-shell startplasma-wayland; do
         if command -v "$comp" >/dev/null 2>&1; then
-            log_check "OK" "Compositor binary: $comp ($(command -v $comp))"
+            log_check "OK" "Compositor/Desktop binary: $comp"
         else
-            log_check "WARN" "Compositor binary: $comp" "Not installed or not in PATH"
+            log_check "WARN" "Compositor/Desktop binary: $comp" "Not installed or not in PATH"
         fi
     done
 
-    header "2. Core Desktop Components"
-    local core_tools=("waybar" "swaync" "wofi" "kitty" "swww" "swayidle" "swaylock" "grim" "slurp" "pamixer" "brightnessctl")
+    header "2. Wayland & Desktop Utilities"
+    local core_tools=("waybar" "swaync" "wofi" "kitty" "foot" "swayidle" "swaylock" "grim" "slurp" "pamixer" "brightnessctl")
     for tool in "${core_tools[@]}"; do
         if command -v "$tool" >/dev/null 2>&1; then
             log_check "OK" "Desktop utility: $tool"
@@ -66,17 +67,42 @@ doctor_check() {
         fi
     done
 
-    header "3. User Configuration Files"
+    header "3. Server & Cloud Daemons"
+    local server_tools=("sshd" "nginx" "docker" "ufw" "fail2ban" "wg" "cockpit-bridge")
+    for s_tool in "${server_tools[@]}"; do
+        if command -v "$s_tool" >/dev/null 2>&1; then
+            log_check "OK" "Server daemon binary: $s_tool"
+        else
+            log_check "WARN" "Server daemon binary: $s_tool" "Not installed (Optional in desktop-only profile)"
+        fi
+    done
+
+    header "4. Cybersecurity & Ethical Hacking Tools"
+    local cyber_tools=("nmap" "wireshark" "tshark" "john" "hydra" "sqlmap" "binwalk" "proxychains4")
+    for c_tool in "${cyber_tools[@]}"; do
+        if command -v "$c_tool" >/dev/null 2>&1; then
+            log_check "OK" "Cyber tool: $c_tool"
+        else
+            log_check "WARN" "Cyber tool: $c_tool" "Not installed (Optional in minimal profile)"
+        fi
+    done
+
+    header "5. Developer Toolchain & Runtimes"
+    local dev_tools=("gcc" "make" "git" "python3" "node" "cargo" "go" "nvim")
+    for d_tool in "${dev_tools[@]}"; do
+        if command -v "$d_tool" >/dev/null 2>&1; then
+            log_check "OK" "Developer tool: $d_tool"
+        else
+            log_check "WARN" "Developer tool: $d_tool" "Not installed (Optional in minimal profile)"
+        fi
+    done
+
+    header "6. User Configuration Files"
     local configs=(
         "hypr/hyprland.conf"
-        "niri/config.kdl"
         "sway/config"
-        "waybar/config.json"
+        "waybar/config"
         "waybar/style.css"
-        "swaync/config.json"
-        "swaync/style.css"
-        "wofi/config"
-        "wofi/style.css"
         "kitty/kitty.conf"
         "ri/theme.conf"
     )
@@ -86,45 +112,12 @@ doctor_check() {
         elif [ -f "/etc/skel/.config/$cfg" ]; then
             log_check "WARN" "User config: ~/.config/$cfg" "Available in /etc/skel but missing for $TARGET_USER"
         else
-            log_check "FAIL" "User config: ~/.config/$cfg" "Missing completely"
+            log_check "WARN" "User config: ~/.config/$cfg" "Missing"
         fi
     done
 
-    header "4. System Theme Engine & Assets"
-    if [ -d "/usr/share/rios/themes" ]; then
-        local theme_count
-        theme_count=$(find /usr/share/rios/themes -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)
-        if [ "$theme_count" -ge 7 ]; then
-            log_check "OK" "7 System Themes present in /usr/share/rios/themes ($theme_count found)"
-        else
-            log_check "WARN" "System themes directory has fewer than 7 themes ($theme_count found)"
-        fi
-    else
-        log_check "FAIL" "Directory /usr/share/rios/themes does not exist"
-    fi
-
-    if [ -f "/etc/rios/theme.conf" ]; then
-        log_check "OK" "System default theme config: /etc/rios/theme.conf"
-    else
-        log_check "WARN" "System default theme config: /etc/rios/theme.conf missing"
-    fi
-
-    header "5. Typography & Fonts"
-    local fonts=("JetBrains Mono" "Noto Sans" "Font Awesome")
-    if command -v fc-list >/dev/null 2>&1; then
-        for font in "${fonts[@]}"; do
-            if fc-list : family | grep -qi "$font"; then
-                log_check "OK" "Font family: $font detected"
-            else
-                log_check "WARN" "Font family: $font not detected in fontconfig cache"
-            fi
-        done
-    else
-        log_check "WARN" "fc-list utility not found (fontconfig missing)"
-    fi
-
-    header "6. RiOS 1.0.0 Helper Utilities"
-    local helpers=("ri-theme" "ri-launcher" "ri-wallpaper" "ri-lock" "ri-power" "ri-screenshot" "ri-first-run" "ri-doctor")
+    header "7. RiOS 1.0.0 Helper Utilities"
+    local helpers=("ri-server" "ri-launcher" "ri-lock" "ri-power" "ri-screenshot" "ri-first-run" "ri-doctor" "ri-installer")
     for h in "${helpers[@]}"; do
         if [ -x "/usr/local/bin/$h" ]; then
             log_check "OK" "Utility: /usr/local/bin/$h (executable)"
@@ -133,7 +126,7 @@ doctor_check() {
         fi
     done
 
-    header "7. Permissions & File Ownership"
+    header "8. Permissions & File Ownership"
     if [ -d "${TARGET_HOME}/.config" ]; then
         local wrong_owner
         wrong_owner=$(find "${TARGET_HOME}/.config" -user root 2>/dev/null | head -n 5)
@@ -146,7 +139,7 @@ doctor_check() {
 
     echo ""
     echo -e "${BOLD}${PURPLE}======================================================${NC}"
-    echo -e "${BOLD}Summary: ${PASSED_CHECKS}/${TOTAL_CHECKS} Passed | ${YELLOW}${WARNINGS} Warnings${NC} | ${RED}${ERRORS} Errors${NC}"
+    echo -e "${BOLD}Summary: ${PASSED_CHECKS}/${TOTAL_CHECKS} Checks Evaluated | ${YELLOW}${WARNINGS} Warnings${NC} | ${RED}${ERRORS} Errors${NC}"
     echo -e "${BOLD}${PURPLE}======================================================${NC}"
 }
 
@@ -154,17 +147,12 @@ doctor_fix() {
     echo -e "${BOLD}${CYAN}[*] Starting RiOS 1.0.0 Self-Healing & Configuration Repair...${NC}"
 
     mkdir -p "${TARGET_HOME}/.config/ri"
-    mkdir -p "${TARGET_HOME}/.config/ri/wallpapers"
 
-    # 1. Restore missing configs from /etc/skel or /usr/share/rios/skel
+    # 1. Restore missing configs from /etc/skel
     local skel_source="/etc/skel/.config"
-    if [ ! -d "$skel_source" ] && [ -d "/usr/share/rios/skel" ]; then
-        skel_source="/usr/share/rios/skel"
-    fi
-
     if [ -d "$skel_source" ]; then
         echo -e "  -> Restoring missing user configurations from ${skel_source}..."
-        for dir in hypr niri sway waybar swaync wofi rofi kitty foot starship fastfetch ri; do
+        for dir in hypr sway waybar kitty foot ri; do
             if [ -d "${skel_source}/${dir}" ]; then
                 if [ ! -d "${TARGET_HOME}/.config/${dir}" ]; then
                     cp -r "${skel_source}/${dir}" "${TARGET_HOME}/.config/"
@@ -174,25 +162,17 @@ doctor_fix() {
         done
     fi
 
-    # 2. Fix theme.conf fallback
-    if [ ! -f "${TARGET_HOME}/.config/ri/theme.conf" ]; then
-        if [ -f "/usr/share/rios/themes/ri-dark/theme.conf" ]; then
-            cp "/usr/share/rios/themes/ri-dark/theme.conf" "${TARGET_HOME}/.config/ri/theme.conf"
-            echo -e "     ${GREEN}+ Initialized default theme: ri-dark${NC}"
-        fi
-    fi
-
-    # 3. Fix permissions and ownership
+    # 2. Fix permissions and ownership
     echo -e "  -> Repairing file permissions and ownership for ${TARGET_USER}..."
     chown -R "${TARGET_USER}:${TARGET_USER}" "${TARGET_HOME}/.config" 2>/dev/null || true
     chmod -R u+rw "${TARGET_HOME}/.config" 2>/dev/null || true
 
-    # 4. Make system scripts executable
+    # 3. Make system scripts executable
     if [ -d "/usr/local/bin" ]; then
         chmod +x /usr/local/bin/ri-* 2>/dev/null || true
     fi
 
-    # 5. Update font cache
+    # 4. Update font cache if present
     if command -v fc-cache >/dev/null 2>&1; then
         echo -e "  -> Refreshing font cache..."
         fc-cache -f >/dev/null 2>&1 || true
@@ -213,7 +193,6 @@ doctor_report() {
         echo "OS:            $(cat /etc/os-release | grep PRETTY_NAME | cut -d= -f2 | tr -d '\"')"
         echo "Current User:  ${TARGET_USER}"
         echo "Memory:        $(free -h | awk '/^Mem:/ {print $3 "/" $2}')"
-        echo "Compositors:   $(which hyprland niri sway 2>/dev/null | tr '\n' ' ')"
         echo "GPU:           $(lspci 2>/dev/null | grep -E -i 'vga|3d|display' || echo 'Unknown')"
         echo ""
         echo "Running checks..."
@@ -235,7 +214,7 @@ case "${1:-check}" in
         ;;
     help|--help|-h)
         echo "Usage: ri-doctor [check|fix|report]"
-        echo "  check   - Perform health inspection of packages, themes, and configs"
+        echo "  check   - Perform health inspection of Desktop, Server, Cyber, Dev, and Configs"
         echo "  fix     - Automatically repair broken permissions and missing configs"
         echo "  report  - Generate full diagnostic report and save to ~/.config/ri/doctor-report.log"
         ;;

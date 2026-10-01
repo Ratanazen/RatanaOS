@@ -90,8 +90,10 @@ case "${ACTION}" in
         build_docker_image
         echo "==> Running live-build inside container..."
         run_in_container_non_interactive lb build
-        if ls "${LIVE_DIR}"/*.iso 1>/dev/null 2>&1; then
-            cp "${LIVE_DIR}"/*.iso "${ROOT_DIR}/build/rios-live-amd64.hybrid.iso"
+        LATEST_ISO=$(ls -t "${LIVE_DIR}"/*.iso 2>/dev/null | head -n1 || true)
+        if [ -n "$LATEST_ISO" ] && [ -f "$LATEST_ISO" ]; then
+            mkdir -p "${ROOT_DIR}/build"
+            cp -f "$LATEST_ISO" "${ROOT_DIR}/build/rios-live-amd64.hybrid.iso"
             echo "==> Live ISO generated at ${ROOT_DIR}/build/rios-live-amd64.hybrid.iso"
         fi
         ;;

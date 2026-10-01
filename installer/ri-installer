@@ -52,7 +52,8 @@ usage() {
     echo "  --user <name>        Primary username (default: ri)"
     echo "  --password <pass>    User and root password (default: ri)"
     echo "  --hostname <host>    Machine hostname (default: rios)"
-    echo "  --session <session>  Default session (rios-hyprland, rios-niri, rios-sway)"
+    echo "  --session <session>  Default session/profile (rios-hyprland, rios-sway, gnome, plasma, server)"
+    echo "  --profile <profile>  Alias for --session"
     echo "  --mode <uefi|bios>   Force boot mode (default: auto)"
     echo "  --dry-run            Simulate installation without touching any disk"
     echo "  -y, --yes            Skip interactive confirmation (for automated testing)"
@@ -67,7 +68,7 @@ while [[ $# -gt 0 ]]; do
         --user)       USERNAME="$2"; shift 2 ;;
         --password)   PASSWORD="$2"; shift 2 ;;
         --hostname)   HOSTNAME="$2"; shift 2 ;;
-        --session)    DESKTOP_SESSION="$2"; shift 2 ;;
+        --session|--profile) DESKTOP_SESSION="$2"; shift 2 ;;
         --mode)       BOOT_MODE="$2"; shift 2 ;;
         --dry-run)    DRY_RUN=1; shift ;;
         -y|--yes)     NON_INTERACTIVE=1; shift ;;

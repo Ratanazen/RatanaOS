@@ -70,9 +70,10 @@ docker run --rm \
     "${IMAGE_NAME}" \
     lb build
 
-if ls "${LIVE_DIR}"/*.iso 1>/dev/null 2>&1; then
+LATEST_ISO=$(ls -t "${LIVE_DIR}"/*.iso 2>/dev/null | head -n1 || true)
+if [ -n "$LATEST_ISO" ] && [ -f "$LATEST_ISO" ]; then
     mkdir -p "${ROOT_DIR}/build"
-    cp "${LIVE_DIR}"/*.iso "${ROOT_DIR}/build/rios-live-amd64.hybrid.iso"
+    cp -f "$LATEST_ISO" "${ROOT_DIR}/build/rios-live-amd64.hybrid.iso"
     sha256sum "${ROOT_DIR}/build/rios-live-amd64.hybrid.iso" > "${ROOT_DIR}/build/RiOS.iso.sha256"
     END_TIME=$(date +%s)
     DIFF_TIME=$((END_TIME - START_TIME))
