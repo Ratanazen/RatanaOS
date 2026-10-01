@@ -1,5 +1,5 @@
 # RiOS GRUB Theme
-title-text: "RiOS Live (macOS Sequoia 2026 Edition)"
+title-text: "RiOS Live (Debian 12 Bookworm)"
 title-font: "Sans Regular 16"
 title-color: "#FFFFFF"
 message-font: "Sans Regular 12"

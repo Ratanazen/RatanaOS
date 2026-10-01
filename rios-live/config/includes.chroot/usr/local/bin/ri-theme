@@ -16,8 +16,8 @@ mkdir -p "${CONFIG_DIR}"
 
 list_themes() {
     echo "Available RiOS Themes:"
-    echo "  - dark      (Ri Dark - macOS Sequoia Obsidian & Electric Blue)"
-    echo "  - light     (Ri Light - Cupertino Clean & Crisp Azure)"
+    echo "  - dark      (Ri Dark - Obsidian & Electric Blue)"
+    echo "  - light     (Ri Light - Clean & Crisp Azure)"
     echo "  - glass     (Ri Glass - Deep Translucency & Ethereal Frost)"
     echo "  - cyber     (Ri Cyber - Neon Synthwave Cyan & Magenta)"
     echo "  - anime     (Ri Anime - Sakura Blossom Pink & Soft Lavender)"

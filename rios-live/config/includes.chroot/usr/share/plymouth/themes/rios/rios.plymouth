@@ -1,6 +1,6 @@
 [Plymouth Theme]
 Name=RiOS Splash
-Description=macOS Sequoia Boot Splash for RiOS
+Description=RiOS Boot Splash
 ModuleName=script
 
 [script]

@@ -13,7 +13,7 @@ DONE_FILE="${CONFIG_DIR}/.first-run-done"
 mkdir -p "${BACKUP_DIR}" "${CONFIG_DIR}"
 
 echo "============================================================"
-echo " 󰀻 Welcome to RiOS 2026 (macOS Sequoia Edition)"
+echo " 󰀻 Welcome to RiOS 2026 (Debian 12 Bookworm)"
 echo "============================================================"
 
 # Create safety backup of existing configurations if any
@@ -28,7 +28,7 @@ fi
 ri-theme dark || true
 
 # 2. Set default wallpaper
-ri-wallpaper set "/usr/share/backgrounds/rios/rios-sequoia-dark.png" || true
+ri-wallpaper set "/usr/share/backgrounds/rios/rios-dark.png" || true
 
 # 3. Mark first-run completed
 touch "${DONE_FILE}"

@@ -223,14 +223,14 @@ configure_gtk() {
         mkdir -p "${USER_CONFIG}/gtk-3.0" "${USER_CONFIG}/gtk-4.0"
         cat << 'GEOF' > "${USER_CONFIG}/gtk-3.0/settings.ini"
 [Settings]
-gtk-theme-name=WhiteSur-Dark
-gtk-icon-theme-name=WhiteSur-dark
-gtk-cursor-theme-name=WhiteSur-cursors
+gtk-theme-name=Adwaita-dark
+gtk-icon-theme-name=Papirus-Dark
+gtk-cursor-theme-name=Adwaita
 gtk-application-prefer-dark-theme=1
 gtk-font-name=Cantarell 11
 GEOF
         cat << 'GEOF' > "${USER_CONFIG}/gtk-4.0/gtk.css"
-@import url("file:///usr/share/themes/WhiteSur-Dark/gtk-4.0/gtk.css");
+/* RiOS Modern Clean Dark GTK4 */
 GEOF
     fi
     echo -e "\e[1;32m✓\e[0m"

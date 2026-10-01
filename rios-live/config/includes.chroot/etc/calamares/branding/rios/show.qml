@@ -31,7 +31,7 @@ Item {
                     height: 64
                 }
                 Text {
-                    text: "Welcome to RiOS 1.0 (macOS Sequoia Edition)"
+                    text: "Welcome to RiOS 1.0 (Debian 12 Bookworm)"
                     color: "#FFFFFF"
                     font.pixelSize: 20
                     font.bold: true

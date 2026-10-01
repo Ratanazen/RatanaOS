@@ -9,9 +9,9 @@ windowPlacement: center
 strings:
     productName:         "RiOS"
     shortProductName:    "RiOS"
-    version:             "1.0 (macOS Sequoia 2026 Edition)"
+    version:             "1.0 (Debian 12 Bookworm)"
     shortVersion:        "1.0"
-    versionedName:       "RiOS 1.0 (macOS Sequoia 2026 Edition)"
+    versionedName:       "RiOS 1.0 (Debian 12 Bookworm)"
     shortVersionedName:  "RiOS 1.0"
     bootloaderEntryName: "RiOS"
     productUrl:          "https://github.com/Rizen/RiOS"

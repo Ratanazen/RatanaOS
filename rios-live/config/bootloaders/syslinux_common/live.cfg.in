@@ -1,5 +1,5 @@
 label live-@FLAVOUR@
-	menu label ^RiOS 2026 Live (macOS Sequoia Edition)
+	menu label ^RiOS 2026 Live (Debian 12 Bookworm)
 	menu default
 	linux @LINUX@
 	initrd @INITRD@

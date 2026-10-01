@@ -7,7 +7,7 @@
 set -euo pipefail
 
 WALLPAPER="${HOME}/.config/ri/theme.conf"
-IMG="/usr/share/backgrounds/rios/rios-sequoia-dark.png"
+IMG="/usr/share/backgrounds/rios/rios-dark.png"
 
 if [ -f "$WALLPAPER" ]; then
     # shellcheck disable=SC1090
