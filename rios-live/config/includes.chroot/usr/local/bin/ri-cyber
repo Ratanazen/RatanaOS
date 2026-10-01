@@ -29,18 +29,22 @@ usage() {
     echo -e "${BOLD}Usage:${NC} ri-cyber <command> [arguments]"
     echo ""
     echo -e "${BOLD}Commands:${NC}"
-    echo "  status            Audit available security tools and versions"
+    echo "  status            Audit all available Kali & Debian security tools"
     echo "  scan <target>     Perform multi-stage network recon on target/subnet"
-    echo "  ports <target>    Fast TCP/UDP port scan"
-    echo "  web <url>         Perform web vulnerability & header check"
-    echo "  wireless          List and inspect Wi-Fi interfaces"
-    echo "  menu              Launch interactive cybersecurity navigation menu"
+    echo "  ports <target>    Fast TCP/UDP service & OS port enumeration"
+    echo "  web <url>         Perform web vulnerability & security header check"
+    echo "  ssl <domain>      Audit TLS/SSL certificates and ciphers (sslscan)"
+    echo "  osint <domain>    Enumerate subdomains & DNS OSINT (sublist3r)"
+    echo "  wireless          Inspect Wi-Fi cards & WPS vulnerability tools"
+    echo "  mitm [interface]  Launch Bettercap / network MITM suite"
+    echo "  kali              Manage Kali Rolling repository integration"
     echo "  help              Show this help"
     echo ""
     echo -e "${BOLD}Examples:${NC}"
     echo "  ri-cyber scan 192.168.1.0/24"
     echo "  ri-cyber ports 192.168.1.50"
-    echo "  ri-cyber web http://target.local"
+    echo "  ri-cyber ssl example.com"
+    echo "  ri-cyber osint target.com"
     echo ""
     exit 0
 }
@@ -61,31 +65,58 @@ cmd_status() {
     check_tool "nmap" "Nmap Network Scanner"
     check_tool "masscan" "Masscan High-Speed Scanner"
     check_tool "arp-scan" "ARP Local Network Scanner"
+    check_tool "arping" "Arping Host Discovery"
+    check_tool "netdiscover" "Netdiscover Active/Passive Scanner"
+    check_tool "fping" "Fast ICMP Ping"
     check_tool "hping3" "Hping3 Packet Crafter"
 
     echo -e "\n${BOLD}=== Traffic & Packet Analysis ===${NC}"
     check_tool "wireshark" "Wireshark GUI Packet Analyzer"
     check_tool "tshark" "TShark CLI Packet Analyzer"
     check_tool "tcpdump" "Tcpdump Packet Capture"
+    check_tool "tcpflow" "TCP Stream Reconstructor"
+    check_tool "ngrep" "Network Grep"
 
-    echo -e "\n${BOLD}=== Web Application Security ===${NC}"
+    echo -e "\n${BOLD}=== Wireless & Wi-Fi Auditing ===${NC}"
+    check_tool "aircrack-ng" "Aircrack-ng Suite"
+    check_tool "wifite" "Wifite Automated Wireless Auditor"
+    check_tool "bully" "Bully WPS Brute-Forcer"
+    check_tool "pixiewps" "Pixiewps Offline WPS Cracker"
+    check_tool "macchanger" "MAC Address Spoofing"
+
+    echo -e "\n${BOLD}=== Web Application Security & OSINT ===${NC}"
     check_tool "sqlmap" "SQLMap Automated SQLi"
-    check_tool "nikto" "Nikto Web Vulnerability Scanner"
+    check_tool "gobuster" "Gobuster Directory/DNS Buster"
+    check_tool "dirb" "Dirb Web Content Scanner"
+    check_tool "sublist3r" "Sublist3r Subdomain Enumerator"
+    check_tool "recon-ng" "Recon-ng OSINT Framework"
+    check_tool "sslscan" "SSLScan TLS/SSL Auditor"
+    check_tool "testssl.sh" "TestSSL.sh TLS Tester"
 
     echo -e "\n${BOLD}=== Password Cracking & Cryptanalysis ===${NC}"
+    check_tool "hashcat" "Hashcat GPU/CPU Password Cracker"
     check_tool "john" "John the Ripper"
     check_tool "hydra" "Hydra Online Password Cracker"
     check_tool "crunch" "Crunch Wordlist Generator"
+    check_tool "cewl" "CeWL Custom Wordlist Spider"
+    check_tool "fcrackzip" "Fast ZIP Password Cracker"
+    check_tool "pdfcrack" "PDF Password Recovery"
 
     echo -e "\n${BOLD}=== Forensics & Reverse Engineering ===${NC}"
     check_tool "binwalk" "Binwalk Firmware Analysis"
-    check_tool "radare2" "Radare2 Reverse Engineering"
+    check_tool "sleuthkit" "The Sleuth Kit (TSK)"
+    check_tool "scalpel" "Scalpel File Carver"
+    check_tool "gddrescue" "GNU Ddrescue Data Recovery"
+    check_tool "yara" "Yara Malware Pattern Matcher"
     check_tool "gdb" "GNU Project Debugger"
     check_tool "hexedit" "Hex Editor"
 
-    echo -e "\n${BOLD}=== Anonymity & Pivoting ===${NC}"
-    check_tool "proxychains4" "Proxychains4 Tor/SOCKS Chainer"
+    echo -e "\n${BOLD}=== MITM, Pivoting & Network Exploitation ===${NC}"
+    check_tool "bettercap" "Bettercap Network Attack Framework"
+    check_tool "ettercap" "Ettercap MITM Suite"
+    check_tool "proxychains4" "Proxychains4 SOCKS Chainer"
     check_tool "socat" "Socat Multipurpose Relay"
+    check_tool "suricata" "Suricata High-Performance IDS/IPS"
     echo ""
 }
 
@@ -130,21 +161,75 @@ cmd_web() {
     echo -e "${BOLD}Auditing Web Headers & Server Fingerprint: ${url}${NC}\n"
     curl -I -s -L "$url" || true
     echo ""
-    if command -v nikto >/dev/null 2>&1; then
-        echo -e "${CYAN}Running Nikto scan...${NC}"
-        nikto -h "$url"
+    if command -v gobuster >/dev/null 2>&1; then
+        echo -e "${CYAN}Tip: Run 'gobuster dir -u $url -w /usr/share/wordlists/...' for directory discovery${NC}"
+    fi
+}
+
+cmd_ssl() {
+    local domain="${1:-}"
+    if [ -z "$domain" ]; then
+        echo -e "${RED}Error: Domain or host required (e.g. example.com)${NC}"
+        exit 1
+    fi
+
+    print_banner
+    echo -e "${BOLD}Auditing TLS/SSL Ciphers on: ${domain}${NC}\n"
+    if command -v sslscan >/dev/null 2>&1; then
+        sslscan "$domain"
+    elif command -v testssl.sh >/dev/null 2>&1; then
+        testssl.sh "$domain"
+    else
+        echo -e "${RED}Neither sslscan nor testssl.sh installed.${NC}"
+    fi
+}
+
+cmd_osint() {
+    local domain="${1:-}"
+    if [ -z "$domain" ]; then
+        echo -e "${RED}Error: Domain required (e.g. example.com)${NC}"
+        exit 1
+    fi
+
+    print_banner
+    echo -e "${BOLD}Running Subdomain Enumeration for: ${domain}${NC}\n"
+    if command -v sublist3r >/dev/null 2>&1; then
+        sublist3r -d "$domain"
+    else
+        echo -e "${YELLOW}sublist3r not installed. Running dnsutils query...${NC}"
+        dig "$domain" ANY +noall +answer
     fi
 }
 
 cmd_wireless() {
     print_banner
-    echo -e "${BOLD}Detected Wireless Interfaces:${NC}"
-    if command -v iwconfig >/dev/null 2>&1; then
-        iwconfig 2>&1 | grep -v "no wireless"
-    elif command -v ip >/dev/null 2>&1; then
+    echo -e "${BOLD}Detected Wireless Interfaces & Tools:${NC}"
+    if command -v ip >/dev/null 2>&1; then
         ip link show | grep -E 'wlan|wlp' || echo "No wireless interfaces detected."
     fi
     echo ""
+    check_tool "aircrack-ng" "Aircrack-ng"
+    check_tool "wifite" "Wifite"
+    check_tool "bully" "Bully"
+    check_tool "pixiewps" "Pixiewps"
+    echo ""
+}
+
+cmd_mitm() {
+    local iface="${1:-}"
+    print_banner
+    if command -v bettercap >/dev/null 2>&1; then
+        echo -e "${CYAN}Launching Bettercap MITM...${NC}"
+        if [ -n "$iface" ]; then
+            sudo bettercap -iface "$iface"
+        else
+            sudo bettercap
+        fi
+    elif command -v ettercap >/dev/null 2>&1; then
+        sudo ettercap -G
+    else
+        echo -e "${RED}Bettercap or Ettercap not installed.${NC}"
+    fi
 }
 
 case "${1:-status}" in
@@ -163,8 +248,24 @@ case "${1:-status}" in
         shift
         cmd_web "$@"
         ;;
+    ssl)
+        shift
+        cmd_ssl "$@"
+        ;;
+    osint)
+        shift
+        cmd_osint "$@"
+        ;;
     wireless|wifi)
         cmd_wireless
+        ;;
+    mitm)
+        shift
+        cmd_mitm "$@"
+        ;;
+    kali)
+        shift
+        sudo "${SCRIPT_DIR}/ri-kali-setup" "$@"
         ;;
     menu)
         cmd_status

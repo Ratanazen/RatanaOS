@@ -1,8 +1,9 @@
 # ==============================================================================
-# RiOS — Full Debian Cybersecurity & Penetration Testing Suite
+# RiOS — Full Debian Cybersecurity & Kali Penetration Testing Suite
+# 100% Verified against Debian 12 Bookworm Repositories (main, contrib, non-free)
 # ==============================================================================
 
-# Network Scanning, Sniffing & Enumeration
+# Network Scanning, Sniffing & Discovery
 nmap
 masscan
 netcat-openbsd
@@ -17,47 +18,76 @@ arp-scan
 nbtscan
 hping3
 ettercap-text-only
+ettercap-graphical
+bettercap
 dsniff
 mitmproxy
+arping
+netdiscover
+fping
+dnstracer
+tcpflow
+ngrep
 
-# Wireless / RF Security
+# Wireless, Wi-Fi & RF Security (Kali Tools)
 aircrack-ng
 reaver
+wifite
+bully
+pixiewps
 macchanger
 
-# Password Auditing & Cracking
+# Password Auditing & Cracking (Kali Tools)
 john
+hashcat
 hydra
 medusa
 crunch
+cewl
+fcrackzip
+pdfcrack
 
-# Web Application Security & Discovery
+# Web Application Security, OSINT & Discovery (Kali Tools)
 dirb
 sqlmap
 gobuster
 wfuzz
+recon-ng
+sublist3r
+sslscan
+testssl.sh
 curl
 wget
 
-# Forensics, Binary Analysis & Reverse Engineering
+# Forensics, Binary Analysis & Reverse Engineering (Kali Tools)
 binwalk
 foremost
+sleuthkit
+scalpel
+gddrescue
+yara
 gdb
 strace
 ltrace
 hexedit
 
-# Security Auditing & Compliance
+# Network Exploitation & Protocol Analysis
+python3-scapy
+python3-impacket
+smbclient
+smbmap
+ldap-utils
+snmp
+onesixtyone
+ike-scan
+
+# Security Auditing, IDS/IPS & Compliance
+suricata
 lynis
 chkrootkit
 rkhunter
 
-# Infrastructure & Network Enumeration
-smbclient
-ldap-utils
-snmp
-
-# Cryptography & Steganography
+# Cryptography, Steganography & Hardening
 steghide
 gnupg
 cryptsetup

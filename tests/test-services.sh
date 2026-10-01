@@ -43,6 +43,7 @@ REQUIRED_SCRIPTS=(
     "ri-flash"
     "ri-cyber"
     "ri-dev"
+    "ri-kali-setup"
 )
 
 for s in "${REQUIRED_SCRIPTS[@]}"; do
