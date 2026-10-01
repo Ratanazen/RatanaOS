@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=RiOS Dev Hub
+GenericName=Developer Hub
+Comment=Project generator, toolchain diagnostics, and development manager
+Exec=x-terminal-emulator -e /usr/local/bin/ri-dev
+Icon=ri-dev
+Terminal=true
+Categories=Development;System;
+StartupNotify=true

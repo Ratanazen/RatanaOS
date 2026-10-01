@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+echo "==> Updating hicolor icon cache for SVG & PNG icons..."
+if command -v gtk-update-icon-cache >/dev/null 2>&1; then
+    gtk-update-icon-cache -f -t /usr/share/icons/hicolor || true
+fi

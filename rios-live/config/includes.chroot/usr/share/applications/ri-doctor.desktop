@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=RiOS System Doctor
+GenericName=System Diagnostics
+Comment=Run hardware, kernel, network, and package verification diagnostics
+Exec=x-terminal-emulator -e /usr/local/bin/ri-doctor check
+Icon=ri-doctor
+Terminal=true
+Categories=System;Settings;
+StartupNotify=true

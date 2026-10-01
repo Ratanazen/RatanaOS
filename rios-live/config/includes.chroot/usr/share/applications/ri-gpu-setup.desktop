@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=RiOS GPU Setup
+GenericName=Graphics Setup
+Comment=Configure NVIDIA, AMD, Intel drivers and PRIME offloading
+Exec=x-terminal-emulator -e /usr/local/bin/ri-gpu-setup
+Icon=ri-gpu-setup
+Terminal=true
+Categories=Settings;HardwareSettings;
+StartupNotify=true

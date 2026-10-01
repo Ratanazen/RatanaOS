@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="instBg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="70%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </radialGradient>
+  </defs>
+  <circle cx="256" cy="256" r="240" fill="url(#instBg)" stroke="#6366f1" stroke-width="6"/>
+  
+  <!-- Hard Drive Enclosure -->
+  <rect x="110" y="100" width="292" height="312" rx="24" fill="#1e293b" stroke="#818cf8" stroke-width="5"/>
+  <circle cx="256" cy="230" r="75" fill="#0f172a" stroke="#6366f1" stroke-width="6"/>
+  <circle cx="256" cy="230" r="30" fill="#6366f1"/>
+  
+  <!-- Download / Install Arrow -->
+  <path d="M 256,150 L 256,270 M 215,235 L 256,275 L 297,235" 
+        fill="none" stroke="#00f0ff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Status LEDs -->
+  <circle cx="150" cy="370" r="8" fill="#10b981"/>
+  <circle cx="180" cy="370" r="8" fill="#38bdf8"/>
+  <line x1="230" y1="370" x2="360" y2="370" stroke="#475569" stroke-width="6" stroke-linecap="round"/>
+</svg>

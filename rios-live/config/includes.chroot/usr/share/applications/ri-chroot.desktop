@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=RiOS Rescue Chroot
+GenericName=System Rescue
+Comment=Emergency disk auto-mount and rescue environment
+Exec=x-terminal-emulator -e sudo /usr/local/bin/ri-chroot
+Icon=ri-chroot
+Terminal=true
+Categories=System;
+StartupNotify=true

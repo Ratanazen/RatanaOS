@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="docBg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#064e3b"/>
+      <stop offset="70%" stop-color="#022c22"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </radialGradient>
+  </defs>
+  <circle cx="256" cy="256" r="240" fill="url(#docBg)" stroke="#10b981" stroke-width="6"/>
+  
+  <!-- Heartbeat ECG Pulse -->
+  <path d="M 70,256 L 160,256 L 195,170 L 235,340 L 275,200 L 310,290 L 335,256 L 442,256" 
+        fill="none" stroke="#34d399" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Checkmark Badge -->
+  <circle cx="256" cy="390" r="45" fill="#10b981"/>
+  <path d="M 238,390 L 250,402 L 276,376" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

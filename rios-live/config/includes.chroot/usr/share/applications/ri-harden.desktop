@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=RiOS Security Hardening
+GenericName=Security Baseline
+Comment=Apply kernel sysctl hardening, zero-trust UFW firewall, and SSH safety
+Exec=x-terminal-emulator -e /usr/local/bin/ri-harden
+Icon=ri-harden
+Terminal=true
+Categories=System;Security;
+StartupNotify=true

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=RiOS Server Cockpit
+GenericName=Server Web Console
+Comment=Open Cockpit Web Console and server services manager
+Exec=xdg-open http://localhost:9090
+Icon=ri-server
+Terminal=false
+Categories=System;Network;
+StartupNotify=true

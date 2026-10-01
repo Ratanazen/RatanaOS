@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=RiOS CVE Auditor
+GenericName=Vulnerability Auditor
+Comment=Scan system for known CVE vulnerabilities and verify CPU mitigations
+Exec=x-terminal-emulator -e /usr/local/bin/ri-cve audit
+Icon=ri-cve
+Terminal=true
+Categories=System;Security;
+StartupNotify=true

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Install RiOS to Disk
+GenericName=System Installer
+Comment=Install RiOS permanently to HDD, SSD, or NVMe drive
+Exec=x-terminal-emulator -e sudo /usr/local/bin/ri-installer
+Icon=ri-installer
+Terminal=true
+Categories=System;Settings;
+StartupNotify=true

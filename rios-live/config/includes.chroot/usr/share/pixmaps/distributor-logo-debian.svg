@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="65%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </radialGradient>
+    <linearGradient id="cyberBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00f0ff"/>
+      <stop offset="35%" stop-color="#3b82f6"/>
+      <stop offset="70%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#00f0ff"/>
+    </linearGradient>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="50%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="cyanNeon" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#00f0ff"/>
+    </linearGradient>
+    <linearGradient id="silverGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="50%" stop-color="#cbd5e1"/>
+      <stop offset="100%" stop-color="#94a3b8"/>
+    </linearGradient>
+    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Outer Ring Background -->
+  <circle cx="256" cy="256" r="248" fill="url(#bgGlow)"/>
+  <circle cx="256" cy="256" r="248" fill="none" stroke="url(#cyberBorder)" stroke-width="8"/>
+  <circle cx="256" cy="256" r="236" fill="none" stroke="#00f0ff" stroke-width="2" opacity="0.6"/>
+
+  <!-- Top Header: RIOS -->
+  <text x="256" y="58" font-family="DejaVu Sans, Inter, sans-serif" font-size="34" font-weight="900" fill="#00f0ff" text-anchor="middle" letter-spacing="14" filter="url(#neonGlow)">RIOS</text>
+  <text x="256" y="58" font-family="DejaVu Sans, Inter, sans-serif" font-size="34" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="14">RIOS</text>
+
+  <!-- Bottom Footer: DEBIAN 12 • CYBER OS -->
+  <text x="256" y="474" font-family="DejaVu Sans, Inter, sans-serif" font-size="18" font-weight="800" fill="#38bdf8" text-anchor="middle" letter-spacing="8">DEBIAN 12 • CYBER OS</text>
+
+  <!-- Left / Right Cyber Stars -->
+  <polygon points="56,256 61,267 73,267 64,274 67,285 56,278 45,285 48,274 39,267 51,267" fill="#00f0ff"/>
+  <polygon points="456,256 461,267 473,267 464,274 467,285 456,278 445,285 448,274 439,267 451,267" fill="#00f0ff"/>
+
+  <!-- Inner Crest Ring -->
+  <circle cx="256" cy="256" r="162" fill="url(#shieldGrad)" stroke="#38bdf8" stroke-width="3"/>
+  <circle cx="256" cy="256" r="154" fill="none" stroke="#6366f1" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.7"/>
+
+  <!-- Radar / Cyber Pulse Grid -->
+  <circle cx="256" cy="256" r="122" fill="none" stroke="#0284c7" stroke-width="1" opacity="0.4"/>
+  <circle cx="256" cy="256" r="85" fill="none" stroke="#0284c7" stroke-width="1" opacity="0.4"/>
+  <circle cx="256" cy="256" r="50" fill="none" stroke="#0284c7" stroke-width="1" opacity="0.4"/>
+  <line x1="256" y1="94" x2="256" y2="418" stroke="#0284c7" stroke-width="1" opacity="0.3"/>
+  <line x1="94" y1="256" x2="418" y2="256" stroke="#0284c7" stroke-width="1" opacity="0.3"/>
+
+  <!-- Center Shield Emblem -->
+  <path d="M 256,128 
+           C 312,128 352,142 372,168 
+           C 372,264 332,344 256,388 
+           C 180,344 140,264 140,168 
+           C 160,142 200,128 256,128 Z" 
+        fill="#0a0f1d" stroke="url(#cyanNeon)" stroke-width="5" filter="url(#neonGlow)"/>
+
+  <!-- Stylized Cyber Falcon & Circuit Crest -->
+  <g transform="translate(256, 252) scale(0.96) translate(-256, -252)">
+    <path d="M 256,155 L 290,195 L 325,185 L 295,215 L 305,245 L 256,220 L 207,245 L 217,215 L 187,185 L 222,195 Z" 
+          fill="url(#silverGrad)" stroke="#38bdf8" stroke-width="2"/>
+    <circle cx="256" cy="190" r="7" fill="#00f0ff" filter="url(#neonGlow)"/>
+    <circle cx="256" cy="190" r="3.5" fill="#ffffff"/>
+
+    <path d="M 215,220 L 172,255 L 172,295 L 195,310 L 225,290 L 225,250" 
+          fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="172" cy="255" r="4" fill="#38bdf8"/>
+    <circle cx="172" cy="295" r="4" fill="#38bdf8"/>
+    <circle cx="195" cy="310" r="4" fill="#00f0ff"/>
+
+    <path d="M 297,220 L 340,255 L 340,295 L 317,310 L 287,290 L 287,250" 
+          fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="340" cy="255" r="4" fill="#38bdf8"/>
+    <circle cx="340" cy="295" r="4" fill="#38bdf8"/>
+    <circle cx="317" cy="310" r="4" fill="#00f0ff"/>
+
+    <polygon points="256,242 280,278 256,338 232,278" fill="#00f0ff" opacity="0.9" filter="url(#neonGlow)"/>
+    <polygon points="256,254 270,278 256,320 242,278" fill="#ffffff"/>
+  </g>
+</svg>

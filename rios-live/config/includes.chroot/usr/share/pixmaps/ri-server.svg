@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="srvBg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="70%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </radialGradient>
+  </defs>
+  <circle cx="256" cy="256" r="240" fill="url(#srvBg)" stroke="#38bdf8" stroke-width="6"/>
+  
+  <!-- Server Unit 1 -->
+  <rect x="100" y="110" width="312" height="70" rx="12" fill="#1e293b" stroke="#0284c7" stroke-width="3"/>
+  <circle cx="140" cy="145" r="8" fill="#10b981"/>
+  <circle cx="170" cy="145" r="8" fill="#38bdf8"/>
+  <line x1="220" y1="135" x2="380" y2="135" stroke="#475569" stroke-width="4" stroke-linecap="round"/>
+  <line x1="220" y1="155" x2="380" y2="155" stroke="#475569" stroke-width="4" stroke-linecap="round"/>
+  
+  <!-- Server Unit 2 -->
+  <rect x="100" y="210" width="312" height="70" rx="12" fill="#1e293b" stroke="#0284c7" stroke-width="3"/>
+  <circle cx="140" cy="245" r="8" fill="#10b981"/>
+  <circle cx="170" cy="245" r="8" fill="#f59e0b"/>
+  <line x1="220" y1="235" x2="380" y2="235" stroke="#475569" stroke-width="4" stroke-linecap="round"/>
+  <line x1="220" y1="255" x2="380" y2="255" stroke="#475569" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Server Unit 3 -->
+  <rect x="100" y="310" width="312" height="70" rx="12" fill="#1e293b" stroke="#0284c7" stroke-width="3"/>
+  <circle cx="140" cy="345" r="8" fill="#10b981"/>
+  <circle cx="170" cy="345" r="8" fill="#00f0ff"/>
+  <line x1="220" y1="335" x2="380" y2="335" stroke="#475569" stroke-width="4" stroke-linecap="round"/>
+  <line x1="220" y1="355" x2="380" y2="355" stroke="#475569" stroke-width="4" stroke-linecap="round"/>
+</svg>

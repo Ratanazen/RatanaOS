@@ -1,11 +1,11 @@
 [Desktop Entry]
 Type=Application
 Version=1.0
-Name=Install RiOS
-GenericName=Live Installer
-Comment=Install RiOS permanently to your drive
-Exec=pkexec calamares
-Icon=calamares
+Name=Install RiOS (Calamares)
+GenericName=System Installer
+Comment=Install RiOS with graphical Calamares installer
+Exec=calamares
+Icon=ri-installer
 Terminal=false
-Categories=System;
+Categories=System;Settings;
 StartupNotify=true

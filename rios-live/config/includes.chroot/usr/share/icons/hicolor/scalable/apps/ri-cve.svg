@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="cveBg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#701a75"/>
+      <stop offset="70%" stop-color="#2e1065"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </radialGradient>
+  </defs>
+  <circle cx="256" cy="256" r="240" fill="url(#cveBg)" stroke="#d946ef" stroke-width="6"/>
+  
+  <!-- Radar Sweep -->
+  <circle cx="256" cy="256" r="150" fill="none" stroke="#a855f7" stroke-width="3"/>
+  <circle cx="256" cy="256" r="90" fill="none" stroke="#a855f7" stroke-width="2"/>
+  
+  <!-- Vulnerability Bug Target -->
+  <circle cx="256" cy="256" r="45" fill="#f43f5e"/>
+  <circle cx="256" cy="190" r="25" fill="#f43f5e"/>
+  
+  <!-- Bug Legs -->
+  <line x1="190" y1="230" x2="160" y2="210" stroke="#f43f5e" stroke-width="8" stroke-linecap="round"/>
+  <line x1="190" y1="256" x2="150" y2="256" stroke="#f43f5e" stroke-width="8" stroke-linecap="round"/>
+  <line x1="190" y1="280" x2="160" y2="300" stroke="#f43f5e" stroke-width="8" stroke-linecap="round"/>
+
+  <line x1="322" y1="230" x2="352" y2="210" stroke="#f43f5e" stroke-width="8" stroke-linecap="round"/>
+  <line x1="322" y1="256" x2="362" y2="256" stroke="#f43f5e" stroke-width="8" stroke-linecap="round"/>
+  <line x1="322" y1="280" x2="352" y2="300" stroke="#f43f5e" stroke-width="8" stroke-linecap="round"/>
+  
+  <!-- Shield Protection Patch -->
+  <path d="M 256,120 L 330,150 L 330,230 L 256,270 L 182,230 L 182,150 Z" 
+        fill="#10b981" opacity="0.4" stroke="#34d399" stroke-width="4"/>
+</svg>

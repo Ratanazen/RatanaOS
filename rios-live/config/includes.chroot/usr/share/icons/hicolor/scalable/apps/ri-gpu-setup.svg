@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <radialGradient id="gpuBg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#14532d"/>
+      <stop offset="70%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </radialGradient>
+  </defs>
+  <circle cx="256" cy="256" r="240" fill="url(#gpuBg)" stroke="#22c55e" stroke-width="6"/>
+  
+  <!-- GPU Processor Chip -->
+  <rect x="130" y="130" width="252" height="252" rx="20" fill="#1e293b" stroke="#22c55e" stroke-width="6"/>
+  <rect x="180" y="180" width="152" height="152" rx="10" fill="#0f172a" stroke="#4ade80" stroke-width="3"/>
+  <text x="256" y="270" font-family="DejaVu Sans, Inter, sans-serif" font-size="36" font-weight="900" fill="#22c55e" text-anchor="middle">GPU</text>
+
+  <!-- External Chip Pins -->
+  <line x1="170" y1="100" x2="170" y2="130" stroke="#22c55e" stroke-width="6"/>
+  <line x1="210" y1="100" x2="210" y2="130" stroke="#22c55e" stroke-width="6"/>
+  <line x1="256" y1="100" x2="256" y2="130" stroke="#22c55e" stroke-width="6"/>
+  <line x1="302" y1="100" x2="302" y2="130" stroke="#22c55e" stroke-width="6"/>
+  <line x1="342" y1="100" x2="342" y2="130" stroke="#22c55e" stroke-width="6"/>
+  
+  <line x1="170" y1="382" x2="170" y2="412" stroke="#22c55e" stroke-width="6"/>
+  <line x1="210" y1="382" x2="210" y2="412" stroke="#22c55e" stroke-width="6"/>
+  <line x1="256" y1="382" x2="256" y2="412" stroke="#22c55e" stroke-width="6"/>
+  <line x1="302" y1="382" x2="302" y2="412" stroke="#22c55e" stroke-width="6"/>
+  <line x1="342" y1="382" x2="342" y2="412" stroke="#22c55e" stroke-width="6"/>
+</svg>

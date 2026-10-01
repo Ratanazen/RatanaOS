@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=RiOS Cyber Hub
+GenericName=Security Hub
+Comment=Launch RiOS offensive cybersecurity and penetration testing suite
+Exec=x-terminal-emulator -e /usr/local/bin/ri-cyber
+Icon=ri-cyber
+Terminal=true
+Categories=System;Security;Network;
+StartupNotify=true
