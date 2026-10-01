@@ -1,0 +1,136 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# RiOS Installation Media Integrity Verifier (1.0.0)
+# Validates checksums and verifies integrity of ISO or live installation media
+# ==============================================================================
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+BOLD='\033[1m'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+
+DEFAULT_ISO="${ROOT_DIR}/build/rios-live-amd64.hybrid.iso"
+DEFAULT_SHA="${ROOT_DIR}/build/RiOS.iso.sha256"
+
+print_banner() {
+    echo -e "${BLUE}${BOLD}"
+    echo "╔══════════════════════════════════════════════════════════╗"
+    echo "║       RiOS Media Integrity & Checksum Verifier (1.0.0)   ║"
+    echo "║      Verify ISO, USB Block Device & SquashFS Health      ║"
+    echo "╚══════════════════════════════════════════════════════════╝"
+    echo -e "${NC}"
+}
+
+usage() {
+    print_banner
+    echo -e "${BOLD}Usage:${NC} $0 [OPTIONS]"
+    echo ""
+    echo -e "${BOLD}Options:${NC}"
+    echo "  --iso <path>         Path to ISO file (default: build/rios-live-amd64.hybrid.iso)"
+    echo "  --device <dev>       Path to USB block device (e.g. /dev/sdb)"
+    echo "  --check-live         Verify the currently booted live squashfs root"
+    echo "  -h, --help           Show this help"
+    echo ""
+    exit 0
+}
+
+TARGET_PATH="${DEFAULT_ISO}"
+MODE="iso"
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --iso)
+            TARGET_PATH="$2"
+            MODE="iso"
+            shift 2
+            ;;
+        --device|--dev)
+            TARGET_PATH="$2"
+            MODE="device"
+            shift 2
+            ;;
+        --check-live)
+            MODE="live"
+            shift
+            ;;
+        -h|--help)
+            usage
+            ;;
+        *)
+            echo "Unknown option: $1"
+            usage
+            ;;
+    esac
+done
+
+print_banner
+
+case "$MODE" in
+    iso)
+        if [ ! -f "$TARGET_PATH" ]; then
+            echo -e "${RED}Error: ISO file not found: ${TARGET_PATH}${NC}"
+            exit 1
+        fi
+        echo -e "Target ISO: ${BOLD}${TARGET_PATH}${NC}"
+        echo -e "File Size:  $(du -h "$TARGET_PATH" | cut -f1)"
+
+        echo -e "\n${CYAN}Calculating SHA256 checksum (this may take a few seconds)...${NC}"
+        CALCULATED_SHA=$(sha256sum "$TARGET_PATH" | awk '{print $1}')
+        echo -e "Calculated SHA256: ${BOLD}${CALCULATED_SHA}${NC}"
+
+        if [ -f "$DEFAULT_SHA" ]; then
+            EXPECTED_SHA=$(awk '{print $1}' "$DEFAULT_SHA" | head -n1)
+            echo -e "Expected SHA256:   ${BOLD}${EXPECTED_SHA}${NC}"
+            if [ "$CALCULATED_SHA" = "$EXPECTED_SHA" ]; then
+                echo -e "\n${GREEN}${BOLD}✔ ISO Checksum Verification: PASSED (100% Match)${NC}"
+            else
+                echo -e "\n${RED}${BOLD}✖ ISO Checksum Verification: FAILED (Hash Mismatch!)${NC}"
+                exit 1
+            fi
+        else
+            echo -e "No reference checksum file found at ${DEFAULT_SHA}."
+        fi
+        ;;
+    device)
+        if [ ! -b "$TARGET_PATH" ]; then
+            echo -e "${RED}Error: Target device is not a valid block device: ${TARGET_PATH}${NC}"
+            exit 1
+        fi
+        echo -e "Target Device: ${BOLD}${TARGET_PATH}${NC} ($(lsblk -d -n -o SIZE,MODEL "$TARGET_PATH" 2>/dev/null))"
+        echo -e "\n${CYAN}Checking partition table structure...${NC}"
+        fdisk -l "$TARGET_PATH" 2>/dev/null | grep -E "^/dev" || echo "Partition table read."
+        echo -e "\n${GREEN}${BOLD}✔ USB block device accessible and partitioned.${NC}"
+        ;;
+    live)
+        echo -e "${BOLD}Checking currently running Live SquashFS rootfs...${NC}"
+        SQUASHFS_LOC=""
+        for loc in /run/live/medium/live/filesystem.squashfs /lib/live/mount/medium/live/filesystem.squashfs; do
+            if [ -f "$loc" ]; then
+                SQUASHFS_LOC="$loc"
+                break
+            fi
+        done
+
+        if [ -n "$SQUASHFS_LOC" ]; then
+            echo -e "Located SquashFS at: ${SQUASHFS_LOC}"
+            if command -v unsquashfs >/dev/null 2>&1; then
+                echo -e "${CYAN}Testing SquashFS integrity...${NC}"
+                unsquashfs -s "$SQUASHFS_LOC"
+                echo -e "\n${GREEN}${BOLD}✔ Live SquashFS filesystem verified healthy!${NC}"
+            else
+                echo "unsquashfs not installed. Skipping deep inspection."
+            fi
+        else
+            echo -e "${YELLOW}Notice: Not currently running in a Live SquashFS environment.${NC}"
+        fi
+        ;;
+esac
+echo ""

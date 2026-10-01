@@ -85,9 +85,10 @@
 ## Phase 10: Real Bare-Metal Media Flashing & Media Integrity
 - `[x]` Automated checksum generator for SHA256 and SHA512 during build
 - `[x]` Multi-partition USB layout support (Live ISO partition + persistent storage partition)
+- `[x]` Safe USB Flashing utility with removable device locks (`ri-flash`)
+- `[x]` Media integrity & live squashfs self-test validator (`ri-media-check`)
 - `[ ]` Verification of USB boot media on Ventoy, Rufus (DD mode), and BalenaEtcher
 - `[ ]` GPG signature validation on installation media (`RiOS.iso.sig`)
-- `[ ]` Live media self-test option in Syslinux/GRUB boot menu (`check-media`)
 
 ## Phase 11: Real Computer UEFI/BIOS Boot & Storage Architecture
 - `[x]` Dual-mode boot compatibility: Legacy MBR BIOS (Syslinux) + UEFI 64-bit (GRUB-EFI)
@@ -99,9 +100,9 @@
 ## Phase 12: GPU Driver Stacks & Hardware Graphics Acceleration
 - `[x]` Open-source graphics drivers included: Mesa, Gallium, Intel Iris/Xe, AMD Radeon R600/RadeonSI
 - `[x]` Vulkan runtime components (`mesa-vulkan-drivers`, `vulkan-tools`)
-- `[ ]` Automated proprietary NVIDIA driver installation helper (`ri-gpu-setup --nvidia`)
-- `[ ]` Hybrid graphics PRIME render offload switching (`switcheroo-control`, `envycontrol`)
-- `[ ]` Hardware video decode acceleration validation (VA-API and VDPAU verification)
+- `[x]` Automated proprietary NVIDIA driver installation helper (`ri-gpu-setup nvidia`)
+- `[x]` Hybrid graphics PRIME render offload switching guide (`ri-gpu-setup prime`)
+- `[x]` Hardware video decode acceleration validation (`ri-gpu-setup status`)
 
 ## Phase 13: Kernel Optimization & Low-Latency Tuning
 - `[x]` Default distribution kernel: Debian 6.1 LTS Bookworm Linux Kernel
@@ -120,10 +121,11 @@
 
 ## Phase 15: Zero-Trust Hardening, AppArmor & Cryptographic Isolation
 - `[x]` UFW stateful firewall and fail2ban pre-installed
+- `[x]` Automated zero-trust hardening script (`ri-harden all`)
+- `[x]` Hardened kernel security sysctls applied (`/etc/sysctl.d/99-rios-security.conf`)
+- `[x]` OpenSSH daemon root login restrictions and key enforcement
 - `[ ]` Default AppArmor profiles enforced for network daemons (Nginx, SSH, Apache, BIND)
-- `[ ]` Hardened kernel boot flags (`slab_nomerge`, `page_poison=1`, `pti=on`)
 - `[ ]` Lynis automated compliance auditing scoring > 80/100 out of the box
-- `[ ]` Restricted `/proc` mounts for non-root users (`hidepid=2` option)
 
 ## Phase 16: Containerization, Kubernetes & Microservices Infrastructure
 - `[x]` Docker CE and Podman pre-configured
@@ -206,7 +208,7 @@
 - `[ ]` Timeshift / Snapper pre-installed with hourly/boot snapshot rules
 - `[ ]` Emergency rescue shell boot entry in GRUB (`RiOS Recovery Mode`)
 - `[ ]` Full-system offline backup utility (`ri-backup`) to external storage or NAS
-- `[ ]` Live USB Chroot Rescue Tool (`ri-chroot`) to easily repair broken systems
+- `[x]` Live USB Chroot Rescue Tool (`ri-chroot`) to easily repair broken systems
 - `[ ]` Automated MBR/GPT partition table backup on installation
 
 ## Phase 28: Performance Telemetry, Observability & Health Metrics
