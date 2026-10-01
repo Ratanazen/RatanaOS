@@ -32,6 +32,18 @@ case "${1:-all}" in
         echo "Starting RiOS Developer Workstation Build..."
         "${SCRIPT_DIR}/scripts/build_custom.sh" dev
         ;;
+    cloud)
+        echo "Starting RiOS Cloud QCOW2 Image Build..."
+        exec "${SCRIPT_DIR}/scripts/build_cloud_image.sh"
+        ;;
+    netboot|pxe)
+        echo "Starting RiOS Netboot & PXE Asset Build..."
+        exec "${SCRIPT_DIR}/scripts/build_netboot.sh"
+        ;;
+    container|docker|podman)
+        echo "Starting RiOS Container Image Build..."
+        exec "${SCRIPT_DIR}/scripts/build_container_image.sh"
+        ;;
     custom|--custom)
         shift 1 || true
         "${SCRIPT_DIR}/scripts/build_custom.sh" custom "$@"
@@ -47,6 +59,9 @@ case "${1:-all}" in
         echo "  server               Build Dedicated Server Edition"
         echo "  cyber                Build Cybersecurity & Pen-Testing Edition"
         echo "  dev                  Build Developer Workstation Edition"
+        echo "  cloud                Build Cloud-Init QCOW2 Virtual Appliance"
+        echo "  netboot              Build iPXE & PXELINUX Network Boot Assets"
+        echo "  container            Build Docker & Podman Container Image"
         echo "  custom [options]     Build with custom modular profiles"
         echo "  status               Show active package profiles"
         echo "  clean                Clean temporary cache and build artifacts"

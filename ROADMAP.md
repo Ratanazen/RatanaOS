@@ -134,6 +134,7 @@
 ## Phase 16: Containerization, Kubernetes & Microservices Infrastructure
 - `[x]` Docker CE and Podman pre-configured
 - `[x]` Container socket management and group permission configuration
+- `[x]` OCI / Docker Container RootFS Image Builder (`build.sh container` / `scripts/build_container_image.sh`)
 - `[ ]` Single-node Kubernetes starter (`k3s` automated deployment script `ri-k3s`)
 - `[ ]` Container networking verification (CNI bridge, overlay, port forwards)
 - `[ ]` Pre-installed compose tooling (`docker-compose-v2` / `podman-compose`)
@@ -160,9 +161,9 @@
 - `[ ]` Multi-node WireGuard mesh configuration wizard (`ri-vpn-mesh`)
 
 ## Phase 20: PXE, iPXE & Diskless Network Installation Architecture
-- `[ ]` TFTP + DHCP network bootloader configuration bundle
-- `[ ]` iPXE HTTP-based boot menu script for streaming RiOS Live ISO over LAN
-- `[ ]` NFS/NBD root filesystem streaming server script (`scripts/setup_pxe_server.sh`)
+- `[x]` TFTP & iPXE network bootloader configuration bundle (`boot.ipxe`, `pxelinux.cfg/default`)
+- `[x]` Netboot & PXE Network Asset Builder (`build.sh netboot` / `scripts/build_netboot.sh`)
+- `[x]` Local HTTP network boot asset streaming server launcher (`build/netboot/serve.sh`)
 - `[ ]` Diskless workstation mode (RiOS running entirely in RAM over network)
 - `[ ]` Lab deployment guide for computer clubs, schools, and security CTF ranges
 
@@ -223,7 +224,7 @@
 - `[ ]` Storage health telemetry monitoring daemon (`smartmontools` + `smartctl`)
 
 ## Phase 29: Cloud Images, Virtual Appliances & Hypervisor Templates
-- `[ ]` Standard QCOW2 cloud image build target (`build.sh cloud`)
+- `[x]` Standard QCOW2 cloud image build target (`build.sh cloud` / `scripts/build_cloud_image.sh`)
 - `[ ]` Vagrant box recipe for local developer provisioning
 - `[ ]` Proxmox VE / KVM LXC & VM template creation script
 - `[ ]` OVA / OVF virtual appliance export for VMware ESXi and VirtualBox
