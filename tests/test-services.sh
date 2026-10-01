@@ -48,6 +48,7 @@ REQUIRED_SCRIPTS=(
     "ri-harden"
     "ri-chroot"
     "ri-media-check"
+    "ri-cve"
 )
 
 for s in "${REQUIRED_SCRIPTS[@]}"; do

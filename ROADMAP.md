@@ -55,6 +55,8 @@
   - Preset: `dev` (Developer workstation)
   - Preset: `minimal` (Minimal Wayland base)
 - `[x]` Master build pipeline (`./build.sh [all|server|cyber|dev|custom|status|clean]`)
+- `[x]` Full system master build pipeline (`scripts/build_full_system.sh`)
+- `[x]` Debian Security & CVE patch archive integrated into build (`security.list.chroot`)
 - `[x]` Profile inspection tool (`./build.sh status`)
 
 ## Phase 7: System Diagnostics & Self-Healing (`ri-doctor`)
@@ -122,6 +124,8 @@
 ## Phase 15: Zero-Trust Hardening, AppArmor & Cryptographic Isolation
 - `[x]` UFW stateful firewall and fail2ban pre-installed
 - `[x]` Automated zero-trust hardening script (`ri-harden all`)
+- `[x]` CVE vulnerability auditor & automated security patching engine (`ri-cve`)
+- `[x]` CPU hardware vulnerability mitigations audit (Spectre, Meltdown, Retbleed)
 - `[x]` Hardened kernel security sysctls applied (`/etc/sysctl.d/99-rios-security.conf`)
 - `[x]` OpenSSH daemon root login restrictions and key enforcement
 - `[ ]` Default AppArmor profiles enforced for network daemons (Nginx, SSH, Apache, BIND)

@@ -18,8 +18,7 @@ case "${1:-all}" in
         exit 0
         ;;
     all|full)
-        echo "Starting RiOS Full Build (All Suites: Server + Cyber + Dev + Desktops)..."
-        "${SCRIPT_DIR}/scripts/build_custom.sh" all
+        exec "${SCRIPT_DIR}/scripts/build_full_system.sh"
         ;;
     server)
         echo "Starting RiOS Dedicated Server Build..."

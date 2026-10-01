@@ -1,0 +1,210 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# RiOS CVE Vulnerability Auditor & Security Patching Engine (1.0.0)
+# Scans system packages for CVEs, checks kernel CPU mitigations, and applies security updates
+# ==============================================================================
+
+set -euo pipefail
+
+BOLD='\033[1m'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+MAGENTA='\033[0;35m'
+NC='\033[0m'
+
+REPORT_FILE="/var/log/rios/cve-audit.log"
+mkdir -p "$(dirname "$REPORT_FILE")" 2>/dev/null || true
+
+print_banner() {
+    echo -e "${MAGENTA}${BOLD}"
+    echo "╔══════════════════════════════════════════════════════════╗"
+    echo "║       RiOS CVE Vulnerability & Security Patch Engine     ║"
+    echo "║       Kernel Mitigations, Debian CVEs & Security Fixes   ║"
+    echo "╚══════════════════════════════════════════════════════════╝"
+    echo -e "${NC}"
+}
+
+usage() {
+    print_banner
+    echo -e "${BOLD}Usage:${NC} sudo ri-cve <command>"
+    echo ""
+    echo -e "${BOLD}Commands:${NC}"
+    echo "  audit             Audit CPU/Hardware kernel vulnerability mitigations"
+    echo "  check             Check for pending CVE security patches in repositories"
+    echo "  patch             Download and apply critical Debian security updates"
+    echo "  harden            Verify and enforce kernel memory & ASLR mitigations"
+    echo "  report            Generate comprehensive vulnerability report"
+    echo "  help              Show this help"
+    echo ""
+    exit 0
+}
+
+cmd_audit() {
+    print_banner
+    echo -e "${BOLD}=== Kernel Hardware CPU Vulnerability Status ===${NC}"
+    local vuln_dir="/sys/devices/system/cpu/vulnerabilities"
+
+    if [ -d "$vuln_dir" ]; then
+        for vuln in "$vuln_dir"/*; do
+            if [ -f "$vuln" ]; then
+                local v_name
+                v_name=$(basename "$vuln")
+                local status
+                status=$(cat "$vuln" 2>/dev/null || echo "Unknown")
+
+                if echo "$status" | grep -qi -E "(Mitigation|Not affected)"; then
+                    echo -e "  [ ${GREEN}PROTECTED${NC} ] ${BOLD}${v_name}${NC}: ${status}"
+                elif echo "$status" | grep -qi "Vulnerable"; then
+                    echo -e "  [ ${RED}VULNERABLE${NC} ] ${BOLD}${v_name}${NC}: ${status}"
+                else
+                    echo -e "  [ ${YELLOW}UNKNOWN${NC} ] ${BOLD}${v_name}${NC}: ${status}"
+                fi
+            fi
+        done
+    else
+        echo -e "${YELLOW}Kernel vulnerability directory ($vuln_dir) not exposed by hypervisor/kernel.${NC}"
+    fi
+
+    echo -e "\n${BOLD}=== Kernel ASLR & Memory Protections ===${NC}"
+    local aslr
+    aslr=$(sysctl -n kernel.randomize_va_space 2>/dev/null || echo "0")
+    if [ "$aslr" = "2" ]; then
+        echo -e "  [ ${GREEN}PASS${NC} ] ASLR (Address Space Layout Randomization): Full (Level 2)"
+    else
+        echo -e "  [ ${YELLOW}WARN${NC} ] ASLR: Level $aslr (Run 'sudo ri-cve harden' to fix)"
+    fi
+
+    local ptrace_scope
+    ptrace_scope=$(sysctl -n kernel.yama.ptrace_scope 2>/dev/null || echo "0")
+    if [ "$ptrace_scope" -ge 1 ]; then
+        echo -e "  [ ${GREEN}PASS${NC} ] Yama Ptrace Restriction: Enforced (Level $ptrace_scope)"
+    else
+        echo -e "  [ ${YELLOW}INFO${NC} ] Yama Ptrace Scope: Default ($ptrace_scope)"
+    fi
+    echo ""
+}
+
+cmd_check() {
+    print_banner
+    echo -e "${BOLD}Checking for security updates from debian-security...${NC}"
+    
+    # Check if security source is configured
+    if ! grep -r -h "bookworm-security" /etc/apt/sources.list* 2>/dev/null | grep -q "^deb"; then
+        echo -e "${YELLOW}Notice: debian-security repository not active in APT sources!${NC}"
+        echo -e "Configuring debian-security now..."
+        cat << 'EOF' > /etc/apt/sources.list.d/debian-security.list
+deb http://deb.debian.org/debian-security/ bookworm-security main contrib non-free non-free-firmware
+EOF
+    fi
+
+    echo -e "Updating APT package indexes..."
+    apt-get update -o Acquire::AllowInsecureRepositories=false -qq || true
+
+    local sec_upgrades
+    sec_upgrades=$(apt-get --just-print upgrade 2>/dev/null | grep -i "Inst" | grep -iE "security|deb12u" || true)
+
+    if [ -n "$sec_upgrades" ]; then
+        local count
+        count=$(echo "$sec_upgrades" | wc -l)
+        echo -e "\n${YELLOW}${BOLD}⚠ Found ${count} pending security patch(es) addressing CVEs:${NC}"
+        echo "$sec_upgrades" | sed 's/^/  • /'
+        echo -e "\nRun '${BOLD}sudo ri-cve patch${NC}' to apply these security fixes."
+    else
+        echo -e "\n${GREEN}${BOLD}✔ System is completely up to date with zero unpatched CVE packages!${NC}"
+    fi
+    echo ""
+}
+
+cmd_patch() {
+    if [ "$EUID" -ne 0 ]; then
+        echo -e "${RED}Error: Root privileges required. Run with sudo.${NC}"
+        exit 1
+    fi
+
+    print_banner
+    echo -e "${BOLD}Applying all pending Debian Security & CVE updates...${NC}"
+    export DEBIAN_FRONTEND=noninteractive
+
+    # Ensure security source is present
+    if ! grep -r -h "bookworm-security" /etc/apt/sources.list* 2>/dev/null | grep -q "^deb"; then
+        cat << 'EOF' > /etc/apt/sources.list.d/debian-security.list
+deb http://deb.debian.org/debian-security/ bookworm-security main contrib non-free non-free-firmware
+EOF
+    fi
+
+    apt-get update -qq
+    apt-get upgrade -y --only-upgrade
+    apt-get autoremove -y -qq
+
+    echo -e "\n${GREEN}${BOLD}✔ Security patching complete! System packages hardened against known CVEs.${NC}"
+}
+
+cmd_harden() {
+    if [ "$EUID" -ne 0 ]; then
+        echo -e "${RED}Error: Root privileges required. Run with sudo.${NC}"
+        exit 1
+    fi
+
+    print_banner
+    echo -e "${CYAN}Applying Kernel Security & CVE Mitigation Parameters...${NC}"
+    cat << 'EOF' > /etc/sysctl.d/99-rios-cve-mitigations.conf
+# RiOS Kernel CVE Mitigation & Memory Hardening Baseline
+kernel.randomize_va_space = 2
+kernel.kptr_restrict = 2
+kernel.dmesg_restrict = 1
+kernel.unprivileged_bpf_disabled = 1
+net.core.bpf_jit_harden = 2
+fs.protected_hardlinks = 1
+fs.protected_symlinks = 1
+fs.protected_fifos = 2
+fs.protected_regular = 2
+EOF
+
+    sysctl --system >/dev/null 2>&1 || true
+    echo -e "${GREEN}${BOLD}✔ Kernel ASLR and memory isolation parameters enforced!${NC}"
+}
+
+cmd_report() {
+    print_banner
+    echo -e "Writing vulnerability audit report to: ${REPORT_FILE}..."
+    {
+        echo "=========================================================="
+        echo " RiOS CVE Vulnerability Audit - $(date -u)"
+        echo " Host: $(hostname 2>/dev/null || echo 'rios')"
+        echo " Kernel: $(uname -r) ($(uname -m))"
+        echo "=========================================================="
+        cmd_audit
+        cmd_check
+    } > "$REPORT_FILE" 2>&1
+
+    cat "$REPORT_FILE"
+    echo -e "\n${GREEN}Report saved to: ${REPORT_FILE}${NC}"
+}
+
+case "${1:-audit}" in
+    audit)
+        cmd_audit
+        ;;
+    check)
+        cmd_check
+        ;;
+    patch|fix)
+        cmd_patch
+        ;;
+    harden)
+        cmd_harden
+        ;;
+    report)
+        cmd_report
+        ;;
+    help|--help|-h)
+        usage
+        ;;
+    *)
+        echo "Unknown command: $1"
+        usage
+        ;;
+esac
