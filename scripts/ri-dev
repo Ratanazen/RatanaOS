@@ -1,0 +1,203 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# RiOS Developer Workstation & Toolchain Manager (1.0.0)
+# Rapid workspace initialization, compiler checks & container runtime diagnostics
+# ==============================================================================
+
+set -euo pipefail
+
+BOLD='\033[1m'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+
+print_banner() {
+    echo -e "${CYAN}${BOLD}"
+    echo "╔══════════════════════════════════════════════════════════╗"
+    echo "║       RiOS Developer Workstation & Toolchain Hub         ║"
+    echo "║      Languages, Compilers, Containers & Project Init     ║"
+    echo "╚══════════════════════════════════════════════════════════╝"
+    echo -e "${NC}"
+}
+
+usage() {
+    print_banner
+    echo -e "${BOLD}Usage:${NC} ri-dev <command> [arguments]"
+    echo ""
+    echo -e "${BOLD}Commands:${NC}"
+    echo "  doctor               Check installed compilers, language runtimes & versions"
+    echo "  init <lang> <name>   Scaffold a new project (python, node, rust, go)"
+    echo "  containers           Check Docker and Podman daemon and container status"
+    echo "  help                 Show this help"
+    echo ""
+    echo -e "${BOLD}Examples:${NC}"
+    echo "  ri-dev doctor"
+    echo "  ri-dev init python my_api"
+    echo "  ri-dev init rust my_cli"
+    echo "  ri-dev init go my_service"
+    echo ""
+    exit 0
+}
+
+check_runtime() {
+    local cmd="$1"
+    local name="$2"
+    local ver_cmd="$3"
+    if command -v "$cmd" >/dev/null 2>&1; then
+        local ver
+        ver=$(eval "$ver_cmd" 2>&1 | head -n1)
+        echo -e "  [ ${GREEN}READY${NC} ] ${BOLD}${name}${NC}: ${ver}"
+    else
+        echo -e "  [ ${YELLOW}MISSING${NC} ] ${name} (${cmd})"
+    fi
+}
+
+cmd_doctor() {
+    print_banner
+    echo -e "${BOLD}=== Core Build Tools & Compilers ===${NC}"
+    check_runtime "gcc" "GNU C Compiler" "gcc --version"
+    check_runtime "g++" "GNU C++ Compiler" "g++ --version"
+    check_runtime "make" "GNU Make" "make --version"
+    check_runtime "git" "Git Version Control" "git --version"
+
+    echo -e "\n${BOLD}=== Language Runtimes & Package Managers ===${NC}"
+    check_runtime "python3" "Python 3" "python3 --version"
+    check_runtime "pip" "Python Pip" "pip --version"
+    check_runtime "node" "Node.js" "node --version"
+    check_runtime "npm" "NPM Package Manager" "npm --version"
+    check_runtime "rustc" "Rust Compiler" "rustc --version"
+    check_runtime "cargo" "Cargo Package Manager" "cargo --version"
+    check_runtime "go" "Go Runtime" "go version"
+
+    echo -e "\n${BOLD}=== Container & Virtualization Engines ===${NC}"
+    check_runtime "docker" "Docker Engine" "docker --version"
+    check_runtime "podman" "Podman Engine" "podman --version"
+
+    echo -e "\n${BOLD}=== Editors & Productivity CLI ===${NC}"
+    check_runtime "nvim" "Neovim" "nvim --version"
+    check_runtime "tmux" "Tmux Terminal Multiplexer" "tmux -V"
+    check_runtime "fzf" "FZF Fuzzy Finder" "fzf --version"
+    check_runtime "rg" "Ripgrep" "rg --version"
+    echo ""
+}
+
+cmd_init() {
+    local lang="${1:-}"
+    local name="${2:-}"
+
+    if [ -z "$lang" ] || [ -z "$name" ]; then
+        echo -e "${RED}Error: Language and project name required.${NC}"
+        echo "Usage: ri-dev init <python|node|rust|go> <project-name>"
+        exit 1
+    fi
+
+    if [ -d "$name" ]; then
+        echo -e "${RED}Error: Directory '$name' already exists.${NC}"
+        exit 1
+    fi
+
+    mkdir -p "$name"
+    cd "$name"
+    git init -q
+
+    case "$lang" in
+        python|py)
+            echo -e "${GREEN}Scaffolding Python project '$name'...${NC}"
+            cat << 'PYEOF' > main.py
+def main():
+    print("Hello from RiOS Python workspace!")
+
+if __name__ == "__main__":
+    main()
+PYEOF
+            cat << 'EOF' > requirements.txt
+# RiOS Project Dependencies
+EOF
+            echo -e "__pycache__/\n*.pyc\n.venv/\nvenv/\n" > .gitignore
+            ;;
+        node|js|ts)
+            echo -e "${GREEN}Scaffolding Node.js project '$name'...${NC}"
+            npm init -y >/dev/null 2>&1 || true
+            cat << 'EOF' > index.js
+console.log("Hello from RiOS Node.js workspace!");
+EOF
+            echo -e "node_modules/\n.env\n" > .gitignore
+            ;;
+        rust|rs)
+            echo -e "${GREEN}Scaffolding Rust project '$name'...${NC}"
+            cd ..
+            cargo new "$name" --bin
+            cd "$name"
+            ;;
+        go|golang)
+            echo -e "${GREEN}Scaffolding Go project '$name'...${NC}"
+            go mod init "$name" 2>/dev/null || true
+            cat << 'GOEOF' > main.go
+package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("Hello from RiOS Go workspace!")
+}
+GOEOF
+            echo -e "bin/\n*.exe\n" > .gitignore
+            ;;
+        *)
+            echo -e "${RED}Unsupported language: $lang (choose python, node, rust, or go)${NC}"
+            cd ..
+            rm -rf "$name"
+            exit 1
+            ;;
+    esac
+
+    cat << DOCKEREOF > Containerfile
+FROM debian:bookworm-slim
+WORKDIR /app
+COPY . .
+DOCKEREOF
+
+    echo -e "${GREEN}${BOLD}✔ Project '$name' created successfully!${NC}"
+    echo -e "Enter directory: ${BOLD}cd $name${NC}"
+}
+
+cmd_containers() {
+    print_banner
+    echo -e "${BOLD}=== Docker Engine Status ===${NC}"
+    if command -v docker >/dev/null 2>&1; then
+        sudo docker ps -a 2>/dev/null || docker ps -a 2>/dev/null || echo "Docker daemon not running."
+    else
+        echo "Docker is not installed."
+    fi
+
+    echo -e "\n${BOLD}=== Podman Engine Status ===${NC}"
+    if command -v podman >/dev/null 2>&1; then
+        podman ps -a 2>/dev/null || echo "Podman unavailable."
+    else
+        echo "Podman is not installed."
+    fi
+    echo ""
+}
+
+case "${1:-doctor}" in
+    doctor)
+        cmd_doctor
+        ;;
+    init)
+        shift
+        cmd_init "$@"
+        ;;
+    containers|docker|podman)
+        cmd_containers
+        ;;
+    help|--help|-h)
+        usage
+        ;;
+    *)
+        echo "Unknown command: $1"
+        usage
+        ;;
+esac
