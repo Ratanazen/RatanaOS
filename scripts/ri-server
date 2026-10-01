@@ -1,0 +1,239 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# RiOS Server Management & Control Center (1.0.0)
+# Comprehensive administration tool for RiOS Server, Web, Container & Security Daemons
+# ==============================================================================
+
+set -euo pipefail
+
+BOLD='\033[1m'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+
+print_banner() {
+    echo -e "${BLUE}${BOLD}"
+    echo "╔══════════════════════════════════════════════════════════╗"
+    echo "║            RiOS Server & Cloud Infrastructure (1.0.0)     ║"
+    echo "║        Daemons, Firewall, Containers & Diagnostics        ║"
+    echo "╚══════════════════════════════════════════════════════════╝"
+    echo -e "${NC}"
+}
+
+usage() {
+    print_banner
+    echo -e "${BOLD}Usage:${NC} ri-server <command> [arguments]"
+    echo ""
+    echo -e "${BOLD}Commands:${NC}"
+    echo "  status            Display status of all managed server daemons"
+    echo "  info              Show server resource usage (CPU, RAM, Disk, Network)"
+    echo "  ports             List all active listening TCP/UDP ports"
+    echo "  start <service>   Start a specific server service"
+    echo "  stop <service>    Stop a specific server service"
+    echo "  restart <service> Restart a specific server service"
+    echo "  enable <service>  Enable service to start on boot"
+    echo "  disable <service> Disable service from starting on boot"
+    echo "  firewall <action> Manage UFW firewall (status, enable, disable, allow <port>)"
+    echo "  cockpit <action>  Control Cockpit Web Admin Console (start, stop, status)"
+    echo "  help              Show this help message"
+    echo ""
+    echo -e "${BOLD}Common Services:${NC}"
+    echo "  ssh, nginx, apache2, docker, ufw, fail2ban, wireguard (wg-quick@wg0)"
+    echo ""
+    exit 0
+}
+
+check_service_status() {
+    local s="$1"
+    local name="$2"
+    if ! command -v systemctl >/dev/null 2>&1; then
+        echo -e "  ${YELLOW}?${NC} ${name}: systemctl not available"
+        return
+    fi
+
+    if systemctl is-active --quiet "$s" 2>/dev/null; then
+        echo -e "  ${GREEN}●${NC} ${BOLD}${name}${NC} (${s}): ${GREEN}running${NC}"
+    elif systemctl is-enabled --quiet "$s" 2>/dev/null; then
+        echo -e "  ${YELLOW}○${NC} ${BOLD}${name}${NC} (${s}): ${YELLOW}stopped (enabled on boot)${NC}"
+    elif systemctl list-unit-files "$s" &>/dev/null; then
+        echo -e "  ${RED}○${NC} ${BOLD}${name}${NC} (${s}): ${RED}inactive${NC}"
+    else
+        echo -e "  ${NC}○${NC} ${name} (${s}): not installed / unavailable"
+    fi
+}
+
+cmd_status() {
+    print_banner
+    echo -e "${BOLD}=== Core Remote & Administration Services ===${NC}"
+    check_service_status "ssh" "OpenSSH Server"
+    check_service_status "cockpit" "Cockpit Web Console"
+    
+    echo -e "\n${BOLD}=== Web & Reverse Proxy Daemons ===${NC}"
+    check_service_status "nginx" "Nginx Web Server"
+    check_service_status "apache2" "Apache2 Web Server"
+
+    echo -e "\n${BOLD}=== Container & Virtualization Engines ===${NC}"
+    check_service_status "docker" "Docker Engine"
+    check_service_status "containerd" "Containerd Runtime"
+
+    echo -e "\n${BOLD}=== Security & Intrusion Prevention ===${NC}"
+    check_service_status "ufw" "UFW Firewall"
+    check_service_status "fail2ban" "Fail2ban Intrusion Defense"
+    check_service_status "nftables" "Nftables Packet Filter"
+
+    echo -e "\n${BOLD}=== VPN & Networking ===${NC}"
+    check_service_status "wg-quick@wg0" "WireGuard VPN (wg0)"
+    check_service_status "openvpn" "OpenVPN Service"
+    echo ""
+}
+
+cmd_info() {
+    print_banner
+    echo -e "${BOLD}=== System & Host Information ===${NC}"
+    echo "Hostname:   $(hostname 2>/dev/null || cat /etc/hostname 2>/dev/null || echo 'rios')"
+    echo "Kernel:     $(uname -r)"
+    echo "Uptime:     $(uptime -p 2>/dev/null || uptime | awk -F'( |,|:)+' '{print $6,"hours,",$7,"min"}')"
+    
+    echo -e "\n${BOLD}=== CPU & Load Average ===${NC}"
+    uptime | awk -F'load average:' '{ print "Load Average:" $2 }'
+    if command -v nproc >/dev/null 2>&1; then
+        echo "CPU Cores:    $(nproc)"
+    fi
+
+    echo -e "\n${BOLD}=== Memory Utilization ===${NC}"
+    free -h | awk 'NR==1{print "             "$1" "$2" "$3" "$4" "$5" "$6} NR==2{print "RAM:         "$2" "$3" "$4" "$5" "$6" "$7}'
+
+    echo -e "\n${BOLD}=== Root Storage ===${NC}"
+    df -h / | awk 'NR==1{print $1" "$2" "$3" "$4" "$5" "$6} NR==2{print $1" "$2" "$3" "$4" "$5" "$6}'
+
+    echo -e "\n${BOLD}=== Network IP Addresses ===${NC}"
+    if command -v ip >/dev/null 2>&1; then
+        ip -brief address show scope global 2>/dev/null || ip addr show | grep 'inet ' | awk '{print $2}'
+    else
+        hostname -I 2>/dev/null || echo "Network information not available."
+    fi
+    echo ""
+}
+
+cmd_ports() {
+    print_banner
+    echo -e "${BOLD}=== Active Listening Ports (TCP / UDP) ===${NC}"
+    if command -v ss >/dev/null 2>&1; then
+        ss -tulnp 2>/dev/null || ss -tuln
+    elif command -v netstat >/dev/null 2>&1; then
+        netstat -tuln
+    elif command -v lsof >/dev/null 2>&1; then
+        lsof -i -P -n | grep LISTEN
+    else
+        echo "Neither ss, netstat, nor lsof found."
+    fi
+    echo ""
+}
+
+cmd_firewall() {
+    local action="${1:-status}"
+    shift 1 || true
+
+    if ! command -v ufw >/dev/null 2>&1; then
+        echo -e "${RED}Error: UFW is not installed.${NC}"
+        exit 1
+    fi
+
+    case "$action" in
+        status)
+            sudo ufw status verbose
+            ;;
+        enable)
+            sudo ufw enable
+            ;;
+        disable)
+            sudo ufw disable
+            ;;
+        allow)
+            if [ -z "${1:-}" ]; then
+                echo -e "${RED}Error: specify port or service to allow (e.g. 22, 80, 443, 9090)${NC}"
+                exit 1
+            fi
+            sudo ufw allow "$1"
+            ;;
+        *)
+            echo "Usage: ri-server firewall [status | enable | disable | allow <port>]"
+            ;;
+    esac
+}
+
+cmd_cockpit() {
+    local action="${1:-status}"
+    case "$action" in
+        start)
+            echo "Starting Cockpit Web Console on port 9090..."
+            sudo systemctl start cockpit.socket
+            echo -e "${GREEN}Cockpit started. Access at: http://localhost:9090 or https://<IP>:9090${NC}"
+            ;;
+        stop)
+            sudo systemctl stop cockpit.socket cockpit.service
+            echo "Cockpit stopped."
+            ;;
+        status)
+            check_service_status "cockpit.socket" "Cockpit Web Console"
+            ;;
+        *)
+            echo "Usage: ri-server cockpit [start | stop | status]"
+            ;;
+    esac
+}
+
+case "${1:-}" in
+    status)
+        cmd_status
+        ;;
+    info|metrics)
+        cmd_info
+        ;;
+    ports)
+        cmd_ports
+        ;;
+    start)
+        [ -z "${2:-}" ] && { echo "Error: specify service name"; exit 1; }
+        sudo systemctl start "$2"
+        echo "Started $2"
+        ;;
+    stop)
+        [ -z "${2:-}" ] && { echo "Error: specify service name"; exit 1; }
+        sudo systemctl stop "$2"
+        echo "Stopped $2"
+        ;;
+    restart)
+        [ -z "${2:-}" ] && { echo "Error: specify service name"; exit 1; }
+        sudo systemctl restart "$2"
+        echo "Restarted $2"
+        ;;
+    enable)
+        [ -z "${2:-}" ] && { echo "Error: specify service name"; exit 1; }
+        sudo systemctl enable "$2"
+        echo "Enabled $2 on boot"
+        ;;
+    disable)
+        [ -z "${2:-}" ] && { echo "Error: specify service name"; exit 1; }
+        sudo systemctl disable "$2"
+        echo "Disabled $2 from boot"
+        ;;
+    firewall)
+        shift
+        cmd_firewall "$@"
+        ;;
+    cockpit)
+        shift
+        cmd_cockpit "$@"
+        ;;
+    help|--help|-h|"")
+        usage
+        ;;
+    *)
+        echo -e "${RED}Unknown command: $1${NC}"
+        usage
+        ;;
+esac

@@ -39,6 +39,7 @@ REQUIRED_SCRIPTS=(
     "ri-monitor"
     "ri-first-run"
     "ri-doctor"
+    "ri-server"
 )
 
 for s in "${REQUIRED_SCRIPTS[@]}"; do
