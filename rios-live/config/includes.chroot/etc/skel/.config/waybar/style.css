@@ -1,37 +1,76 @@
-/* RiOS Waybar — Clean Dark Theme */
+/* ==============================================================================
+   RiOS Waybar — Host Style Parity (Floating Island Theme)
+   ============================================================================== */
+
+@import "theme.css";
+
+@define-color background rgba(20, 20, 25, 0.88);
+@define-color foreground #cdd6f4;
+@define-color border-color rgba(255, 255, 255, 0.12);
+
 * {
-    font-family: "FiraCode Nerd Font", "Font Awesome 6 Free", monospace;
-    font-size: 13px;
+    font-family: "JetBrains Mono Nerd Font", "Noto Sans Khmer", "Noto Sans", sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    min-height: 0px;
     border: none;
-    border-radius: 0;
-    min-height: 0;
 }
 
 window#waybar {
-    background-color: rgba(30, 30, 46, 0.9);
-    color: #cdd6f4;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    color: @foreground;
+}
+
+/* Floating Island Sub-Groups & Modules */
+#workspaces, #window, #clock, #mpris, #cpu, #memory, #temperature, #network, #pulseaudio, #battery, #tray, #custom-notification, #custom-power, #custom-logo {
+    background-color: @background;
+    border: 1px solid @border-color;
+    border-radius: 20px;
+    box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.6);
+    margin: 0px 4px 2px 4px;
+    padding: 2px 10px;
+}
+
+#custom-logo {
+    color: #89b4fa;
+    font-size: 15px;
+    padding: 2px 8px;
 }
 
 #workspaces button {
-    padding: 0 8px;
+    padding: 0 6px;
     color: #6c7086;
     background: transparent;
+    border-radius: 12px;
 }
 
-#workspaces button.active {
+#workspaces button.active,
+#workspaces button.focused {
     color: #89b4fa;
     border-bottom: 2px solid #89b4fa;
 }
 
-#clock, #cpu, #memory, #network, #pulseaudio, #battery, #tray {
-    padding: 0 10px;
+#workspaces button.urgent {
+    color: #f38ba8;
 }
 
 #cpu { color: #f38ba8; }
 #memory { color: #fab387; }
+#temperature { color: #fab387; }
 #network { color: #89b4fa; }
 #pulseaudio { color: #a6e3a1; }
 #battery { color: #f9e2af; }
-
 #battery.warning { color: #fab387; }
-#battery.critical { color: #f38ba8; }
+#battery.critical { color: #f38ba8; animation: blink 1s linear infinite; }
+#clock { color: #cdd6f4; }
+#custom-power { color: #f38ba8; }
+#custom-notification { color: #89b4fa; }
+
+@keyframes blink {
+    to {
+        background-color: #f38ba8;
+        color: #ffffff;
+    }
+}

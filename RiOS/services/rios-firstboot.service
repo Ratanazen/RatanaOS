@@ -1,13 +1,17 @@
 [Unit]
 Description=RiOS First Boot Configuration
-ConditionPathExists=!/var/lib/rios/firstboot-done
-After=network.target
+Documentation=https://github.com/Ratanazen/RatanaOS
+ConditionPathExists=!/var/lib/rios/.first-boot-done
+After=network.target local-fs.target
+Before=display-manager.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/local/bin/rios-firstboot
-ExecStartPost=/bin/touch /var/lib/rios/firstboot-done
+ExecStart=/usr/local/bin/ri-first-boot
 RemainAfterExit=yes
+TimeoutStartSec=300
+StandardOutput=journal+console
+StandardError=journal+console
 
 [Install]
 WantedBy=multi-user.target

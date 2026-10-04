@@ -1,0 +1,8 @@
+# ==============================================================================
+# RiOS Systemd Default Enablement Policy
+# Ensures core first-boot provisioning and background monitors run on startup.
+# ==============================================================================
+enable ri-first-boot.service
+enable rios-health.service
+enable NetworkManager.service
+enable lightdm.service

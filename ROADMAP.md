@@ -258,3 +258,17 @@
 - `[ ]` Automated CVE patch distribution mechanism via dedicated apt security channels
 - `[ ]` Community issue triage guidelines and code of conduct
 - `[ ]` Enterprise contribution governance model and bug bounty program
+
+## Phase 34: Systemd Service Hardening & Host Environment Style Parity
+- `[x]` Audit and harden systemd units (`ri-first-boot.service`, `rios-firstboot.service`, `rios-health.service`)
+- `[x]` Implement lightweight background health monitoring daemon (`rios-health-daemon`)
+- `[x]` Deploy systemd default preset policies (`/usr/lib/systemd/system-preset/99-rios.preset`)
+- `[x]` Deploy chroot live-build preset enablement hook (`0130-systemd-enable.hook.chroot`)
+- `[x]` Enforce automated systemd unit testing (`tests/test-systemd.sh`) in test pipeline
+- `[x]` Replicate host machine Starship cross-shell prompt with two-line layout and folder icons
+- `[x]` Replicate host Kitty terminal configuration, acrylic blur opacity, and dark theme palette
+- `[x]` Deploy modern Waybar floating island design with rounded pill modules and hardware sensors
+- `[x]` Align Sway window manager borders, gaps, font, and palette with host desktop
+- `[x]` Deploy host Fastfetch telemetry layout with RiOS branding to `etc/skel/.config/fastfetch/`
+- `[x]` Deploy complete shell skeleton dotfiles (`.bashrc`, `.zshrc`, `.profile`) into `etc/skel/`
+

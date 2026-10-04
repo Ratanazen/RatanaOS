@@ -1,0 +1,113 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "logo": {
+    "type": "auto",
+    "source": "/usr/share/pixmaps/ri-logo.png",
+    "width": 32,
+    "height": 16,
+    "padding": {
+      "top": 1,
+      "left": 2,
+      "right": 4
+    }
+  },
+  "display": {
+    "separator": ": ",
+    "color": {
+      "keys": "blue",
+      "title": "cyan"
+    },
+    "key": {
+      "width": 12
+    }
+  },
+  "modules": [
+    "title",
+    "separator",
+    {
+      "type": "os",
+      "key": " ",
+      "keyColor": "blue"
+    },
+    {
+      "type": "kernel",
+      "key": " ",
+      "keyColor": "blue"
+    },
+    {
+      "type": "uptime",
+      "key": "󰔟 ",
+      "keyColor": "blue"
+    },
+    {
+      "type": "packages",
+      "key": "󰏖 ",
+      "keyColor": "blue"
+    },
+    {
+      "type": "shell",
+      "key": " ",
+      "keyColor": "cyan"
+    },
+    {
+      "type": "de",
+      "key": " ",
+      "keyColor": "cyan"
+    },
+    {
+      "type": "wm",
+      "key": " ",
+      "keyColor": "cyan"
+    },
+    {
+      "type": "theme",
+      "key": "󰉼 ",
+      "keyColor": "cyan"
+    },
+    {
+      "type": "icons",
+      "key": "󰀨 ",
+      "keyColor": "cyan"
+    },
+    {
+      "type": "font",
+      "key": " ",
+      "keyColor": "cyan"
+    },
+    {
+      "type": "cpu",
+      "key": " ",
+      "keyColor": "magenta",
+      "showPeCoreCount": true
+    },
+    {
+      "type": "gpu",
+      "key": " ",
+      "keyColor": "magenta"
+    },
+    {
+      "type": "memory",
+      "key": "󰍛 ",
+      "keyColor": "magenta"
+    },
+    {
+      "type": "disk",
+      "key": "󰋊 ",
+      "keyColor": "yellow",
+      "folders": "/"
+    },
+    {
+      "type": "localip",
+      "key": "󰤨 ",
+      "keyColor": "green"
+    },
+    {
+      "type": "dateTime",
+      "key": "󰃭 ",
+      "keyColor": "green",
+      "format": "{1}-{3}-{11} ({day}) | {14}:{18}:{20}"
+    },
+    "break",
+    "colors"
+  ]
+}

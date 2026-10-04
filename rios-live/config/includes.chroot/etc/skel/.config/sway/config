@@ -1,11 +1,13 @@
 # ==============================================================================
-# RiOS — Sway Configuration
-# Fully aligned with RiOS 7-Theme & Wayland Architecture
+# RiOS — Sway Configuration (Host Style Parity)
 # ==============================================================================
 
 set $mod Mod4
 set $term kitty
 set $menu ri-launcher
+
+# Default Font
+font pango:JetBrains Mono Nerd Font, Noto Sans 10
 
 # Input Configuration
 input type:touchpad {
@@ -22,17 +24,28 @@ input type:keyboard {
 
 # Gaps & Borders
 gaps inner 8
-gaps outer 12
+gaps outer 6
 default_border pixel 2
 default_floating_border pixel 2
 smart_gaps on
-smart_borders on
+smart_borders off
 
-# Theme Colors (Obsidian & Electric Blue Accent)
-client.focused          #0A84FF #16161E #FFFFFF #0A84FF   #0A84FF
-client.focused_inactive #3B4261 #1F2335 #C0CAF5 #3B4261   #3B4261
-client.unfocused        #1F2335 #16161E #565F89 #1F2335   #1F2335
-client.urgent           #FF453A #16161E #FFFFFF #FF453A   #FF453A
+# SwayFX Aesthetics (if running SwayFX compositor)
+corner_radius 10
+blur enable
+blur_xray off
+blur_passes 4
+blur_radius 8
+shadows enable
+shadow_blur_radius 14
+shadow_color #00000080
+
+# Window decoration (Host Nordic/Catppuccin Palette)
+# class                 border  backgr. text    indicator child_border
+client.focused          #89b4fa #1e1e2e #ffffff #89b4fa   #89b4fa
+client.focused_inactive #313244 #181825 #a6adc8 #313244   #313244
+client.unfocused        #1e1e2e #181825 #a6adc8 #1e1e2e   #1e1e2e
+client.urgent           #f38ba8 #181825 #ffffff #f38ba8   #f38ba8
 
 # Keybindings
 bindsym $mod+Return exec $term

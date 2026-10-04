@@ -1,0 +1,23 @@
+#!/bin/sh
+set -e
+
+# ==============================================================================
+# RiOS Live Build Hook: Enable Essential Systemd Units
+# ==============================================================================
+
+echo "I: RiOS Systemd Service Enablement Hook"
+
+if [ -x /bin/systemctl ] || [ -x /usr/bin/systemctl ]; then
+    systemctl preset-all || true
+    systemctl enable ri-first-boot.service 2>/dev/null || true
+    systemctl enable rios-health.service 2>/dev/null || true
+fi
+
+# Ensure multi-user.target.wants symlinks exist
+mkdir -p /etc/systemd/system/multi-user.target.wants
+if [ -f /etc/systemd/system/ri-first-boot.service ]; then
+    ln -sf /etc/systemd/system/ri-first-boot.service /etc/systemd/system/multi-user.target.wants/ri-first-boot.service
+fi
+if [ -f /etc/systemd/system/rios-health.service ]; then
+    ln -sf /etc/systemd/system/rios-health.service /etc/systemd/system/multi-user.target.wants/rios-health.service
+fi

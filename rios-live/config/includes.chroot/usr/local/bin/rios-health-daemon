@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# RiOS Security & System Health Monitoring Daemon
+# Periodically samples system metrics, checks failed services, and writes health log.
+# ==============================================================================
+set -euo pipefail
+
+LOG_FILE="/var/log/rios/health.log"
+INTERVAL_SEC=60
+ONCE_MODE=false
+
+if [ "${1:-}" = "--once" ]; then
+    ONCE_MODE=true
+fi
+
+mkdir -p /var/log/rios /var/lib/rios
+
+check_health() {
+    local timestamp
+    timestamp="$(date -u +"%Y-%m-%d %H:%M:%SZ")"
+    
+    local ram_free ram_total
+    ram_total=$(free -m | awk '/^Mem:/ {print $2}')
+    ram_free=$(free -m | awk '/^Mem:/ {print $4}')
+    
+    local disk_used_pct
+    disk_used_pct=$(df -h / | awk 'NR==2 {print $5}')
+    
+    local failed_units
+    failed_units=$(systemctl --failed --no-legend 2>/dev/null | wc -l || echo "0")
+    
+    echo "[$timestamp] [HEALTH] RAM: ${ram_free}MB/${ram_total}MB free | Disk(/): ${disk_used_pct} | Failed units: ${failed_units}" >> "$LOG_FILE"
+    
+    # If failed units exist, log names
+    if [ "$failed_units" -gt 0 ]; then
+        echo "[$timestamp] [WARNING] Failed systemd units detected:" >> "$LOG_FILE"
+        systemctl --failed --no-legend 2>/dev/null >> "$LOG_FILE" || true
+    fi
+}
+
+if [ "$ONCE_MODE" = true ]; then
+    check_health
+    exit 0
+fi
+
+echo "[$(date -u +"%Y-%m-%d %H:%M:%SZ")] [START] RiOS Health Daemon initialized (interval: ${INTERVAL_SEC}s)." >> "$LOG_FILE"
+
+while true; do
+    check_health
+    sleep "$INTERVAL_SEC"
+done
