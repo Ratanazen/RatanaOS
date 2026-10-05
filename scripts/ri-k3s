@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# RiOS Lightweight Kubernetes Starter (2026)
+# Automated K3s cluster provisioning, status inspection, and teardown
+# ==============================================================================
+set -euo pipefail
+
+BOLD='\033[1m'
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+ACTION="${1:-status}"
+
+case "$ACTION" in
+    start|install)
+        if [ "$EUID" -ne 0 ]; then
+            echo -e "${RED}Error: K3s installer requires root privileges.${NC}" >&2
+            exit 1
+        fi
+        echo -e "${CYAN}[*] Deploying RiOS Lightweight K3s Cluster...${NC}"
+        if ! command -v k3s >/dev/null 2>&1; then
+            curl -sfL https://get.k3s.io | sh -s - --write-kubeconfig-mode 644
+        else
+            systemctl start k3s
+        fi
+        echo -e "${GREEN}✔ K3s cluster active. Use 'kubectl get nodes'.${NC}"
+        ;;
+    stop)
+        sudo systemctl stop k3s 2>/dev/null || true
+        echo -e "${GREEN}✔ K3s cluster stopped.${NC}"
+        ;;
+    status)
+        echo -e "${BOLD}RiOS Kubernetes Status:${NC}"
+        if systemctl is-active --quiet k3s 2>/dev/null; then
+            echo -e "  Cluster: ${GREEN}RUNNING${NC}"
+            if command -v kubectl >/dev/null 2>&1; then
+                kubectl get nodes 2>/dev/null || true
+            fi
+        else
+            echo -e "  Cluster: ${CYAN}INACTIVE${NC}"
+            echo "  Run 'ri-k3s start' to launch local cluster."
+        fi
+        ;;
+    uninstall)
+        if [ "$EUID" -ne 0 ]; then
+            echo -e "${RED}Error: Uninstall requires root privileges.${NC}" >&2
+            exit 1
+        fi
+        if [ -x /usr/local/bin/k3s-uninstall.sh ]; then
+            /usr/local/bin/k3s-uninstall.sh
+            echo -e "${GREEN}✔ K3s uninstalled.${NC}"
+        fi
+        ;;
+    -h|--help|help)
+        echo "Usage: ri-k3s [start|stop|status|uninstall]"
+        exit 0
+        ;;
+    *)
+        echo "Unknown action: $ACTION"
+        exit 1
+        ;;
+esac

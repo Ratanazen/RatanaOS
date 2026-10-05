@@ -49,6 +49,14 @@ REQUIRED_SCRIPTS=(
     "ri-chroot"
     "ri-media-check"
     "ri-cve"
+    "ri-airmon"
+    "ri-k3s"
+    "ri-rollback"
+    "ri-monitors"
+    "ri-backup"
+    "ri-vpn-mesh"
+    "ri-repo"
+    "ri-iso-sign"
 )
 
 for s in "${REQUIRED_SCRIPTS[@]}"; do

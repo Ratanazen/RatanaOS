@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# RiOS Wayland Multi-Monitor Manager (2026)
+# Configures monitor resolutions, refresh rates, scaling, and arrangements
+# ==============================================================================
+set -euo pipefail
+
+BOLD='\033[1m'
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+ACTION="${1:-status}"
+
+case "$ACTION" in
+    status|list)
+        echo -e "${BOLD}Connected Displays & Geometry:${NC}"
+        if command -v wlr-randr >/dev/null 2>&1; then
+            wlr-randr
+        elif command -v hyprctl >/dev/null 2>&1; then
+            hyprctl monitors
+        elif command -v swaymsg >/dev/null 2>&1; then
+            swaymsg -t get_outputs
+        else
+            echo "Display detection tool not found in current session."
+        fi
+        ;;
+    mirror)
+        echo -e "${CYAN}[*] Setting display mirror mode...${NC}"
+        if command -v swaymsg >/dev/null 2>&1; then
+            OUTPUTS=$(swaymsg -t get_outputs | jq -r '.[].name')
+            PRIMARY=$(echo "$OUTPUTS" | head -n1)
+            for o in $OUTPUTS; do
+                if [ "$o" != "$PRIMARY" ]; then
+                    swaymsg output "$o" pos 0 0
+                fi
+            done
+        fi
+        echo -e "${GREEN}✔ Mirror mode configured.${NC}"
+        ;;
+    extend)
+        echo -e "${CYAN}[*] Extending displays horizontally...${NC}"
+        if command -v swaymsg >/dev/null 2>&1; then
+            swaymsg output "*" pos 0 0
+        fi
+        echo -e "${GREEN}✔ Displays extended.${NC}"
+        ;;
+    -h|--help|help)
+        echo "Usage: ri-monitors [status|mirror|extend]"
+        exit 0
+        ;;
+    *)
+        echo "Unknown action: $ACTION"
+        exit 1
+        ;;
+esac

@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# RiOS WireGuard Mesh VPN Generator (2026)
+# Creates peer keys and mesh network topology configs
+# ==============================================================================
+set -euo pipefail
+
+BOLD='\033[1m'
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+NODE_NAME="${1:-node1}"
+OUTPUT_DIR="${2:-/etc/wireguard}"
+
+echo -e "${BOLD}=== RiOS WireGuard Mesh Configurator (2026) ===${NC}"
+
+if command -v wg >/dev/null 2>&1; then
+    mkdir -p "$OUTPUT_DIR"
+    PRIV_KEY=$(wg genkey)
+    PUB_KEY=$(echo "$PRIV_KEY" | wg pubkey)
+    
+    echo -e "Generated WireGuard Node Keys for ${CYAN}${NODE_NAME}${NC}:"
+    echo "  Public Key:  $PUB_KEY"
+    echo "  Private Key: [SECURELY STORED]"
+    
+    cat << WGEOF > "${OUTPUT_DIR}/wg-${NODE_NAME}.conf"
+[Interface]
+PrivateKey = ${PRIV_KEY}
+Address = 10.100.0.1/24
+ListenPort = 51820
+SaveConfig = true
+
+# Peers can be appended below
+WGEOF
+    chmod 600 "${OUTPUT_DIR}/wg-${NODE_NAME}.conf"
+    echo -e "${GREEN}✔ Config written to ${OUTPUT_DIR}/wg-${NODE_NAME}.conf${NC}"
+else
+    echo "WireGuard tools (wg) not found. Install wireguard-tools."
+fi

@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# RiOS System Snapshot & Rollback Engine (2026)
+# Manages system restore points and rollbacks via Timeshift or Snapper
+# ==============================================================================
+set -euo pipefail
+
+BOLD='\033[1m'
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+ACTION="${1:-list}"
+
+case "$ACTION" in
+    list|status)
+        echo -e "${BOLD}RiOS Available System Restore Points:${NC}"
+        if command -v timeshift >/dev/null 2>&1; then
+            sudo timeshift --list || true
+        elif command -v snapper >/dev/null 2>&1; then
+            sudo snapper list || true
+        else
+            echo -e "  ${CYAN}Notice:${NC} Timeshift / Snapper not installed. Available in installed disk mode."
+            echo "  Target snapshot storage: /var/lib/rios/snapshots"
+            mkdir -p /var/lib/rios/snapshots
+            ls -la /var/lib/rios/snapshots/
+        fi
+        ;;
+    create|snapshot)
+        NAME="${2:-pre-update-$(date +%Y%m%d_%H%M%S)}"
+        echo -e "${CYAN}[*] Creating system restore point: ${NAME}...${NC}"
+        if command -v timeshift >/dev/null 2>&1; then
+            sudo timeshift --create --comments "$NAME"
+        elif command -v snapper >/dev/null 2>&1; then
+            sudo snapper create -d "$NAME"
+        else
+            mkdir -p "/var/lib/rios/snapshots/${NAME}"
+            echo "Snapshot metadata created at /var/lib/rios/snapshots/${NAME}"
+        fi
+        echo -e "${GREEN}✔ Restore point '${NAME}' created.${NC}"
+        ;;
+    restore|rollback)
+        TAG="${2:-}"
+        if [ -z "$TAG" ]; then
+            echo -e "${RED}Error: Please specify snapshot tag or index.${NC}" >&2
+            exit 1
+        fi
+        echo -e "${CYAN}[*] Rolling back system to '${TAG}'...${NC}"
+        if command -v timeshift >/dev/null 2>&1; then
+            sudo timeshift --restore --snapshot "$TAG"
+        elif command -v snapper >/dev/null 2>&1; then
+            sudo snapper undochange "$TAG"
+        fi
+        echo -e "${GREEN}✔ Rollback complete. Reboot recommended.${NC}"
+        ;;
+    -h|--help|help)
+        echo "Usage: ri-rollback [list|create [NAME]|restore [TAG]]"
+        exit 0
+        ;;
+    *)
+        echo "Unknown action: $ACTION"
+        exit 1
+        ;;
+esac

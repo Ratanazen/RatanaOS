@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# RiOS Full System Offline Backup Utility (2026)
+# Archives root filesystem or home directory to external storage
+# ==============================================================================
+set -euo pipefail
+
+BOLD='\033[1m'
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+TARGET_DEST="${1:-/mnt/backup}"
+TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
+
+if [ "$EUID" -ne 0 ]; then
+    echo -e "${RED}Error: Backup requires root privileges (use sudo).${NC}" >&2
+    exit 1
+fi
+
+echo -e "${BOLD}=== RiOS Full System Offline Backup (2026) ===${NC}"
+echo -e "Target Destination: ${CYAN}${TARGET_DEST}${NC}"
+
+mkdir -p "$TARGET_DEST"
+
+BACKUP_TAR="${TARGET_DEST}/rios-backup-${TIMESTAMP}.tar.zst"
+
+echo -e "${CYAN}[*] Creating compressed root archive: ${BACKUP_TAR}...${NC}"
+tar --exclude=/proc \
+    --exclude=/sys \
+    --exclude=/dev \
+    --exclude=/run \
+    --exclude=/tmp \
+    --exclude=/mnt \
+    --exclude=/media \
+    --exclude=/lost+found \
+    --exclude="${TARGET_DEST}" \
+    -cpf - / 2>/dev/null | zstd -3 -T0 -o "$BACKUP_TAR"
+
+echo -e "${GREEN}✔ Full backup successfully completed: ${BACKUP_TAR}${NC}"
+echo -e "Archive Size: $(du -h "$BACKUP_TAR" | cut -f1)"

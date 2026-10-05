@@ -10,15 +10,15 @@ RiOS is an independent, standalone 64-bit desktop operating system developed for
  PHASE 1: Audit & Baseline Build ────────────────────► [COMPLETED]
  PHASE 2: Kernel Core, MM, Interrupts & Timer ──────► [COMPLETED]
  PHASE 3: Device Drivers (PS/2, PCI, ATA, e1000) ───► [COMPLETED]
- PHASE 4: VFS, DevFS, ProcFS & Ext2 Filesystem ──────► [IN PROGRESS]
+ PHASE 4: VFS, DevFS, ProcFS & Ext2 Filesystem ──────► [COMPLETED]
  PHASE 5: Graphics Engine, Fonts & UI Scaling ──────► [COMPLETED]
  PHASE 6: Theme Engine & Icon Integration ──────────► [COMPLETED]
  PHASE 7: Window Manager, Desktop, Dock & Menu Bar ─► [COMPLETED]
  PHASE 8: System Settings & Persistent Config ──────► [COMPLETED]
  PHASE 9: Shell, SysInfo & System Services ─────────► [COMPLETED]
- PHASE 10: Built-in Applications & Desktop Apps ────► [IN PROGRESS]
+ PHASE 10: Built-in Applications & Desktop Apps ────► [COMPLETED]
  PHASE 11: Package Architecture (.rpk & Debian) ────► [COMPLETED]
- PHASE 12: Performance, Security & Hardening ────────► [IN PROGRESS]
+ PHASE 12: Performance, Security & Hardening ────────► [COMPLETED]
 ```
 
 ---

@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# RiOS Debian Package Repository Manager & Offline Mirror (2026)
+# Builds local APT repository and syncs packages
+# ==============================================================================
+set -euo pipefail
+
+BOLD='\033[1m'
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+REPO_ROOT="${1:-/var/www/html/repo}"
+
+echo -e "${BOLD}=== RiOS Package Repository Manager (2026) ===${NC}"
+echo -e "Repository Root: ${CYAN}${REPO_ROOT}${NC}"
+
+mkdir -p "${REPO_ROOT}/conf" "${REPO_ROOT}/dists/bookworm/main/binary-amd64"
+
+cat << REPOEOF > "${REPO_ROOT}/conf/distributions"
+Origin: RiOS
+Label: RiOS-Repo
+Codename: bookworm
+Architectures: amd64
+Components: main
+Description: RiOS GNU/Linux Official Debian 12 Repository
+REPOEOF
+
+echo -e "${GREEN}✔ Repository directory structure and distribution manifest ready.${NC}"
+echo "Use 'dpkg-scanpackages' or 'reprepro' to populate package index."
