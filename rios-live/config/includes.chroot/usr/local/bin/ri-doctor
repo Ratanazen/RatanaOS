@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RiOS 1.0.0 Doctor — Diagnostic & Self-Healing Utility
+# RiOS 2026 Doctor — Diagnostic & Self-Healing Utility
 # Performs full audit of Desktop, Server, Cyber, Dev, and Core system configs
 # ==============================================================================
 
@@ -45,7 +45,7 @@ header() {
 
 doctor_check() {
     echo -e "${BOLD}${PURPLE}======================================================${NC}"
-    echo -e "${BOLD}${PURPLE}          RiOS 1.0.0 System Health Audit               ${NC}"
+    echo -e "${BOLD}${PURPLE}          RiOS 2026 System Health Audit               ${NC}"
     echo -e "${BOLD}${PURPLE}======================================================${NC}"
 
     header "1. Desktop Compositors & Display Sessions"
@@ -116,7 +116,7 @@ doctor_check() {
         fi
     done
 
-    header "7. RiOS 1.0.0 Helper Utilities"
+    header "7. RiOS 2026 Helper Utilities"
     local helpers=("ri-server" "ri-launcher" "ri-lock" "ri-power" "ri-screenshot" "ri-first-run" "ri-doctor" "ri-installer")
     for h in "${helpers[@]}"; do
         if [ -x "/usr/local/bin/$h" ]; then
@@ -144,7 +144,7 @@ doctor_check() {
 }
 
 doctor_fix() {
-    echo -e "${BOLD}${CYAN}[*] Starting RiOS 1.0.0 Self-Healing & Configuration Repair...${NC}"
+    echo -e "${BOLD}${CYAN}[*] Starting RiOS 2026 Self-Healing & Configuration Repair...${NC}"
 
     mkdir -p "${TARGET_HOME}/.config/ri"
 
@@ -185,7 +185,7 @@ doctor_report() {
     mkdir -p "$(dirname "$REPORT_FILE")"
     {
         echo "=========================================================="
-        echo " RiOS 1.0.0 Diagnostic Report - $(date -u)"
+        echo " RiOS 2026 Diagnostic Report - $(date -u)"
         echo "=========================================================="
         echo "Kernel:        $(uname -r)"
         echo "Architecture:  $(uname -m)"

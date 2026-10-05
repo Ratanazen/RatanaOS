@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RiOS Universal Lockscreen Wrapper
+# RiOS 2026 Universal Lockscreen Wrapper
 # Intelligently uses hyprlock, swaylock-effects, or swaylock
 # ==============================================================================
 
 set -euo pipefail
 
 WALLPAPER="${HOME}/.config/ri/theme.conf"
-IMG="/usr/share/backgrounds/rios/rios-dark.png"
+IMG="/usr/share/backgrounds/rios/rios-sequoia-dark.png"
 
 if [ -f "$WALLPAPER" ]; then
     # shellcheck disable=SC1090

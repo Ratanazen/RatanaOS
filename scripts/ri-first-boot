@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RiOS 1.0.0 Master First-Boot System Provisioner (Stage B — Internal Disk First Boot)
+# RiOS 2026 Master First-Boot System Provisioner (Stage B — Internal Disk First Boot)
 # Runs once on the installed machine to configure hardware, performance, and services.
 # ==============================================================================
 set -euo pipefail
@@ -12,7 +12,7 @@ mkdir -p /var/lib/rios /var/log/rios
 exec >> "$LOG_FILE" 2>&1
 
 echo "=========================================================="
-echo " RiOS 1.0.0 First-Boot Hardware & System Provisioning"
+echo " RiOS 2026 First-Boot Hardware & System Provisioning"
 echo " Timestamp: $(date -u)"
 echo "=========================================================="
 

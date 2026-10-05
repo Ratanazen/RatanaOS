@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RiOS OCI / Docker Container Image Builder (1.0.0)
+# RiOS OCI / Docker Container Image Builder (2026)
 # Exports the RiOS system rootfs into a standalone Docker / Podman container image
 # ==============================================================================
 
@@ -17,7 +17,7 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
-IMAGE_TAG="rios:1.0.0"
+IMAGE_TAG="rios:2026"
 OUTPUT_TAR="${ROOT_DIR}/build/rios-rootfs.tar.gz"
 
 print_banner() {
@@ -56,7 +56,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 LABEL org.opencontainers.image.title="RiOS Container Base"
-LABEL org.opencontainers.image.version="1.0.0"
+LABEL org.opencontainers.image.version="2026"
 LABEL org.opencontainers.image.vendor="RiOS Project"
 
 CMD ["/bin/bash"]

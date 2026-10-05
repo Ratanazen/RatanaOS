@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RiOS CVE Vulnerability Auditor & Security Patching Engine (1.0.0)
+# RiOS CVE Vulnerability Auditor & Security Patching Engine (2026)
 # Scans system packages for CVEs, checks kernel CPU mitigations, and applies security updates
 # ==============================================================================
 

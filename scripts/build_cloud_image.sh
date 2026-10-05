@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RiOS Cloud & Virtual Appliance QCOW2 Image Builder (1.0.0)
+# RiOS Cloud & Virtual Appliance QCOW2 Image Builder (2026)
 # Builds compressed, cloud-init ready QCOW2 disk images for Proxmox, KVM & OpenStack
 # ==============================================================================
 

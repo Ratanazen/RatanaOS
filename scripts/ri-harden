@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RiOS Zero-Trust Hardening & Defense Baseline (1.0.0)
+# RiOS Zero-Trust Hardening & Defense Baseline (2026)
 # Enforces enterprise security posture: AppArmor, SSH, Sysctl, and UFW firewalls
 # ==============================================================================
 

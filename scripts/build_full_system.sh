@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RiOS Full System Master Build Pipeline (1.0.0)
+# RiOS Full System Master Build Pipeline (2026)
 # Orchestrates clean verification, security updates, and complete ISO compilation
 # ==============================================================================
 
@@ -20,7 +20,7 @@ NC='\033[0m'
 print_banner() {
     echo -e "${BLUE}${BOLD}"
     echo "╔══════════════════════════════════════════════════════════╗"
-    echo "║       RiOS Master Full System Build Pipeline (1.0.0)     ║"
+    echo "║       RiOS Master Full System Build Pipeline (2026)     ║"
     echo "║     Complete ISO Compilation, CVE Updates & Validation   ║"
     echo "╚══════════════════════════════════════════════════════════╝"
     echo -e "${NC}"

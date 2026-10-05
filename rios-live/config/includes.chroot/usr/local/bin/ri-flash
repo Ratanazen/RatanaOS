@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RiOS Safe USB Flasher (1.0.0)
+# RiOS Safe USB Flasher (2026)
 # Safely writes RiOS Hybrid Live ISO to removable USB drives for real PC install
 # Features:
 #   - Strict removable drive detection (prevents overwriting internal SSD/NVMe)
@@ -30,7 +30,7 @@ NON_INTERACTIVE=0
 print_banner() {
     echo -e "${BLUE}${BOLD}"
     echo "╔══════════════════════════════════════════════════════════╗"
-    echo "║               RiOS Safe USB Flasher (1.0.0)              ║"
+    echo "║               RiOS Safe USB Flasher (2026)              ║"
     echo "║       Prepare Real PC Installation USB Media Safely      ║"
     echo "╚══════════════════════════════════════════════════════════╝"
     echo -e "${NC}"

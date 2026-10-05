@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RiOS 1.0.0 Session Switcher
+# RiOS 2026 Session Switcher
 # Switch between Hyprland, Niri, Sway, KDE, or GNOME
 # ==============================================================================
 
@@ -9,7 +9,7 @@ set -euo pipefail
 SESSION="${1:-}"
 
 if [ -z "$SESSION" ]; then
-    OPTIONS="RiOS 1.0.0 Hyprland\nRiOS 1.0.0 Niri\nRiOS 1.0.0 Sway\nGNOME Desktop\nKDE Plasma"
+    OPTIONS="RiOS 2026 Hyprland\nRiOS 2026 Niri\nRiOS 2026 Sway\nGNOME Desktop\nKDE Plasma"
     if command -v wofi >/dev/null 2>&1; then
         SESSION=$(echo -e "$OPTIONS" | wofi --dmenu --prompt "Select Session" --width 300 --height 240)
     elif command -v rofi >/dev/null 2>&1; then

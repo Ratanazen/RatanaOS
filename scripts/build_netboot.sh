@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RiOS Netboot & PXE Network Installation Asset Builder (1.0.0)
+# RiOS Netboot & PXE Network Installation Asset Builder (2026)
 # Extracts and packages kernel, initrd, squashfs, and iPXE/PXELINUX boot configs
 # ==============================================================================
 
@@ -67,8 +67,8 @@ echo -e "${CYAN}[4/4] Generating iPXE and PXELINUX configuration scripts...${NC}
 # Generate iPXE boot script
 cat << 'IPXEEOF' > "${OUTPUT_DIR}/boot.ipxe"
 #!ipxe
-# RiOS 1.0.0 iPXE Network Boot Script
-echo Booting RiOS 1.0.0 over Network (HTTP/TFTP)...
+# RiOS 2026 iPXE Network Boot Script
+echo Booting RiOS 2026 over Network (HTTP/TFTP)...
 set server_ip ${next-server}
 kernel http://${server_ip}:8080/assets/vmlinuz boot=live components fetch=http://${server_ip}:8080/assets/filesystem.squashfs quiet splash
 initrd http://${server_ip}:8080/assets/initrd.img
@@ -82,7 +82,7 @@ PROMPT 0
 TIMEOUT 50
 
 LABEL rios
-  MENU LABEL RiOS 1.0.0 (Network Boot)
+  MENU LABEL RiOS 2026 (Network Boot)
   KERNEL assets/vmlinuz
   APPEND initrd=assets/initrd.img boot=live components fetch=http://192.168.1.1:8080/assets/filesystem.squashfs quiet splash
 PXEEOF

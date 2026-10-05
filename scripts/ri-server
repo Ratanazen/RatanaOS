@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RiOS Server Management & Control Center (1.0.0)
+# RiOS Server Management & Control Center (2026)
 # Comprehensive administration tool for RiOS Server, Web, Container & Security Daemons
 # ==============================================================================
 
@@ -17,7 +17,7 @@ NC='\033[0m'
 print_banner() {
     echo -e "${BLUE}${BOLD}"
     echo "╔══════════════════════════════════════════════════════════╗"
-    echo "║            RiOS Server & Cloud Infrastructure (1.0.0)     ║"
+    echo "║            RiOS Server & Cloud Infrastructure (2026)     ║"
     echo "║        Daemons, Firewall, Containers & Diagnostics        ║"
     echo "╚══════════════════════════════════════════════════════════╝"
     echo -e "${NC}"

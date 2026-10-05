@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RiOS Kali Linux Repository & Tool Integrator (1.0.0)
+# RiOS Kali Linux Repository & Tool Integrator (2026)
 # Enables safe integration of Kali Rolling tools on Debian 12 Bookworm with APT pinning
 # ==============================================================================
 

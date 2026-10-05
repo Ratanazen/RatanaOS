@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RiOS Emergency Chroot & System Recovery Tool (1.0.0)
+# RiOS Emergency Chroot & System Recovery Tool (2026)
 # Automatically locates installed Linux partitions, mounts virtual filesystems,
 # and opens an interactive chroot rescue environment.
 # ==============================================================================

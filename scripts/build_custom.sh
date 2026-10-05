@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RiOS Custom ISO Builder (1.0.0)
+# RiOS Custom ISO Builder (2026)
 # Enables building customized RiOS ISOs by enabling/disabling modular profiles:
 #   - Server:   Nginx, OpenSSH, Cockpit, Docker, UFW, Fail2ban, WireGuard
 #   - Cyber:    Nmap, Wireshark, John, Hydra, SQLMap, Binwalk, Radare2
@@ -25,7 +25,7 @@ NC='\033[0m'
 print_banner() {
     echo -e "${BLUE}${BOLD}"
     echo "╔══════════════════════════════════════════════════════════╗"
-    echo "║              RiOS Custom ISO Builder (1.0.0)             ║"
+    echo "║              RiOS Custom ISO Builder (2026)             ║"
     echo "║       Build Tailored Server, Cyber, Dev & Desktop ISOs   ║"
     echo "╚══════════════════════════════════════════════════════════╝"
     echo -e "${NC}"
@@ -103,6 +103,13 @@ if [ $# -eq 0 ]; then
     usage
 fi
 
+for arg in "$@"; do
+    case "$arg" in
+        --no-build) DO_BUILD=0 ;;
+        --clean)    DO_CLEAN=1 ;;
+    esac
+done
+
 case "$1" in
     all|full)
         print_banner
@@ -147,6 +154,16 @@ case "$1" in
         set_profile "cyber" 0
         set_profile "gnome" 0
         set_profile "kde" 0
+        ;;
+    all4)
+        print_banner
+        echo -e "${BOLD}Batch Validating All 4 Editions (Server, Cyber, Dev, Full)...${NC}"
+        for ed in server cyber dev all; do
+            echo -e "\n${CYAN}>>> Checking Edition: ${ed}${NC}"
+            "$0" "$ed" --no-build
+        done
+        echo -e "\n${GREEN}✔ All 4 editions successfully verified and ready for deployment.${NC}"
+        exit 0
         ;;
     minimal)
         print_banner

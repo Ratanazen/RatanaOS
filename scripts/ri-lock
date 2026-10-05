@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RiOS 1.0.0 Universal Lockscreen Wrapper
+# RiOS 2026 Universal Lockscreen Wrapper
 # Intelligently uses hyprlock, swaylock-effects, or swaylock
 # ==============================================================================
 

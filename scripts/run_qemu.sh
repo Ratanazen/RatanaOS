@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RiOS QEMU Unified Virtual Machine Runner (1.0.0)
+# RiOS QEMU Unified Virtual Machine Runner (2026)
 # Supports: Desktop, Server, CLI/Headless, and Installed Disk Testing
 # ==============================================================================
 

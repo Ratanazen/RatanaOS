@@ -1,9 +1,6 @@
-       /\        OS:        RiOS 1.0.0
-      /  \       Kernel:    Linux 6.1 (Debian Bookworm)
-     / /\ \      Desktop:   Hyprland / GNOME / KDE Plasma
-    / /__\ \     Base:      Debian 12 Bookworm
-   / /    \ \    Packages:  APT / dpkg
-  /_/      \_\   Platform:  x86_64
-
-Welcome to RiOS!
-Documentation & Source: https://github.com/Ratanazen/RatanaOS
+       /\        OS:        RiOS 2026 Full System (Bookworm LTS)
+      /  \       Editions:  All 4 Core Suites Active (Server, Cyber, Dev, Desktop)
+     / /\ \      Security:  Debian 12 Hardened / Zero-Trust Baseline
+    / /__\ \     Doc:       https://github.com/Ratanazen/RatanaOS
+   / /    \ \    
+  /_/      \_\   

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# RiOS Installation Media Integrity Verifier (1.0.0)
+# RiOS Installation Media Integrity Verifier (2026)
 # Validates checksums and verifies integrity of ISO or live installation media
 # ==============================================================================
 
@@ -23,7 +23,7 @@ DEFAULT_SHA="${ROOT_DIR}/build/RiOS.iso.sha256"
 print_banner() {
     echo -e "${BLUE}${BOLD}"
     echo "╔══════════════════════════════════════════════════════════╗"
-    echo "║       RiOS Media Integrity & Checksum Verifier (1.0.0)   ║"
+    echo "║       RiOS Media Integrity & Checksum Verifier (2026)   ║"
     echo "║      Verify ISO, USB Block Device & SquashFS Health      ║"
     echo "╚══════════════════════════════════════════════════════════╝"
     echo -e "${NC}"
